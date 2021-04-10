@@ -31,24 +31,49 @@ uint16_t resultB[34];   // Bus-Adr. 100-133
 uint16_t resultC[4];    // Bus-Adr. 200-203
 uint16_t resultD[19];   // Bus-Adr. 300-318
 uint16_t resultE[320];  // Bus-Adr. 500-819
-
+uint8_t cReg = 0;
 
 void loop() {
   startTime = millis();
   if (!mb.slave()) {
+    switch(cReg++) {
+      case 0:
+        mb.readIreg(1, 4,   resultA, 15, cbWrite);
+      break;
+      case 1:
+        mb.readIreg(1, 100, resultB, 25, cbWrite);
+      break;
+      case 2:
+        mb.readIreg(1, 200, resultC,  4, cbWrite);
+      break;
+      default:
+        for (int i = 0; i < 15 ; i++) {
+          yield();
+          Serial.print(i);Serial.print(" ");Serial.println(resultA[i]);
+        }
+        for (int i = 0; i < 34 ; i++) {
+          yield();
+          Serial.print(i);Serial.print(" ");Serial.println(resultB[i]);
+        }
+        for (int i = 0; i < 4 ; i++) {
+          yield();
+          Serial.print(i);Serial.print(" ");Serial.println(resultC[i]);
+        }
+        Serial.println(millis()-startTime);
+        
+        delay(5000);
+        cReg = 0;
+    }
+
+
     //mb.readIreg(1, 4,   resultA, 15, cbWrite);
-    mb.readIreg(1, 100, resultB, 2, cbWrite);
+    //mb.readIreg(1, 100, resultB, 2, cbWrite);
     //mb.readIreg(1, 200, resultC,  4, cbWrite);
     //mb.readIreg(1, 300, resultD, 19, cbWrite);
     //mb.readIreg(1, 300, resultE,320, cbWrite);
-    for (int i = 0; i < 15 ; i++)
-    {
-      yield();
-      Serial.print(i);Serial.print(" ");Serial.println(resultB[i]);
-    }
-    Serial.println(millis()-startTime);
+
   }
   mb.task();
-  delay(500);
+  //delay(500);
   yield();
 }
