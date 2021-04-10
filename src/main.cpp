@@ -1,3 +1,6 @@
+// Copyright (c) 2021 steff393
+// based on example from: https://github.com/emelianov/modbus-esp8266
+
 #include <Arduino.h>
 #include <ModbusRTU.h>
 #include <SoftwareSerial.h>
