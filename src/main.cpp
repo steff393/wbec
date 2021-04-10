@@ -9,6 +9,7 @@
 SoftwareSerial S(4, 5);
 
 ModbusRTU mb;
+long startTime;
 
 bool cbWrite(Modbus::ResultCode event, uint16_t transactionId, void* data) {
   Serial.printf_P("Request result: 0x%02X, Mem: %d\n", event, ESP.getFreeHeap());
@@ -24,14 +25,28 @@ void setup() {
 
 uint16_t result[5];
 
+
+uint16_t resultA[15];   // Bus-Adr. 4-18
+uint16_t resultB[34];   // Bus-Adr. 100-133
+uint16_t resultC[4];    // Bus-Adr. 200-203
+uint16_t resultD[19];   // Bus-Adr. 300-318
+uint16_t resultE[320];  // Bus-Adr. 500-819
+
+
 void loop() {
+  startTime = millis();
   if (!mb.slave()) {
-    mb.readIreg(1, 8, result, 5, cbWrite);
-    Serial.printf_P("result: 0x%02X, test: %d\n", result[0], 0x42);
-    Serial.printf_P("result: 0x%02X, test: %d\n", result[1], 0x42);
-    Serial.printf_P("result: 0x%02X, test: %d\n", result[2], 0x42);
-    Serial.printf_P("result: 0x%02X, test: %d\n", result[3], 0x42);
-    Serial.printf_P("result: 0x%02X, test: %d\n", result[4], 0x42);
+    //mb.readIreg(1, 4,   resultA, 15, cbWrite);
+    mb.readIreg(1, 100, resultB, 2, cbWrite);
+    //mb.readIreg(1, 200, resultC,  4, cbWrite);
+    //mb.readIreg(1, 300, resultD, 19, cbWrite);
+    //mb.readIreg(1, 300, resultE,320, cbWrite);
+    for (int i = 0; i < 15 ; i++)
+    {
+      yield();
+      Serial.print(i);Serial.print(" ");Serial.println(resultB[i]);
+    }
+    Serial.println(millis()-startTime);
   }
   mb.task();
   delay(500);

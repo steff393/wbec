@@ -21,4 +21,4 @@ S2 = 0000
 S3 = 0 (6A min)  
 S4 = 0001 (slave address)  
 S5 = 0000  
-S6 = 0000  
+S6 = 1000 (terminator 120 Ohm, only on last box)  
