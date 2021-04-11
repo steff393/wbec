@@ -9,7 +9,7 @@
 SoftwareSerial S(4, 5);
 
 ModbusRTU mb;
-long startTime;
+long startTime = 10001;
 long lastRead;
 long lastKey;
 
@@ -38,6 +38,7 @@ char buffer[40];
 uint16_t WdTime_Readv = 0;
 uint16_t WdTime_Readn = 0;
 uint16_t WdTime_Write = 15000;
+uint16_t content[400];
 
 void loop() {
   
@@ -46,8 +47,8 @@ void loop() {
   int key = Serial.read();
   switch (key) {
     case '1': Serial.println(key); WdTime_Write = 15000; mb.writeHreg(1, 257, &WdTime_Write,  1, cbWrite); break;
-    case '2': Serial.println(key); WdTime_Write = 15002; mb.writeHreg(1, 257, &WdTime_Write,  1, cbWrite); break;
-    case '3': Serial.println(key); WdTime_Write = 15003; mb.writeHreg(1, 257, &WdTime_Write,  1, cbWrite); break;
+    case '2': Serial.println(key); WdTime_Write = 30000; mb.writeHreg(1, 257, &WdTime_Write,  1, cbWrite); break;
+    case '3': Serial.println(key); WdTime_Write = 60000; mb.writeHreg(1, 257, &WdTime_Write,  1, cbWrite); break;
     default: ;
   }
 
@@ -55,31 +56,22 @@ void loop() {
 
     if (!mb.slave()) {
       switch(msgCnt++) {
-        case 0: mb.readIreg(1, 4,   resultA, 15, cbWrite); break;
-        case 1: mb.readIreg(1, 100, resultB, 25, cbWrite); break;
-        case 2: mb.readIreg(1, 125, &resultB[25], 9, cbWrite); break;
-        case 3: mb.readIreg(1, 200, resultC,  4, cbWrite); break;
-        case 4: mb.readHreg(1, 257, &WdTime_Readv,  1, cbWrite); break;
-        //case 5: mb.writeHreg(1, 257, &WdTime_Write,  1, cbWrite); break;
-        //case 6: mb.readHreg(1, 257, &WdTime_Readn,  1, cbWrite); break;
+        case 0: mb.readIreg(1, 4,   &content[0] ,  15, cbWrite); break;
+        case 1: mb.readIreg(1, 100, &content[15],  17, cbWrite); break;
+        case 2: mb.readIreg(1, 117, &content[32],  17, cbWrite); break;
+        case 3: mb.readIreg(1, 200, &content[49],   4, cbWrite); break;
+        case 4: mb.readIreg(1, 300, &content[53],  19, cbWrite); break;
+        case 5: mb.readIreg(1, 500, &content[72],  25, cbWrite); break;
+        case 6: mb.readIreg(1, 525, &content[97],  25, cbWrite); break;
+        case 7: mb.readIreg(1, 550, &content[122], 25, cbWrite); break;
+        case 8: mb.readIreg(1, 575, &content[147], 25, cbWrite); break;
+        case 9: mb.readHreg(1, 257, &content[392],  5, cbWrite); break;
         default:
-          for (int i = 5; i < 8 ; i++) {
-            Serial.print(i);Serial.print(" ");Serial.println(resultA[i]);
+          for (int i = 0; i < 400 ; i++) {
+            Serial.print(i);Serial.print(":");Serial.println(content[i]);
           }
-          //for (int i = 0; i < 34 ; i++) {
-            //Serial.print(i);Serial.print(" ");Serial.printf_P("Resp: %s\n", (char*) resultB);
-          //  Serial.print(i);Serial.print(" ");Serial.println(resultB[i]);
-          //}
-          //Serial.print("Test");Serial.print(" ");Serial.println((char*) resultB);
-          //strcpy(buffer, (char *) result);
-          //Serial.print("Test");Serial.print(" ");Serial.println(buffer);
-          //for (int i = 0; i < 4 ; i++) {
-          //  Serial.print(i);Serial.print(" ");Serial.println(resultC[i]);
-          //}
-          Serial.print("vorher ");Serial.print(" ");Serial.println(WdTime_Readv);
-          //Serial.print("Write..");Serial.print(" ");Serial.println(WdTime_Write);
-          //Serial.print("nachher");Serial.print(" ");Serial.println(WdTime_Readn);
-          Serial.println(millis()-startTime);
+          //Serial.print("vorher ");Serial.print(" ");Serial.println(WdTime_Readv);
+          Serial.print("Time:");Serial.println(millis()-startTime);
           
           startTime = millis();
           msgCnt = 0;
@@ -90,5 +82,5 @@ void loop() {
   }
   mb.task();
   yield();
-  delay(500);
+  //delay(500);
 }
