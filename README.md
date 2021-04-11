@@ -1,6 +1,10 @@
 # wbec
 Wifi interface to Heidelberg Wallbox Energy Control using ESP8266
 
+## Current Status
+- Communication via Modbus working
+- Registers can be read and are transmitted to serial debug terminal
+
 ## Materials
 - Heidelberg Wallbox Energy Control
 - NodeMCU
