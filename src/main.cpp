@@ -2,11 +2,33 @@
 // based on example from: https://github.com/emelianov/modbus-esp8266
 
 #include <Arduino.h>
+#include "ESPAsyncTCP.h"
+#include "ESPAsyncWebServer.h"
 #include <ModbusRTU.h>
 #include <SoftwareSerial.h>
+#include "wlan_key.h"
+
+
+AsyncWebServer server(80);
+
+void onRequest(AsyncWebServerRequest *request){
+  //Handle Unknown Request
+  request->send(404);
+}
+
+void onBody(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total){
+  //Handle body
+}
+
+void onUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final){
+  //Handle upload
+}
+
+
 // receivePin, transmitPin, inverse_logic, bufSize, isrBufSize
 // connect RX to NodeMCU D2 (GPIO4), TX to NodeMCU D1 (GPIO5)
 SoftwareSerial S(4, 5);
+
 
 ModbusRTU mb;
 long startTime = 10001;
@@ -20,6 +42,29 @@ bool cbWrite(Modbus::ResultCode event, uint16_t transactionId, void* data) {
 
 void setup() {
   Serial.begin(115200);
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  Serial.print("Connecting\n");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.print("Connected to WiFi\n");
+
+  // respond to GET requests on URL /heap
+  server.on("/heap", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(200, "text/plain", String(ESP.getFreeHeap()));
+  });
+
+  // Catch-All Handlers
+  // Any request that can not find a Handler that canHandle it
+  // ends in the callbacks below.
+  server.onNotFound(onRequest);
+  server.onFileUpload(onUpload);
+  server.onRequestBody(onBody);
+
+  server.begin();
+
   S.begin(19200, SWSERIAL_8E1);       // Wallbox Energy Control uses 19.200 bit/sec, 8 data bit, 1 parity bit (even), 1 stop bit
   mb.begin(&S, 14);                   // GPIO14, NodeMCU pin D5 --> connect to DE & RE
   mb.master();
@@ -77,5 +122,4 @@ void loop() {
   }
   mb.task();
   yield();
-  //delay(500);
 }
