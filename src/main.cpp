@@ -2,6 +2,7 @@
 // based on example from: https://github.com/emelianov/modbus-esp8266
 
 #include <Arduino.h>
+#include <ArduinoOTA.h>
 #include "AsyncJson.h"
 #include "ArduinoJson.h"
 #include "ESPAsyncTCP.h"
@@ -57,6 +58,8 @@ void setup() {
   }
   Serial.print("Connected to WiFi\n");
 
+
+  // setup the Webserver and Json
   // respond to GET requests on URL /heap
   server.on("/heap", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(200, "text/plain", String(ESP.getFreeHeap()));
@@ -66,23 +69,41 @@ void setup() {
     request->send(200, "application/json", "{\"message\":\"Welcome\"}");
   });
 
-  server.on("/get-message", HTTP_GET, [](AsyncWebServerRequest *request) {
-    StaticJsonDocument<100> data;
-    if (request->hasParam("pcbTemp"))
+  server.on("/json", HTTP_GET, [](AsyncWebServerRequest *request) {
+    char tmp[10]; 
+    StaticJsonDocument<500> data;
+    if (request->hasParam("set"))
     {
-      //data["wbec"] = request->getParam("message")->value();
-      data["wbec"] = content[5];
+      // modify values
+      data["wbec"] = request->getParam("set")->value();
+      //data["wbec"] = content[5];
     }
-    else if (request->hasParam("voltage"))
+    else
     {
+      // provide the complete content
       //data["wbec"] = request->getParam("message")->value();
-      data["wbec"] = content[6];
-    } else 
-    {
-      data["wbec"] = "No message parameter";
+      //data["wbec"] = "No message parameter";
+      data["wbec"][0]["slaveID"]  = 1;
+      sprintf(tmp, "0x%04X", content[0]);
+      data["wbec"][0]["version"]  = tmp;
+      data["wbec"][0]["chgStat"]  = content[1];
+      data["wbec"][0]["currL1"]   = content[2];
+      data["wbec"][0]["currL2"]   = content[3];
+      data["wbec"][0]["currL3"]   = content[4];
+      data["wbec"][0]["pcbTemp"]  = content[5];
+      data["wbec"][0]["voltL1"]   = content[6];
+      data["wbec"][0]["voltL2"]   = content[7];
+      data["wbec"][0]["voltL3"]   = content[8];
+      data["wbec"][0]["extLock"]  = content[9];
+      data["wbec"][0]["power"]    = content[10];
+
+      data["wbec"][0]["currMax"]  = content[15];
+      data["wbec"][0]["currMin"]  = content[16];
     }
+
     String response;
     serializeJson(data, response);
+    Serial.println(response);
     request->send(200, "application/json", response);
   });
 
@@ -112,6 +133,11 @@ void setup() {
 
   server.begin();
 
+  // setup the OTA server
+  ArduinoOTA.setHostname(otaHost);
+  ArduinoOTA.begin();
+
+  // setup SoftwareSerial and Modbus Master
   S.begin(19200, SWSERIAL_8E1);       // Wallbox Energy Control uses 19.200 bit/sec, 8 data bit, 1 parity bit (even), 1 stop bit
   mb.begin(&S, 14);                   // GPIO14, NodeMCU pin D5 --> connect to DE & RE
   mb.master();
@@ -119,6 +145,7 @@ void setup() {
 
 
 void loop() {
+  ArduinoOTA.handle();
 
   int key = Serial.read();
   switch (key) {
