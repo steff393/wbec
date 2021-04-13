@@ -2,6 +2,8 @@
 // based on example from: https://github.com/emelianov/modbus-esp8266
 
 #include <Arduino.h>
+#include "AsyncJson.h"
+#include "ArduinoJson.h"
 #include "ESPAsyncTCP.h"
 #include "ESPAsyncWebServer.h"
 #include <ModbusRTU.h>
@@ -55,6 +57,42 @@ void setup() {
   server.on("/heap", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(200, "text/plain", String(ESP.getFreeHeap()));
   });
+
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(200, "application/json", "{\"message\":\"Welcome\"}");
+  });
+
+  server.on("/get-message", HTTP_GET, [](AsyncWebServerRequest *request) {
+    StaticJsonDocument<100> data;
+    if (request->hasParam("message"))
+    {
+      data["message"] = request->getParam("message")->value();
+    }
+    else
+    {
+      data["message"] = "No message parameter";
+    }
+    String response;
+    serializeJson(data, response);
+    request->send(200, "application/json", response);
+  });
+  
+  AsyncCallbackJsonWebHandler *handler = new AsyncCallbackJsonWebHandler("/post-message", [](AsyncWebServerRequest *request, JsonVariant &json) {
+    StaticJsonDocument<200> data;
+    if (json.is<JsonArray>())
+    {
+      data = json.as<JsonArray>();
+    }
+    else if (json.is<JsonObject>())
+    {
+      data = json.as<JsonObject>();
+    }
+    String response;
+    serializeJson(data, response);
+    request->send(200, "application/json", response);
+    Serial.println(response);
+  });
+  server.addHandler(handler);
 
   // Catch-All Handlers
   // Any request that can not find a Handler that canHandle it
