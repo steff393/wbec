@@ -25,20 +25,14 @@ void setup() {
   mb.master();
 }
 
-uint16_t result[5];
 
-
-uint16_t resultA[15];   // Bus-Adr. 4-18
-uint16_t resultB[34];   // Bus-Adr. 100-133
-uint16_t resultC[4];    // Bus-Adr. 200-203
-uint16_t resultD[19];   // Bus-Adr. 300-318
-uint16_t resultE[320];  // Bus-Adr. 500-819
 uint8_t msgCnt = 0;
 char buffer[40];
 uint16_t WdTime_Readv = 0;
 uint16_t WdTime_Readn = 0;
 uint16_t WdTime_Write = 15000;
 uint16_t content[400];
+uint16_t StdByDisable = 4;
 
 void loop() {
   
@@ -66,8 +60,9 @@ void loop() {
         case 7: mb.readIreg(1, 550, &content[122], 25, cbWrite); break;
         case 8: mb.readIreg(1, 575, &content[147], 25, cbWrite); break;
         case 9: mb.readHreg(1, 257, &content[392],  5, cbWrite); break;
+        case 10: mb.writeHreg(1, 258, &StdByDisable,  1, cbWrite); break;
         default:
-          for (int i = 0; i < 400 ; i++) {
+          for (int i = 5; i < 9 ; i++) {
             Serial.print(i);Serial.print(":");Serial.println(content[i]);
           }
           //Serial.print("vorher ");Serial.print(" ");Serial.println(WdTime_Readv);
