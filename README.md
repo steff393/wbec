@@ -4,6 +4,9 @@ Wifi interface to Heidelberg Wallbox Energy Control using ESP8266
 ## Current Status
 - Communication via Modbus working
 - Registers can be read and are transmitted to serial debug terminal
+- Registers can be read via JSON
+- Standby of Wallbox is inhibited by sending every 10s the register 257 with value 4
+- Update via WiFi
 
 ## Contact
 In case of any questions, feel free to open an issue ;-)
