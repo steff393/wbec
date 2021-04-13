@@ -34,8 +34,12 @@ SoftwareSerial S(4, 5);
 
 ModbusRTU mb;
 long startTime = 10001;
-long lastRead;
-long lastKey;
+
+uint8_t msgCnt = 0;
+uint16_t WdTime_Readv = 0;
+uint16_t WdTime_Write = 15000;
+uint16_t content[400];
+uint16_t StdByDisable = 4;
 
 bool cbWrite(Modbus::ResultCode event, uint16_t transactionId, void* data) {
   Serial.printf_P("Request result: 0x%02X, Mem: %d\n", event, ESP.getFreeHeap());
@@ -64,19 +68,24 @@ void setup() {
 
   server.on("/get-message", HTTP_GET, [](AsyncWebServerRequest *request) {
     StaticJsonDocument<100> data;
-    if (request->hasParam("message"))
+    if (request->hasParam("pcbTemp"))
     {
-      data["message"] = request->getParam("message")->value();
+      //data["wbec"] = request->getParam("message")->value();
+      data["wbec"] = content[5];
     }
-    else
+    else if (request->hasParam("voltage"))
     {
-      data["message"] = "No message parameter";
+      //data["wbec"] = request->getParam("message")->value();
+      data["wbec"] = content[6];
+    } else 
+    {
+      data["wbec"] = "No message parameter";
     }
     String response;
     serializeJson(data, response);
     request->send(200, "application/json", response);
   });
-  
+
   AsyncCallbackJsonWebHandler *handler = new AsyncCallbackJsonWebHandler("/post-message", [](AsyncWebServerRequest *request, JsonVariant &json) {
     StaticJsonDocument<200> data;
     if (json.is<JsonArray>())
@@ -109,17 +118,7 @@ void setup() {
 }
 
 
-uint8_t msgCnt = 0;
-char buffer[40];
-uint16_t WdTime_Readv = 0;
-uint16_t WdTime_Readn = 0;
-uint16_t WdTime_Write = 15000;
-uint16_t content[400];
-uint16_t StdByDisable = 4;
-
 void loop() {
-  
-  
 
   int key = Serial.read();
   switch (key) {
