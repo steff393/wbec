@@ -34,15 +34,18 @@ SoftwareSerial S(4, 5);
 
 
 ModbusRTU mb;
-long startTime = 10001;
-bool _handlingOTA = false;
-uint8_t msgCnt = 0;
-uint16_t WdTime_Readv = 0;
-uint16_t WdTime_Write = 15000;
-uint16_t content[400];
-uint16_t StdByDisable = 4;
+uint32_t  modbusLastTime = 0;
+uint32_t  modbusCycleTime = 5000;
+uint8_t   modbusResultCode = 0;
+bool      _handlingOTA = false;
+uint8_t   msgCnt = 0;
+uint16_t  writeReg = 0;
+uint16_t  writeVal = 0;
+uint16_t  content[400];
+uint16_t  StdByDisable = 4;
 
 bool cbWrite(Modbus::ResultCode event, uint16_t transactionId, void* data) {
+  modbusResultCode = event;
   Serial.printf_P("Request result: 0x%02X, Mem: %d\n", event, ESP.getFreeHeap());
   return true;
 }
@@ -85,43 +88,54 @@ void setup() {
   });
 
   server.on("/json", HTTP_GET, [](AsyncWebServerRequest *request) {
-    char tmp[10]; 
-    StaticJsonDocument<500> data;
-    if (request->hasParam("set"))
-    {
-      // modify values
-      data["wbec"] = request->getParam("set")->value();
-      //data["wbec"] = content[5];
+    StaticJsonDocument<600> data;
+    // modify values
+    if (request->hasParam("wdTmOut")) {
+      writeReg = 257;
+      writeVal = request->getParam("wdTmOut")->value().toInt();
     }
-    else
-    {
-      // provide the complete content
-      //data["wbec"] = request->getParam("message")->value();
-      //data["wbec"] = "No message parameter";
-      data["wbec"][0]["slaveID"]  = 1;
-      sprintf(tmp, "0x%04X", content[0]);
-      data["wbec"][0]["version"]  = String(content[0], HEX);   //tmp;
-      data["wbec"][0]["chgStat"]  = content[1];
-      data["wbec"][0]["currL1"]   = content[2];
-      data["wbec"][0]["currL2"]   = content[3];
-      data["wbec"][0]["currL3"]   = content[4];
-      data["wbec"][0]["pcbTemp"]  = content[5];
-      data["wbec"][0]["voltL1"]   = content[6];
-      data["wbec"][0]["voltL2"]   = content[7];
-      data["wbec"][0]["voltL3"]   = content[8];
-      data["wbec"][0]["extLock"]  = content[9];
-      data["wbec"][0]["power"]    = content[10];
-
-      data["wbec"][0]["currMax"]  = content[15];
-      data["wbec"][0]["currMin"]  = content[16];
-
-      data["wbec"][0]["logStr"]   = getAscii(17,32);
-      data["wbec"][0]["wdTmOut"]  = content[392];
-      data["wbec"][0]["standby"]  = content[393];
-      data["wbec"][0]["remLock"]  = content[394];
-      data["wbec"][0]["currLim"]  = content[395];
-      data["wbec"][0]["currFs"]   = content[396];
+    if (request->hasParam("currLim")) {
+      uint16_t val = request->getParam("currLim")->value().toInt();
+      if (val == 0 || (val >=60 && val <=160)) {
+        writeReg = 261;
+        writeVal = val;
+      }
     }
+    if (request->hasParam("cycleTm")) {
+      uint16_t val = request->getParam("cycleTm")->value().toInt();
+      if (val >=500) {
+        modbusCycleTime = val;
+      }
+    }
+
+    // provide the complete content
+    data["modbus"]["cfg"]["cycleTm"]  = modbusCycleTime;
+    data["modbus"]["state"]["resCode"]  = String(modbusResultCode, HEX);
+    data["modbus"]["state"]["lastTm"]  = modbusLastTime;
+    data["modbus"]["state"]["millis"]  = millis();
+
+    data["wbec"][0]["slaveID"]  = 1;
+    data["wbec"][0]["version"]  = String(content[0], HEX);
+    data["wbec"][0]["chgStat"]  = content[1];
+    data["wbec"][0]["currL1"]   = content[2];
+    data["wbec"][0]["currL2"]   = content[3];
+    data["wbec"][0]["currL3"]   = content[4];
+    data["wbec"][0]["pcbTemp"]  = content[5];
+    data["wbec"][0]["voltL1"]   = content[6];
+    data["wbec"][0]["voltL2"]   = content[7];
+    data["wbec"][0]["voltL3"]   = content[8];
+    data["wbec"][0]["extLock"]  = content[9];
+    data["wbec"][0]["power"]    = content[10];
+
+    data["wbec"][0]["currMax"]  = content[15];
+    data["wbec"][0]["currMin"]  = content[16];
+
+    data["wbec"][0]["logStr"]   = getAscii(17,32);
+    data["wbec"][0]["wdTmOut"]  = content[392];
+    data["wbec"][0]["standby"]  = content[393];
+    data["wbec"][0]["remLock"]  = content[394];
+    data["wbec"][0]["currLim"]  = content[396];
+    data["wbec"][0]["currFs"]   = content[397];
 
     String response;
     serializeJson(data, response);
@@ -161,29 +175,21 @@ void setup() {
 
   ArduinoOTA.onStart([]() 
   {
-      _handlingOTA = true;
+    _handlingOTA = true;
   });
 
   // setup SoftwareSerial and Modbus Master
   S.begin(19200, SWSERIAL_8E1);       // Wallbox Energy Control uses 19.200 bit/sec, 8 data bit, 1 parity bit (even), 1 stop bit
   mb.begin(&S, 14);                   // GPIO14, NodeMCU pin D5 --> connect to DE & RE
   mb.master();
+  Serial.println(millis());
 }
 
 
 void loop() {
   ArduinoOTA.handle();
   if(!_handlingOTA) {
-    int key = Serial.read();
-    switch (key) {
-      case '1': Serial.println(key); WdTime_Write = 15000; mb.writeHreg(1, 257, &WdTime_Write,  1, cbWrite); break;
-      case '2': Serial.println(key); WdTime_Write = 30000; mb.writeHreg(1, 257, &WdTime_Write,  1, cbWrite); break;
-      case '3': Serial.println(key); WdTime_Write = 60000; mb.writeHreg(1, 257, &WdTime_Write,  1, cbWrite); break;
-      default: ;
-    }
-
-    if (millis()-startTime > 10000) {
-
+    if (modbusLastTime == 0 || millis() > modbusLastTime + modbusCycleTime) {
       if (!mb.slave()) {
         switch(msgCnt++) {
           case 0: mb.readIreg(1, 4,   &content[0] ,  15, cbWrite); break;
@@ -197,14 +203,20 @@ void loop() {
           //case 8: mb.readIreg(1, 575, &content[147], 25, cbWrite); break;
           case 3: mb.readHreg(1, 257, &content[392],  5, cbWrite); break;
           case 4: mb.writeHreg(1, 258, &StdByDisable,  1, cbWrite); break;
+          case 5: 
+            if (writeReg) {
+              mb.writeHreg(1, writeReg, &writeVal,  1, cbWrite); 
+              writeReg = 0;
+              writeVal = 0;
+              break;
+            }
           default:
             for (int i = 5; i < 9 ; i++) {
               Serial.print(i);Serial.print(":");Serial.println(content[i]);
             }
-            //Serial.print("vorher ");Serial.print(" ");Serial.println(WdTime_Readv);
-            Serial.print("Time:");Serial.println(millis()-startTime);
+            Serial.print("Time:");Serial.println(millis()-modbusLastTime);
             
-            startTime = millis();
+            modbusLastTime = millis();
             msgCnt = 0;
         }
 

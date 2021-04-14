@@ -32,10 +32,21 @@ S6 = 1000 (terminator 120 Ohm, only on last box)
 
 ## Examples
 
+Get current status:
 ```c++
 http://192.168.xx.yy/json
 
 {
+  "modbus": {
+    "cfg": {
+      "cycleTm": 5000
+    },
+    "state": {
+      "resCode": "0",
+      "lastTm": 103717,
+      "millis": 104894
+    }
+  },
   "wbec": [
     {
       "slaveID": 1,
@@ -45,8 +56,8 @@ http://192.168.xx.yy/json
       "currL2": 0,
       "currL3": 0,
       "pcbTemp": 322,
-      "voltL1": 231,
-      "voltL2": 8,
+      "voltL1": 232,
+      "voltL2": 9,
       "voltL3": 9,
       "extLock": 1,
       "power": 0,
@@ -61,4 +72,14 @@ http://192.168.xx.yy/json
     }
   ]
 }
+```
+
+Set allowed current:
+```c++
+http://192.168.xx.yy/json?currLim=130
+```
+
+Set Watchdog timeout:
+```c++
+http://192.168.xx.yy/json?wdTmOut=20000
 ```
