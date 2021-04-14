@@ -13,10 +13,11 @@ In case of any questions, feel free to open an issue ;-)
 
 ## Materials
 - Heidelberg Wallbox Energy Control
-- NodeMCU
+- NodeMCU, e.g. https://www.amazon.de/AZDelivery-NodeMCU-ESP8266-ESP-12E-Development/dp/B0754HWZSQ/ref=sr_1_4?__mk_de_DE=%C3%85M%C3%85%C5%BD%C3%95%C3%91&dchild=1&keywords=NodeMCU&qid=1618435569&sr=8-4
 - TTL-RS485-Adapter, e.g. https://www.amazon.de/gp/product/B07DK4QG6H/ref=ppx_yo_dt_b_asin_title_o03_s00?ie=UTF8&psc=1
 
 ## Connections
+RS485-Adapter --> NodeMCU
 DI --> D1  
 DE --> D5  
 RE --> D5  
