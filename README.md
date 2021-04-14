@@ -39,19 +39,25 @@ http://192.168.xx.yy/json
   "wbec": [
     {
       "slaveID": 1,
-      "version": "0x0108",
+      "version": "108",
       "chgStat": 2,
       "currL1": 0,
       "currL2": 0,
       "currL3": 0,
-      "pcbTemp": 333,
-      "voltL1": 233,
-      "voltL2": 9,
+      "pcbTemp": 322,
+      "voltL1": 231,
+      "voltL2": 8,
       "voltL3": 9,
       "extLock": 1,
       "power": 0,
       "currMax": 16,
-      "currMin": 6
+      "currMin": 6,
+      "logStr": "<item no> <mfgDate> <serial>",
+      "wdTmOut": 15000,
+      "standby": 4,
+      "remLock": 1,
+      "currLim": 0,
+      "currFs": 0
     }
   ]
 }
