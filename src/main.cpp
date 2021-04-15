@@ -127,10 +127,10 @@ void setup() {
     data["wbec"][0]["voltL3"]   = content[8];
     data["wbec"][0]["extLock"]  = content[9];
     data["wbec"][0]["power"]    = content[10];
-
+    data["wbec"][0]["energyP"]   = (float)((uint32_t) content[11] << 16 | (uint32_t)content[12]) / 1000.0;
+    data["wbec"][0]["energyI"]   = (float)((uint32_t) content[13] << 16 | (uint32_t)content[14]) / 1000.0;
     data["wbec"][0]["currMax"]  = content[15];
     data["wbec"][0]["currMin"]  = content[16];
-
     data["wbec"][0]["logStr"]   = getAscii(17,32);
     data["wbec"][0]["wdTmOut"]  = content[49];
     data["wbec"][0]["standby"]  = content[50];
