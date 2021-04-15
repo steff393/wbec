@@ -7,6 +7,7 @@
 #include "ArduinoJson.h"
 #include "ESPAsyncTCP.h"
 #include "ESPAsyncWebServer.h"
+#include "loadManager.h"
 #include <ModbusRTU.h>
 #include <SoftwareSerial.h>
 #include "wlan_key.h"
@@ -41,7 +42,7 @@ bool      _handlingOTA = false;
 uint8_t   msgCnt = 0;
 uint16_t  writeReg = 0;
 uint16_t  writeVal = 0;
-uint16_t  content[400];
+uint16_t  content[55];
 uint16_t  StdByDisable = 4;
 
 bool cbWrite(Modbus::ResultCode event, uint16_t transactionId, void* data) {
@@ -131,11 +132,11 @@ void setup() {
     data["wbec"][0]["currMin"]  = content[16];
 
     data["wbec"][0]["logStr"]   = getAscii(17,32);
-    data["wbec"][0]["wdTmOut"]  = content[392];
-    data["wbec"][0]["standby"]  = content[393];
-    data["wbec"][0]["remLock"]  = content[394];
-    data["wbec"][0]["currLim"]  = content[396];
-    data["wbec"][0]["currFs"]   = content[397];
+    data["wbec"][0]["wdTmOut"]  = content[49];
+    data["wbec"][0]["standby"]  = content[50];
+    data["wbec"][0]["remLock"]  = content[51];
+    data["wbec"][0]["currLim"]  = content[53];
+    data["wbec"][0]["currFs"]   = content[54];
 
     String response;
     serializeJson(data, response);
@@ -195,13 +196,7 @@ void loop() {
           case 0: mb.readIreg(1, 4,   &content[0] ,  15, cbWrite); break;
           case 1: mb.readIreg(1, 100, &content[15],  17, cbWrite); break;
           case 2: mb.readIreg(1, 117, &content[32],  17, cbWrite); break;
-          //case 3: mb.readIreg(1, 200, &content[49],   4, cbWrite); break;
-          //case 4: mb.readIreg(1, 300, &content[53],  19, cbWrite); break;
-          //case 5: mb.readIreg(1, 500, &content[72],  25, cbWrite); break;
-          //case 6: mb.readIreg(1, 525, &content[97],  25, cbWrite); break;
-          //case 7: mb.readIreg(1, 550, &content[122], 25, cbWrite); break;
-          //case 8: mb.readIreg(1, 575, &content[147], 25, cbWrite); break;
-          case 3: mb.readHreg(1, 257, &content[392],  5, cbWrite); break;
+          case 3: mb.readHreg(1, 257, &content[49],  5, cbWrite); break;
           case 4: mb.writeHreg(1, 258, &StdByDisable,  1, cbWrite); break;
           case 5: 
             if (writeReg) {
@@ -215,8 +210,15 @@ void loop() {
               Serial.print(i);Serial.print(":");Serial.println(content[i]);
             }
             Serial.print("Time:");Serial.println(millis()-modbusLastTime);
-            
             modbusLastTime = millis();
+
+            // 1st trial implementation of a simple loadManager
+            lm_setWbState(1, content[1], 60, 160);
+            lm_setWbState(2, 6, 60, 160);
+            lm_setWbState(3, 0, 60, 160);
+            lm_updateWbLimits();
+            Serial.print("Allowed Current WB2: ");Serial.println(lm_getWbLimit(2));
+
             msgCnt = 0;
         }
 
