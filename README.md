@@ -1,5 +1,9 @@
 # wbec
-Wifi interface to Heidelberg Wallbox Energy Control using ESP8266
+Wifi interface to Heidelberg Wallbox Energy Control using ESP8266  
+  
+The Heidelberg Wallbox Energy Control is a high quality wallbox, but it offers only a Modbus interface.
+Goal of this project is to establish an Wifi interface, which also acts as Modbus master (for local external load management).
+Focus is on price: < 10 Euro (only NodeMCU and RS485 adapter needed)
 
 ## Features (as of now)
 - Communication via Modbus working
