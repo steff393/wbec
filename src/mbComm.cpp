@@ -14,18 +14,19 @@ ModbusRTU mb;
 uint16_t  content[WB_CNT][55];
 
 uint32_t  modbusLastTime = 0;
-uint32_t  modbusCycleTime = 1000;
-uint8_t   modbusResultCode = 0;
+uint32_t  modbusCycleTime = 10000;
+uint8_t   modbusResultCode[WB_CNT];
 uint8_t   msgCnt = 0;
 uint8_t   id = 0;
 uint16_t  StdByDisable = 4;
+uint8_t   writeId  = 0;
 uint16_t  writeReg = 0;
 uint16_t  writeVal = 0;
 
 
 bool cbWrite(Modbus::ResultCode event, uint16_t transactionId, void* data) {
-  modbusResultCode = event;
-  Serial.printf_P("Request result: 0x%02X, Mem: %d\n", event, ESP.getFreeHeap());
+  modbusResultCode[mb.slave()-1] = event;
+  Serial.printf_P("Request result: 0x%02X, BusID: %d\n", event, /*ESP.getFreeHeap()*/ mb.slave());
   return true;
 }
 
@@ -41,7 +42,8 @@ void mb_setup() {
 void mb_handle() {
 	if (writeReg) {
 		if (!mb.slave()) {
-			mb.writeHreg(1, writeReg, &writeVal,  1, cbWrite); 
+			mb.writeHreg(writeId + 1, writeReg, &writeVal,  1, cbWrite); 
+			writeId	 = 0;
 			writeReg = 0;
 			writeVal = 0;
 		}
@@ -49,27 +51,28 @@ void mb_handle() {
 
 	if (modbusLastTime == 0 || millis() > modbusLastTime + modbusCycleTime) {
       if (!mb.slave()) {
-				switch(msgCnt++) {
-					case 0: mb.readIreg(id+1, 4,   &content[id][0] ,  15, cbWrite); break;
-					case 1: mb.readIreg(id+1, 100, &content[id][15],  17); break;
-					case 2: mb.readIreg(id+1, 117, &content[id][32],  17); break;
-					case 3: mb.readHreg(id+1,  REG_WD_TIME_OUT,  &content[id][49],   5); break;
-					case 4: mb.writeHreg(id+1, REG_STANDBY_CTRL, &StdByDisable,  1); break;
-					default:
-						Serial.print("Time:");Serial.println(millis()-modbusLastTime);
-						modbusLastTime = millis();
-						// 1st trial implementation of a simple loadManager
-						lm_setWbState(id, content[id][1], 60, 160);
-						lm_updateWbLimits();
-
-						msgCnt = 0;
-						if (++id >= WB_CNT) { id = 0;}
-						Serial.print("Next BusID: ");Serial.println(id+1);
+				//Serial.print(millis());Serial.print(": Sending to BusID: ");Serial.print(id+1);Serial.print(" with msgCnt = ");Serial.println(msgCnt);
+				switch(msgCnt) {
+					case 0:                              mb.readIreg(id+1,    4,              &content[id][0] ,  15, cbWrite); break;
+					case 1: if (!modbusResultCode[id]) { mb.readIreg (id+1, 100,              &content[id][15],  17); } break;
+					case 2: if (!modbusResultCode[id]) { mb.readIreg (id+1, 117,              &content[id][32],  17); } break;
+					case 3: if (!modbusResultCode[id]) { mb.readHreg (id+1, REG_WD_TIME_OUT,  &content[id][49],   5); } break;
+					case 4: if (!modbusResultCode[id]) { mb.writeHreg(id+1, REG_STANDBY_CTRL, &StdByDisable,      1); } break;
+					default: ; // do nothing, will be handled below
 				}
-				//if (modbusResultCode != Modbus::EX_SUCCESS) {
-				//	// on error: immediately go-on with next wallbox to avoid timeouts
-				//	msgCnt = 250;
-				//}
+				id++;
+				if (id >= WB_CNT) {
+					id = 0;
+					msgCnt++;
+				}
+				if (msgCnt > 4) {
+					msgCnt = 0;
+					Serial.print("Time:");Serial.println(millis()-modbusLastTime);
+					modbusLastTime = millis();
+					// 1st trial implementation of a simple loadManager
+					lm_setWbState(id, content[id][1], content[id][16], content[id][15]);
+					lm_updateWbLimits();
+				}
       }
     }
     mb.task();
@@ -77,7 +80,8 @@ void mb_handle() {
 }
 
 
-void mb_writeReg(uint16_t reg, uint16_t val) {
+void mb_writeReg(uint8_t id, uint16_t reg, uint16_t val) {
+	writeId  = id;
 	writeReg = reg;
 	writeVal = val;
 }

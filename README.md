@@ -35,7 +35,7 @@ A/B --> A/B of wallbox
 S1 > 5 (16A max)  
 S2 = 0000  
 S3 = 0 (6A min)  
-S4 = 0001 (slave address)  
+S4 = 0001 (slave address, Bus-ID)  
 S5 = 0000  
 S6 = 1000 (terminator 120 Ohm, only on last box)  
 
@@ -48,44 +48,104 @@ http://192.168.xx.yy/json
 {
   "modbus": {
     "cfg": {
-      "cycleTm": 5000
+      "cycleTm": 10000
     },
     "state": {
-      "resCode": "0",
-      "lastTm": 103717,
-      "millis": 104894
+      "lastTm": 185055,
+      "millis": 186817
     }
   },
-  "wbec": [
+  "boxes": [
     {
-      "slaveID": 1,
+      "busId": 1,
       "version": "108",
       "chgStat": 2,
       "currL1": 0,
       "currL2": 0,
       "currL3": 0,
-      "pcbTemp": 322,
+      "pcbTemp": 333,
       "voltL1": 232,
       "voltL2": 9,
       "voltL3": 9,
       "extLock": 1,
       "power": 0,
+      "energyP": 0,
+      "energyI": 0.003,
       "currMax": 16,
       "currMin": 6,
       "logStr": "<item no> <mfgDate> <serial>",
       "wdTmOut": 15000,
       "standby": 4,
       "remLock": 1,
+      "currLim": 130,
+      "currFs": 0
+    },
+    {
+      "busId": 2,
+      "version": "0",
+      "chgStat": 0,
+      "currL1": 0,
+      "currL2": 0,
+      "currL3": 0,
+      "pcbTemp": 0,
+      "voltL1": 0,
+      "voltL2": 0,
+      "voltL3": 0,
+      "extLock": 0,
+      "power": 0,
+      "energyP": 0,
+      "energyI": 0,
+      "currMax": 0,
+      "currMin": 0,
+      "logStr": "",
+      "wdTmOut": 0,
+      "standby": 0,
+      "remLock": 0,
+      "currLim": 0,
+      "currFs": 0
+    },
+    {
+      "busId": 3,
+      "version": "0",
+      "chgStat": 0,
+      "currL1": 0,
+      "currL2": 0,
+      "currL3": 0,
+      "pcbTemp": 0,
+      "voltL1": 0,
+      "voltL2": 0,
+      "voltL3": 0,
+      "extLock": 0,
+      "power": 0,
+      "energyP": 0,
+      "energyI": 0,
+      "currMax": 0,
+      "currMin": 0,
+      "logStr": "",
+      "wdTmOut": 0,
+      "standby": 0,
+      "remLock": 0,
       "currLim": 0,
       "currFs": 0
     }
+  ],
+  "load": [
+    0,
+    0,
+    0
+  ],
+  "resCode": [
+    "0",
+    "e4",
+    "e4"
   ]
 }
 ```
 
 Set allowed current:
 ```c++
-http://192.168.xx.yy/json?currLim=130
+http://192.168.xx.yy/json?currLim=120      --> to set current limit to 12A (on the box with id=0, i.e. ModBus Bus-ID=1)
+http://192.168.xx.yy/json?currLim=60&id=2  --> to set current limit to 6A on the box with id=2 (i.e. ModBus Bus-ID=3)
 ```
 
 Set Watchdog timeout:

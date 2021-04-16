@@ -73,14 +73,19 @@ void setup() {
 
   server.on("/json", HTTP_GET, [](AsyncWebServerRequest *request) {
     DynamicJsonDocument data(2048);
+    uint8_t id = 0;
     // modify values
+    if (request->hasParam("id")) {
+      id = request->getParam("id")->value().toInt();
+    }
+
     if (request->hasParam("wdTmOut")) {
-      mb_writeReg(REG_WD_TIME_OUT, request->getParam("wdTmOut")->value().toInt());
+      mb_writeReg(id, REG_WD_TIME_OUT, request->getParam("wdTmOut")->value().toInt());
     }
     if (request->hasParam("currLim")) {
       uint16_t val = request->getParam("currLim")->value().toInt();
       if (val == 0 || (val >= CURR_ABS_MIN && val <= CURR_ABS_MAX)) {
-        mb_writeReg(REG_CURR_LIMIT, val);
+        mb_writeReg(id, REG_CURR_LIMIT, val);
       }
     }
     if (request->hasParam("cycleTm")) {
@@ -92,7 +97,7 @@ void setup() {
 
     // provide the complete content
     data["modbus"]["cfg"]["cycleTm"]  = modbusCycleTime;
-    data["modbus"]["state"]["resCode"]  = String(modbusResultCode, HEX);
+    //data["modbus"]["state"]["resCode"]  = String(modbusResultCode[0], HEX);
     data["modbus"]["state"]["lastTm"]  = modbusLastTime;
     data["modbus"]["state"]["millis"]  = millis();
 
@@ -121,7 +126,7 @@ void setup() {
       data["boxes"][i]["currFs"]   = content[i][54];
     
       data["load"][i]   = lm_getWbLimit(i+1);
-      Serial.println(lm_getWbLimit(i+1));
+      data["resCode"][i]   = String(modbusResultCode[i], HEX);
     }
 
     String response;
