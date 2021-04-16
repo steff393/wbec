@@ -55,26 +55,14 @@ void mb_handle() {
 					case 2: mb.readIreg(id+1, 117, &content[id][32],  17); break;
 					case 3: mb.readHreg(id+1,  REG_WD_TIME_OUT,  &content[id][49],   5); break;
 					case 4: mb.writeHreg(id+1, REG_STANDBY_CTRL, &StdByDisable,  1); break;
-					/*case 5: 
-						if (writeReg) {
-							mb.writeHreg(id+1, writeReg, &writeVal,  1, cbWrite); 
-							writeReg = 0;
-							writeVal = 0;
-							break;
-						}*/
 					default:
 						Serial.print("Time:");Serial.println(millis()-modbusLastTime);
 						modbusLastTime = millis();
-
 						// 1st trial implementation of a simple loadManager
-						lm_setWbState(1, content[id][1], 60, 160);
-						lm_setWbState(2, 6, 60, 160);
-						lm_setWbState(3, 0, 60, 160);
+						lm_setWbState(id, content[id][1], 60, 160);
 						lm_updateWbLimits();
-						//Serial.print("Allowed Current WB2: ");Serial.println(lm_getWbLimit(2));
 
 						msgCnt = 0;
-
 						if (++id >= WB_CNT) { id = 0;}
 						Serial.print("Next BusID: ");Serial.println(id+1);
 				}
