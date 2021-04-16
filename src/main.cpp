@@ -1,5 +1,4 @@
 // Copyright (c) 2021 steff393
-// based on example from: https://github.com/emelianov/modbus-esp8266
 
 #include <Arduino.h>
 #include <ArduinoOTA.h>
@@ -9,8 +8,7 @@
 #include "ESPAsyncWebServer.h"
 #include "globalConfig.h"
 #include "loadManager.h"
-#include <ModbusRTU.h>
-#include <SoftwareSerial.h>
+#include "mbComm.h"
 #include "wlan_key.h"
 
 
@@ -30,35 +28,20 @@ void onUpload(AsyncWebServerRequest *request, String filename, size_t index, uin
 }
 
 
-// receivePin, transmitPin, inverse_logic, bufSize, isrBufSize
-SoftwareSerial S(PIN_RO, PIN_DI);
 
 
-ModbusRTU mb;
-uint32_t  modbusLastTime = 0;
-uint32_t  modbusCycleTime = 5000;
-uint8_t   modbusResultCode = 0;
 bool      _handlingOTA = false;
-uint8_t   msgCnt = 0;
-uint16_t  writeReg = 0;
-uint16_t  writeVal = 0;
-uint16_t  content[55];
-uint16_t  StdByDisable = 4;
 
-bool cbWrite(Modbus::ResultCode event, uint16_t transactionId, void* data) {
-  modbusResultCode = event;
-  Serial.printf_P("Request result: 0x%02X, Mem: %d\n", event, ESP.getFreeHeap());
-  return true;
-}
 
-String getAscii(uint8_t from, uint8_t len) {
+
+String getAscii(uint8_t id, uint8_t from, uint8_t len) {
   char ch;
   String ret = "";
   // translate the uint16 values into a String
   for (int i = from; i < (from + len) ; i++) {
-    ch = (char) (content[i] & 0x00FF);
+    ch = (char) (content[id][i] & 0x00FF);
     ret += ch;
-    ch = (char) (content[i] >> 8);
+    ch = (char) (content[id][i] >> 8);
     ret += ch;
   }
   return(ret);
@@ -89,17 +72,15 @@ void setup() {
   });
 
   server.on("/json", HTTP_GET, [](AsyncWebServerRequest *request) {
-    StaticJsonDocument<1024> data;
+    DynamicJsonDocument data(2048);
     // modify values
     if (request->hasParam("wdTmOut")) {
-      writeReg = REG_WD_TIME_OUT;
-      writeVal = request->getParam("wdTmOut")->value().toInt();
+      mb_writeReg(REG_WD_TIME_OUT, request->getParam("wdTmOut")->value().toInt());
     }
     if (request->hasParam("currLim")) {
       uint16_t val = request->getParam("currLim")->value().toInt();
       if (val == 0 || (val >= CURR_ABS_MIN && val <= CURR_ABS_MAX)) {
-        writeReg = REG_CURR_LIMIT;
-        writeVal = val;
+        mb_writeReg(REG_CURR_LIMIT, val);
       }
     }
     if (request->hasParam("cycleTm")) {
@@ -115,29 +96,30 @@ void setup() {
     data["modbus"]["state"]["lastTm"]  = modbusLastTime;
     data["modbus"]["state"]["millis"]  = millis();
 
-    data["wbec"][0]["busId"]    = 1;
-    data["wbec"][0]["version"]  = String(content[0], HEX);
-    data["wbec"][0]["chgStat"]  = content[1];
-    data["wbec"][0]["currL1"]   = content[2];
-    data["wbec"][0]["currL2"]   = content[3];
-    data["wbec"][0]["currL3"]   = content[4];
-    data["wbec"][0]["pcbTemp"]  = content[5];
-    data["wbec"][0]["voltL1"]   = content[6];
-    data["wbec"][0]["voltL2"]   = content[7];
-    data["wbec"][0]["voltL3"]   = content[8];
-    data["wbec"][0]["extLock"]  = content[9];
-    data["wbec"][0]["power"]    = content[10];
-    data["wbec"][0]["energyP"]   = (float)((uint32_t) content[11] << 16 | (uint32_t)content[12]) / 1000.0;
-    data["wbec"][0]["energyI"]   = (float)((uint32_t) content[13] << 16 | (uint32_t)content[14]) / 1000.0;
-    data["wbec"][0]["currMax"]  = content[15];
-    data["wbec"][0]["currMin"]  = content[16];
-    data["wbec"][0]["logStr"]   = getAscii(17,32);
-    data["wbec"][0]["wdTmOut"]  = content[49];
-    data["wbec"][0]["standby"]  = content[50];
-    data["wbec"][0]["remLock"]  = content[51];
-    data["wbec"][0]["currLim"]  = content[53];
-    data["wbec"][0]["currFs"]   = content[54];
-    for (int i = 0; i < MAX_BUS_ID; i++) {
+    for (int i = 0; i < WB_CNT; i++) {
+      data["boxes"][i]["busId"]    = i+1;
+      data["boxes"][i]["version"]  = String(content[i][0], HEX);
+      data["boxes"][i]["chgStat"]  = content[i][1];
+      data["boxes"][i]["currL1"]   = content[i][2];
+      data["boxes"][i]["currL2"]   = content[i][3];
+      data["boxes"][i]["currL3"]   = content[i][4];
+      data["boxes"][i]["pcbTemp"]  = content[i][5];
+      data["boxes"][i]["voltL1"]   = content[i][6];
+      data["boxes"][i]["voltL2"]   = content[i][7];
+      data["boxes"][i]["voltL3"]   = content[i][8];
+      data["boxes"][i]["extLock"]  = content[i][9];
+      data["boxes"][i]["power"]    = content[i][10];
+      data["boxes"][i]["energyP"]   = (float)((uint32_t) content[i][11] << 16 | (uint32_t)content[i][12]) / 1000.0;
+      data["boxes"][i]["energyI"]   = (float)((uint32_t) content[i][13] << 16 | (uint32_t)content[i][14]) / 1000.0;
+      data["boxes"][i]["currMax"]  = content[i][15];
+      data["boxes"][i]["currMin"]  = content[i][16];
+      data["boxes"][i]["logStr"]   = getAscii(i, 17,32);
+      data["boxes"][i]["wdTmOut"]  = content[i][49];
+      data["boxes"][i]["standby"]  = content[i][50];
+      data["boxes"][i]["remLock"]  = content[i][51];
+      data["boxes"][i]["currLim"]  = content[i][53];
+      data["boxes"][i]["currFs"]   = content[i][54];
+    
       data["load"][i]   = lm_getWbLimit(i+1);
       Serial.println(lm_getWbLimit(i+1));
     }
@@ -183,10 +165,7 @@ void setup() {
     _handlingOTA = true;
   });
 
-  // setup SoftwareSerial and Modbus Master
-  S.begin(19200, SWSERIAL_8E1);       // Wallbox Energy Control uses 19.200 bit/sec, 8 data bit, 1 parity bit (even), 1 stop bit
-  mb.begin(&S, PIN_DE_RE);
-  mb.master();
+  mb_setup();
   Serial.println(millis());
 }
 
@@ -194,39 +173,6 @@ void setup() {
 void loop() {
   ArduinoOTA.handle();
   if(!_handlingOTA) {
-    if (modbusLastTime == 0 || millis() > modbusLastTime + modbusCycleTime) {
-      if (!mb.slave()) {
-        switch(msgCnt++) {
-          case 0: mb.readIreg(1, 4,   &content[0] ,  15, cbWrite); break;
-          case 1: mb.readIreg(1, 100, &content[15],  17, cbWrite); break;
-          case 2: mb.readIreg(1, 117, &content[32],  17, cbWrite); break;
-          case 3: mb.readHreg(1,  REG_WD_TIME_OUT,  &content[49],   5, cbWrite); break;
-          case 4: mb.writeHreg(1, REG_STANDBY_CTRL, &StdByDisable,  1, cbWrite); break;
-          case 5: 
-            if (writeReg) {
-              mb.writeHreg(1, writeReg, &writeVal,  1, cbWrite); 
-              writeReg = 0;
-              writeVal = 0;
-              break;
-            }
-          default:
-            Serial.print("Time:");Serial.println(millis()-modbusLastTime);
-            modbusLastTime = millis();
-
-            // 1st trial implementation of a simple loadManager
-            lm_setWbState(1, content[1], 60, 160);
-            lm_setWbState(2, 6, 60, 160);
-            lm_setWbState(3, 0, 60, 160);
-            lm_updateWbLimits();
-            Serial.print("Allowed Current WB2: ");Serial.println(lm_getWbLimit(2));
-
-            msgCnt = 0;
-        }
-
-      }
-
-    }
-    mb.task();
-    yield();
+    mb_handle();
   }
 }
