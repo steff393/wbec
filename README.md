@@ -14,7 +14,7 @@ Focus is on price: < 10 Euro (only NodeMCU and RS485 adapter needed)
 - Simple prototype of a local load management
 
 ## Contact
-In case of any questions, feel free to open an issue ;-)
+In case of any questions, feel free to send a mail (wbec393@gmail.com) or open an issue  ;-)
 
 ## Materials
 - Heidelberg Wallbox Energy Control
@@ -144,8 +144,8 @@ http://192.168.xx.yy/json
 
 Set allowed current:
 ```c++
-http://192.168.xx.yy/json?currLim=120      --> to set current limit to 12A (on the box with id=0, i.e. ModBus Bus-ID=1)
-http://192.168.xx.yy/json?currLim=60&id=2  --> to set current limit to 6A on the box with id=2 (i.e. ModBus Bus-ID=3)
+http://192.168.xx.yy/json?currLim=120      --> set current limit to 12A (on the box with id=0, i.e. ModBus Bus-ID=1)
+http://192.168.xx.yy/json?currLim=60&id=2  --> set current limit to 6A on the box with id=2 (i.e. ModBus Bus-ID=3)
 ```
 
 Set Watchdog timeout:
