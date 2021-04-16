@@ -7,6 +7,7 @@
 #include "ArduinoJson.h"
 #include "ESPAsyncTCP.h"
 #include "ESPAsyncWebServer.h"
+#include "globalConfig.h"
 #include "loadManager.h"
 #include <ModbusRTU.h>
 #include <SoftwareSerial.h>
@@ -30,8 +31,7 @@ void onUpload(AsyncWebServerRequest *request, String filename, size_t index, uin
 
 
 // receivePin, transmitPin, inverse_logic, bufSize, isrBufSize
-// connect RX to NodeMCU D2 (GPIO4), TX to NodeMCU D1 (GPIO5)
-SoftwareSerial S(4, 5);
+SoftwareSerial S(PIN_RO, PIN_DI);
 
 
 ModbusRTU mb;
@@ -54,13 +54,13 @@ bool cbWrite(Modbus::ResultCode event, uint16_t transactionId, void* data) {
 String getAscii(uint8_t from, uint8_t len) {
   char ch;
   String ret = "";
+  // translate the uint16 values into a String
   for (int i = from; i < (from + len) ; i++) {
     ch = (char) (content[i] & 0x00FF);
     ret += ch;
     ch = (char) (content[i] >> 8);
     ret += ch;
   }
-  Serial.println(ret);
   return(ret);
 }
 
@@ -89,16 +89,16 @@ void setup() {
   });
 
   server.on("/json", HTTP_GET, [](AsyncWebServerRequest *request) {
-    StaticJsonDocument<600> data;
+    StaticJsonDocument<1024> data;
     // modify values
     if (request->hasParam("wdTmOut")) {
-      writeReg = 257;
+      writeReg = REG_WD_TIME_OUT;
       writeVal = request->getParam("wdTmOut")->value().toInt();
     }
     if (request->hasParam("currLim")) {
       uint16_t val = request->getParam("currLim")->value().toInt();
-      if (val == 0 || (val >=60 && val <=160)) {
-        writeReg = 261;
+      if (val == 0 || (val >= CURR_ABS_MIN && val <= CURR_ABS_MAX)) {
+        writeReg = REG_CURR_LIMIT;
         writeVal = val;
       }
     }
@@ -115,7 +115,7 @@ void setup() {
     data["modbus"]["state"]["lastTm"]  = modbusLastTime;
     data["modbus"]["state"]["millis"]  = millis();
 
-    data["wbec"][0]["slaveID"]  = 1;
+    data["wbec"][0]["busId"]    = 1;
     data["wbec"][0]["version"]  = String(content[0], HEX);
     data["wbec"][0]["chgStat"]  = content[1];
     data["wbec"][0]["currL1"]   = content[2];
@@ -137,6 +137,10 @@ void setup() {
     data["wbec"][0]["remLock"]  = content[51];
     data["wbec"][0]["currLim"]  = content[53];
     data["wbec"][0]["currFs"]   = content[54];
+    for (int i = 0; i < MAX_BUS_ID; i++) {
+      data["load"][i]   = lm_getWbLimit(i+1);
+      Serial.println(lm_getWbLimit(i+1));
+    }
 
     String response;
     serializeJson(data, response);
@@ -181,7 +185,7 @@ void setup() {
 
   // setup SoftwareSerial and Modbus Master
   S.begin(19200, SWSERIAL_8E1);       // Wallbox Energy Control uses 19.200 bit/sec, 8 data bit, 1 parity bit (even), 1 stop bit
-  mb.begin(&S, 14);                   // GPIO14, NodeMCU pin D5 --> connect to DE & RE
+  mb.begin(&S, PIN_DE_RE);
   mb.master();
   Serial.println(millis());
 }
@@ -196,8 +200,8 @@ void loop() {
           case 0: mb.readIreg(1, 4,   &content[0] ,  15, cbWrite); break;
           case 1: mb.readIreg(1, 100, &content[15],  17, cbWrite); break;
           case 2: mb.readIreg(1, 117, &content[32],  17, cbWrite); break;
-          case 3: mb.readHreg(1, 257, &content[49],  5, cbWrite); break;
-          case 4: mb.writeHreg(1, 258, &StdByDisable,  1, cbWrite); break;
+          case 3: mb.readHreg(1,  REG_WD_TIME_OUT,  &content[49],   5, cbWrite); break;
+          case 4: mb.writeHreg(1, REG_STANDBY_CTRL, &StdByDisable,  1, cbWrite); break;
           case 5: 
             if (writeReg) {
               mb.writeHreg(1, writeReg, &writeVal,  1, cbWrite); 
@@ -206,9 +210,6 @@ void loop() {
               break;
             }
           default:
-            for (int i = 5; i < 9 ; i++) {
-              Serial.print(i);Serial.print(":");Serial.println(content[i]);
-            }
             Serial.print("Time:");Serial.println(millis()-modbusLastTime);
             modbusLastTime = millis();
 
