@@ -7,8 +7,10 @@
 #include "ESPAsyncTCP.h"
 #include "ESPAsyncWebServer.h"
 #include "globalConfig.h"
+#include "LittleFS.h"
 #include "loadManager.h"
 #include "mbComm.h"
+#include "SPIFFSEditor.h"
 #include "wlan_key.h"
 
 
@@ -152,6 +154,9 @@ void setup() {
   });
   server.addHandler(handler);
 
+  // add the SPIFFSEditor, which can be opened via "/edit"
+  server.addHandler(new SPIFFSEditor("" ,"" ,LittleFS));//http_username,http_password));
+
   // Catch-All Handlers
   // Any request that can not find a Handler that canHandle it
   // ends in the callbacks below.
@@ -171,6 +176,22 @@ void setup() {
   });
 
   mb_setup();
+
+  if(!LittleFS.begin()){ 
+    Serial.println("An Error has occurred while mounting LittleFS");
+    return;
+  }
+  File file = LittleFS.open("/test.txt", "r");
+  if(!file){
+    Serial.println("Failed to open file for reading");
+    return;
+  }
+  Serial.println("File Content:");
+  while(file.available()){
+    Serial.write(file.read());
+  }
+  file.close();
+
   Serial.println(millis());
 }
 
