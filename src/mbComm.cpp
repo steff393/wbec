@@ -24,8 +24,18 @@ uint16_t  writeReg = 0;
 uint16_t  writeVal = 0;
 
 
+void timeout(uint8_t id) {
+	for (int i =  1; i <= 16; i++) { content[id][i] = 0;	}
+	for (int i = 49; i <= 54; i++) { content[id][i] = 0;	}
+}
+
+
 bool cbWrite(Modbus::ResultCode event, uint16_t transactionId, void* data) {
-  modbusResultCode[mb.slave()-1] = event;
+  int id = mb.slave()-1;
+	modbusResultCode[id] = event;
+	if (event) {
+		timeout(id);
+	}
   Serial.printf_P("Request result: 0x%02X, BusID: %d\n", event, /*ESP.getFreeHeap()*/ mb.slave());
   return true;
 }
