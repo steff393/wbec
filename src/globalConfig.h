@@ -9,8 +9,8 @@
 #define CURR_ABS_MIN			 60		// absolute possible lower limit for current
 #define CURR_ABS_MAX			160		// absolute possible upper limit for current
 
-#define PIN_DI							5		// TX to NodeMCU D1 (GPIO5)
-#define PIN_RO							4		// RX to NodeMCU D2 (GPIO4)
-#define PIN_DE_RE					 14		// GPIO14, NodeMCU pin D5 --> connect to DE & RE
+#define PIN_DI							5		// GPIO5, NodeMCU pin D1, TX --> connect to DI 
+#define PIN_RO							2		// GPIO2, NodeMCU pin D4, RX --> connect to RO 
+#define PIN_DE_RE					  4		// GPIO4, NodeMCU pin D2     --> connect to DE & RE
 
 #endif	/* GLOBALCONFIG_H */
