@@ -12,6 +12,8 @@
 #include "mbComm.h"
 #include "SPIFFSEditor.h"
 #include "wlan_key.h"
+#define WIFI_MANAGER_USE_ASYNC_WEB_SERVER
+#include <WiFiManager.h>
 
 
 AsyncWebServer server(80);
@@ -53,7 +55,12 @@ String getAscii(uint8_t id, uint8_t from, uint8_t len) {
 
 void setup() {
   Serial.begin(115200);
-  WiFi.mode(WIFI_STA);
+
+  WiFiManager wifiManager;
+  //wifiManager.autoConnect("wbec", "cebw1234");
+  wifiManager.autoConnect("wbec");
+
+  /*WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   Serial.print("Connecting\n");
   while (WiFi.status() != WL_CONNECTED) {
@@ -61,7 +68,7 @@ void setup() {
     Serial.print(".");
   }
   Serial.print("Connected to WiFi\n");
-
+  */
 
   // setup the Webserver and Json
   // respond to GET requests on URL /heap
@@ -69,9 +76,9 @@ void setup() {
     request->send(200, "text/plain", String(ESP.getFreeHeap()));
   });
 
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(200, "application/json", "{\"message\":\"Welcome\"}");
-  });
+  //server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+  //  request->send(200, "application/json", "{\"message\":\"Welcome\"}");
+  //});
 
   server.on("/json", HTTP_GET, [](AsyncWebServerRequest *request) {
     DynamicJsonDocument data(2048);
@@ -200,5 +207,18 @@ void loop() {
   ArduinoOTA.handle();
   if(!_handlingOTA) {
     mb_handle();
+    int key = Serial.read();
+    if (key == '1') {
+      Serial.print("%; Pressed: "); Serial.println(key);
+      WiFiManager wifiManager;
+      wifiManager.startConfigPortal("wbec");
+      Serial.println("connected...yeey :)");
+    }
+    if (key == '2') {
+      Serial.print("%; Pressed: "); Serial.println(key);
+      WiFiManager wifiManager;
+      wifiManager.resetSettings();
+      Serial.println("deleted!");
+    }
   }
 }
