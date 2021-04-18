@@ -20,6 +20,10 @@ In case of any questions, feel free to send a mail (wbec393@gmail.com) or open a
 - NodeMCU, ESP8266
 - TTL-RS485-Adapter
 
+<p align="center">
+  <img src="/images/wbec.jpg">
+</p>
+
 ## Switch configuration of wallbox
 S1 > 5 (16A max)  
 S2 = 0000  
