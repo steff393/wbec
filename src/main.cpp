@@ -37,6 +37,32 @@ void onUpload(AsyncWebServerRequest *request, String filename, size_t index, uin
 bool      _handlingOTA = false;
 
 
+String processor(const String& var){
+  String ledState;
+  Serial.println(var);
+  if(var == "STATE"){
+    if(modbusResultCode[0]==0x00){
+      ledState = "ON";
+    }
+    else{
+      ledState = "OFF";
+    }
+    Serial.print(ledState);
+    return ledState;
+  }
+  else if (var == "TEMPERATURE"){
+    return String(content[0][5]);
+  }
+  else if (var == "HUMIDITY"){
+    return String(content[0][6]);
+  }
+  else if (var == "PRESSURE"){
+    return String(content[0][53]);
+  }  
+}
+
+
+
 
 String getAscii(uint8_t id, uint8_t from, uint8_t len) {
   char ch;
@@ -76,7 +102,34 @@ void setup() {
   });
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(200, "application/json", "{\"message\":\"Welcome\"}");
+    //request->send(200, "application/json", "{\"message\":\"Welcome\"}");
+    request->send(LittleFS, "/index.html", String(), false, processor);
+  });
+
+  server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/style.css", "text/css");
+  });
+
+  server.on("/on", HTTP_GET, [](AsyncWebServerRequest *request){
+    mb_writeReg(0, REG_CURR_LIMIT, 160);
+    request->send(LittleFS, "/index.html", String(), false, processor);
+  });
+
+  server.on("/off", HTTP_GET, [](AsyncWebServerRequest *request){
+    mb_writeReg(0, REG_CURR_LIMIT, 0);  
+    request->send(LittleFS, "/index.html", String(), false, processor);
+  });
+
+  server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", String(content[0][5]).c_str());
+  });
+  
+  server.on("/humidity", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", String(content[0][6]).c_str());
+  });
+  
+  server.on("/pressure", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", String(content[0][53]).c_str());
   });
 
   server.on("/resetwifi", HTTP_GET, [](AsyncWebServerRequest *request){
