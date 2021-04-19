@@ -5,17 +5,17 @@
 -->
 <html>
 <head>
-  <title>ESP8266 Web Server</title>
+  <title>wbec</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-  <h1>ESP8266 Web Server</h1>
-  <p>GPIO state<strong> %STATE%</strong></p>
+  <h1>wbec</h1>
+  <p>Connection<strong> %STATE%</strong></p>
   <p>
-    <a href="/on"><button class="button">ON</button></a>
-    <a href="/off"><button class="button button2">OFF</button></a>
+    <a href="/on"><button class="button">16 A</button></a>
+    <a href="/off"><button class="button button2">0 A</button></a>
   </p>
   <p>
     <span class="sensor-labels">Temperature</span>
@@ -23,14 +23,14 @@
     <sup class="units">&deg;C</sup>
   </p>
   <p>
-    <span class="sensor-labels">Humidity</span>
+    <span class="sensor-labels">Voltage L1</span>
     <span id="humidity">%HUMIDITY%</span>
-    <sup class="units">&#37;</sup>
+    <sup class="units">V</sup>
   </p>
   <p>
-    <span class="sensor-labels">Pressure</span>
+    <span class="sensor-labels">Current Limit</span>
     <span id="pressure">%PRESSURE%</span>
-    <sup class="units">hPa</sup>
+    <sup class="units">A</sup>
   </p>
 </body>
 <script>

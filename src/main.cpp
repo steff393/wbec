@@ -48,17 +48,20 @@ String processor(const String& var){
       ledState = "OFF";
     }
     Serial.print(ledState);
-    return ledState;
+    return(ledState);
   }
   else if (var == "TEMPERATURE"){
-    return String(content[0][5]);
+    float tmp = content[0][5] / 10.0;
+    return(String(tmp));
   }
   else if (var == "HUMIDITY"){
-    return String(content[0][6]);
+    float tmp = content[0][6] / 10.0;
+    return(String(tmp));
   }
   else if (var == "PRESSURE"){
-    return String(content[0][53]);
-  }  
+    float tmp = content[0][53] / 10.0;
+    return(String(tmp));
+  } else return(String("notFound"));
 }
 
 
@@ -121,15 +124,18 @@ void setup() {
   });
 
   server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(content[0][5]).c_str());
+    float tmp = content[0][5] / 10.0;
+    request->send_P(200, "text/plain", String(tmp).c_str());
   });
   
   server.on("/humidity", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(content[0][6]).c_str());
+    float tmp = content[0][6] / 10.0;
+    request->send_P(200, "text/plain", String(tmp).c_str());
   });
   
   server.on("/pressure", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(content[0][53]).c_str());
+    float tmp = content[0][53] / 10.0;
+    request->send_P(200, "text/plain", String(tmp).c_str());
   });
 
   server.on("/resetwifi", HTTP_GET, [](AsyncWebServerRequest *request){

@@ -32,10 +32,10 @@ p {
   background-color: #f44336;
 }
 .units {
-  font-size: 1.2rem;
+  font-size: 1.5rem;
  }
 .sensor-labels {
   font-size: 1.5rem;
-  vertical-align:middle;
-  padding-bottom: 15px;
+  /***vertical-align:middle;***/
+  /***padding-bottom: 15px;***/
 }
