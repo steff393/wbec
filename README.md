@@ -39,7 +39,7 @@ First simple web interface:
   <img src="https://i.ibb.co/kKSkL1X/wbec-Web-Interface.png">
 </p>
 
-Get current status (here for 3 connected wallboxes):
+Get current status (here for 3 configured wallboxes, but only 1 connected):
 ```c++
 http://192.168.xx.yy/json
 
