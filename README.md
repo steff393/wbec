@@ -34,8 +34,12 @@ S5 = 0000
 S6 = 1000 (terminator 120 Ohm, only on last box)  
 
 ## Examples
+First simple web interface:
+<p align="center">
+  <img src="https://i.ibb.co/kKSkL1X/wbec-Web-Interface.png">
+</p>
 
-Get current status:
+Get current status (here for 3 connected wallboxes):
 ```c++
 http://192.168.xx.yy/json
 

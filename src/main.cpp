@@ -54,11 +54,11 @@ String processor(const String& var){
     float tmp = content[0][5] / 10.0;
     return(String(tmp));
   }
-  else if (var == "HUMIDITY"){
+  else if (var == "VOLTAGE"){
     float tmp = content[0][6] / 10.0;
     return(String(tmp));
   }
-  else if (var == "PRESSURE"){
+  else if (var == "CURRENT"){
     float tmp = content[0][53] / 10.0;
     return(String(tmp));
   } else return(String("notFound"));
@@ -113,14 +113,23 @@ void setup() {
     request->send(LittleFS, "/style.css", "text/css");
   });
 
-  server.on("/on", HTTP_GET, [](AsyncWebServerRequest *request){
-    mb_writeReg(0, REG_CURR_LIMIT, 160);
+  server.on("/web", HTTP_GET, [](AsyncWebServerRequest *request){
+    uint8_t id = 0;
+    if (request->hasParam("currLim")) {
+      uint16_t val = request->getParam("currLim")->value().toInt();
+      if (val == 0 || (val >= CURR_ABS_MIN && val <= CURR_ABS_MAX)) {
+        mb_writeReg(id, REG_CURR_LIMIT, val);
+      }
+    }
     request->send(LittleFS, "/index.html", String(), false, processor);
   });
 
-  server.on("/off", HTTP_GET, [](AsyncWebServerRequest *request){
-    mb_writeReg(0, REG_CURR_LIMIT, 0);  
-    request->send(LittleFS, "/index.html", String(), false, processor);
+  server.on("/state", HTTP_GET, [](AsyncWebServerRequest *request){
+    if(modbusResultCode[0]==0x00) {
+      request->send_P(200, "text/plain", String("ON").c_str());
+    } else {
+      request->send_P(200, "text/plain", String("OFF").c_str());
+    }
   });
 
   server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -128,12 +137,11 @@ void setup() {
     request->send_P(200, "text/plain", String(tmp).c_str());
   });
   
-  server.on("/humidity", HTTP_GET, [](AsyncWebServerRequest *request){
-    float tmp = content[0][6] / 10.0;
-    request->send_P(200, "text/plain", String(tmp).c_str());
+  server.on("/voltage", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", String(content[0][6]).c_str());
   });
   
-  server.on("/pressure", HTTP_GET, [](AsyncWebServerRequest *request){
+  server.on("/current", HTTP_GET, [](AsyncWebServerRequest *request){
     float tmp = content[0][53] / 10.0;
     request->send_P(200, "text/plain", String(tmp).c_str());
   });

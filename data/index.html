@@ -12,10 +12,13 @@
 </head>
 <body>
   <h1>wbec</h1>
-  <p>Connection<strong> %STATE%</strong></p>
+  <p>Connection<strong> <span id="state">%STATE% </span></strong></p>
   <p>
-    <a href="/on"><button class="button">16 A</button></a>
-    <a href="/off"><button class="button button2">0 A</button></a>
+    <a href="/web?currLim=0"><button class="button button2">0 A</button></a>
+    <a href="/web?currLim=60"><button class="button">6 A</button></a>
+    <a href="/web?currLim=100"><button class="button">10 A</button></a>
+    <a href="/web?currLim=120"><button class="button">12 A</button></a>
+    <a href="/web?currLim=160"><button class="button">16 A</button></a>
   </p>
   <p>
     <span class="sensor-labels">Temperature</span>
@@ -24,16 +27,27 @@
   </p>
   <p>
     <span class="sensor-labels">Voltage L1</span>
-    <span id="humidity">%HUMIDITY%</span>
+    <span id="voltage">%VOLTAGE%</span>
     <sup class="units">V</sup>
   </p>
   <p>
     <span class="sensor-labels">Current Limit</span>
-    <span id="pressure">%PRESSURE%</span>
+    <span id="current">%CURRENT%</span>
     <sup class="units">A</sup>
   </p>
 </body>
 <script>
+  setInterval(function ( ) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("state").innerHTML = this.responseText;
+      }
+    };
+    xhttp.open("GET", "/state", true);
+    xhttp.send();
+  }, 2000 ) ;
+
   setInterval(function ( ) {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
@@ -43,28 +57,28 @@
     };
     xhttp.open("GET", "/temperature", true);
     xhttp.send();
-  }, 10000 ) ;
+  }, 2000 ) ;
 
   setInterval(function ( ) {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
-        document.getElementById("humidity").innerHTML = this.responseText;
+        document.getElementById("voltage").innerHTML = this.responseText;
       }
     };
-    xhttp.open("GET", "/humidity", true);
+    xhttp.open("GET", "/voltage", true);
     xhttp.send();
-  }, 10000 ) ;
+  }, 2000 ) ;
 
   setInterval(function ( ) {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
-        document.getElementById("pressure").innerHTML = this.responseText;
+        document.getElementById("current").innerHTML = this.responseText;
       }
     };
-    xhttp.open("GET", "/pressure", true);
+    xhttp.open("GET", "/current", true);
     xhttp.send();
-  }, 10000 ) ;
+  }, 2000 ) ;
 </script>
 </html>
