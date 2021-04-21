@@ -9,6 +9,7 @@ Goal of this project is to establish an Wifi interface, which also acts as Modbu
 - Registers can be read and are transmitted to serial debug terminal
 - Registers can be read/written via JSON web interface
 - Standby of Wallbox is inhibited by sending every 10s the register 257 with value 4
+- Prepared for supporting up to all 16 connected boxes
 - Simple prototype of a local load management
 - Update via WiFi (OTA)
 - Access point mode, to configure your WiFi network/password
