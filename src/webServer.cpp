@@ -85,6 +85,10 @@ void initWebserver() {
     request->send(LittleFS, "/style.css", "text/css");
   });
 
+  server.on("/cfg", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/cfg.json", "application/json");
+  });
+
   server.on("/web", HTTP_GET, [](AsyncWebServerRequest *request){
     uint8_t id = 0;
     if (request->hasParam("currLim")) {
