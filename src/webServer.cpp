@@ -141,16 +141,8 @@ void initWebserver() {
         mb_writeReg(id, REG_CURR_LIMIT, val);
       }
     }
-    if (request->hasParam("cycleTm")) {
-      uint16_t val = request->getParam("cycleTm")->value().toInt();
-      if (val >=500) {
-        modbusCycleTime = val;
-      }
-    }
 
     // provide the complete content
-    data["modbus"]["cfg"]["cycleTm"]  = modbusCycleTime;
-    //data["modbus"]["state"]["resCode"]  = String(modbusResultCode[0], HEX);
     data["modbus"]["state"]["lastTm"]  = modbusLastTime;
     data["modbus"]["state"]["millis"]  = millis();
 

@@ -7,6 +7,7 @@
 const char* cfgApSsid;	// SSID of the initial Access Point
 const char* cfgApPass;  // Password of the initial Access Point
 uint8_t cfgCntWb;		    // number of connected wallboxes in the system
+uint8_t cfgMbCycleTime;	// cycle time of the modbus (in seconds)
 
 
 bool loadConfig() {
@@ -37,9 +38,10 @@ bool loadConfig() {
     return false;
   }
 
-  cfgApSsid = doc["cfgApSsid"];
-  cfgApPass = doc["cfgApPass"];
-  cfgCntWb  = doc["cfgCntWb"];
+  cfgApSsid       = doc["cfgApSsid"];
+  cfgApPass       = doc["cfgApPass"];
+  cfgCntWb        = doc["cfgCntWb"];
+  cfgMbCycleTime  = doc["cfgMbCycleTime"]; 
 
   Serial.print("\nLoaded cfgApSsid: "); Serial.println(cfgApSsid);
   Serial.print("Loaded cfgApPass: "); Serial.println(cfgApPass);

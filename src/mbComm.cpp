@@ -16,7 +16,6 @@ ModbusRTU mb;
 uint16_t  content[WB_CNT][55];
 
 uint32_t  modbusLastTime = 0;
-uint32_t  modbusCycleTime = 10000;
 uint8_t   modbusResultCode[WB_CNT];
 uint8_t   msgCnt = 0;
 uint8_t   id = 0;
@@ -61,7 +60,7 @@ void mb_handle() {
 		}
 	}
 
-	if (modbusLastTime == 0 || millis() > modbusLastTime + modbusCycleTime) {
+	if (modbusLastTime == 0 || millis() > modbusLastTime + (cfgMbCycleTime*1000)) {
       if (!mb.slave()) {
 				//Serial.print(millis());Serial.print(": Sending to BusID: ");Serial.print(id+1);Serial.print(" with msgCnt = ");Serial.println(msgCnt);
 				switch(msgCnt) {

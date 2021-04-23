@@ -19,6 +19,7 @@
 extern const char* cfgApSsid;		// SSID of the initial Access Point
 extern const char* cfgApPass; 	// password of the initial Access Point
 extern uint8_t cfgCntWb;				// number of connected wallboxes in the system
+extern uint8_t cfgMbCycleTime;	// cycle time of the modbus (in seconds)
 
 extern bool loadConfig();
 //extern bool saveConfig();
