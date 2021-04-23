@@ -22,8 +22,13 @@ void setup() {
     return;
   }
 
+  if (!loadConfig()) {
+    Serial.println("Failed to load config");
+    return;
+  } 
+
   WiFiManager wifiManager;
-  wifiManager.autoConnect("wbec", "cebw1234");
+  wifiManager.autoConnect(cfgApSsid, cfgApPass);
 
   // setup the Webserver
   initWebserver();

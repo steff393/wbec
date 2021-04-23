@@ -1,3 +1,5 @@
+// Copyright (c) 2021 steff393
+
 #ifndef GLOBALCONFIG_H
 #define GLOBALCONFIG_H
 
@@ -12,5 +14,13 @@
 #define PIN_DI							5		// GPIO5, NodeMCU pin D1, TX --> connect to DI 
 #define PIN_RO							2		// GPIO2, NodeMCU pin D4, RX --> connect to RO 
 #define PIN_DE_RE					  4		// GPIO4, NodeMCU pin D2     --> connect to DE & RE
+
+
+extern const char* cfgApSsid;		// SSID of the initial Access Point
+extern const char* cfgApPass; 	// Password of the initial Access Point
+
+
+extern bool loadConfig();
+//extern bool saveConfig();
 
 #endif	/* GLOBALCONFIG_H */
