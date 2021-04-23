@@ -3,7 +3,7 @@
 #ifndef GLOBALCONFIG_H
 #define GLOBALCONFIG_H
 
-#define WB_CNT 			  		  3		// equals number of wallboxes in the system (NodeMCU has Bus-ID = 0)
+#define WB_CNT 			  		 16		// max. possible number of wallboxes in the system (NodeMCU has Bus-ID = 0)
 #define REG_WD_TIME_OUT 	257		// modbus register for "ModBus-Master Watchdog Timeout in ms"
 #define REG_STANDBY_CTRL	258		// modbus register for "Standby Function Control"
 #define REG_CURR_LIMIT		261		// modbus register for "Maximal current command"
@@ -17,8 +17,8 @@
 
 
 extern const char* cfgApSsid;		// SSID of the initial Access Point
-extern const char* cfgApPass; 	// Password of the initial Access Point
-
+extern const char* cfgApPass; 	// password of the initial Access Point
+extern uint8_t cfgCntWb;				// number of connected wallboxes in the system
 
 extern bool loadConfig();
 //extern bool saveConfig();

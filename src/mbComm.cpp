@@ -1,3 +1,5 @@
+// Copyright (c) 2021 steff393
+
 #include <Arduino.h>
 #include "globalConfig.h"
 #include "mbComm.h"
@@ -71,7 +73,7 @@ void mb_handle() {
 					default: ; // do nothing, will be handled below
 				}
 				id++;
-				if (id >= WB_CNT) {
+				if (id >= cfgCntWb) {
 					id = 0;
 					msgCnt++;
 				}

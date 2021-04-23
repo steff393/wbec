@@ -125,7 +125,7 @@ void initWebserver() {
   });
 
   server.on("/json", HTTP_GET, [](AsyncWebServerRequest *request) {
-    DynamicJsonDocument data(2048);
+    DynamicJsonDocument data((cfgCntWb+1)/2  * 1024);  // always 1024 byte for 2 wallboxes
     uint8_t id = 0;
     // modify values
     if (request->hasParam("id")) {
@@ -154,7 +154,7 @@ void initWebserver() {
     data["modbus"]["state"]["lastTm"]  = modbusLastTime;
     data["modbus"]["state"]["millis"]  = millis();
 
-    for (int i = 0; i < WB_CNT; i++) {
+    for (int i = 0; i < cfgCntWb; i++) {
       data["boxes"][i]["busId"]    = i+1;
       data["boxes"][i]["version"]  = String(content[i][0], HEX);
       data["boxes"][i]["chgStat"]  = content[i][1];

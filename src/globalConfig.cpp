@@ -5,7 +5,8 @@
 #include <LittleFS.h>
 
 const char* cfgApSsid;	// SSID of the initial Access Point
-const char* cfgApPass; // Password of the initial Access Point
+const char* cfgApPass;  // Password of the initial Access Point
+uint8_t cfgCntWb;		    // number of connected wallboxes in the system
 
 
 bool loadConfig() {
@@ -38,9 +39,11 @@ bool loadConfig() {
 
   cfgApSsid = doc["cfgApSsid"];
   cfgApPass = doc["cfgApPass"];
+  cfgCntWb  = doc["cfgCntWb"];
 
-  Serial.print("Loaded cfgApSsid: "); Serial.println(cfgApSsid);
+  Serial.print("\nLoaded cfgApSsid: "); Serial.println(cfgApSsid);
   Serial.print("Loaded cfgApPass: "); Serial.println(cfgApPass);
+  Serial.print("Loaded cfgCntWb: "); Serial.println(cfgCntWb);
   return true;
 }
 
