@@ -32,7 +32,7 @@ S2 = 0000
 S3 = 0 (6A min)  
 S4 = 0001 (slave address, Bus-ID)  
 S5 = 0000  
-S6 = 1000 (terminator 120 Ohm, only on last box)  
+S6 = 0100 (terminator 120 Ohm, only on last box)  
 
 ## Examples
 First simple web interface:
