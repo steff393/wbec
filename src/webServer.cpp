@@ -70,6 +70,19 @@ String getAscii(uint8_t id, uint8_t from, uint8_t len) {
   return(ret);
 }
 
+uint8_t getSignalQuality(int rssi)
+{
+    int quality = 0;
+    if (rssi <= -100) {
+        quality = 0;
+    } else if (rssi >= -50) {
+        quality = 100;
+    } else {
+        quality = 2 * (rssi + 100);
+    }
+    return quality;
+}
+
 void initWebserver() {
 	// respond to GET requests on URL /heap
   server.on("/heap", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -147,36 +160,39 @@ void initWebserver() {
     }
 
     // provide the complete content
+        for (int i = 0; i < cfgCntWb; i++) {
+      data["box"][i]["busId"]    = i+1;
+      data["box"][i]["version"]  = String(content[i][0], HEX);
+      data["box"][i]["chgStat"]  = content[i][1];
+      data["box"][i]["currL1"]   = content[i][2];
+      data["box"][i]["currL2"]   = content[i][3];
+      data["box"][i]["currL3"]   = content[i][4];
+      data["box"][i]["pcbTemp"]  = content[i][5];
+      data["box"][i]["voltL1"]   = content[i][6];
+      data["box"][i]["voltL2"]   = content[i][7];
+      data["box"][i]["voltL3"]   = content[i][8];
+      data["box"][i]["extLock"]  = content[i][9];
+      data["box"][i]["power"]    = content[i][10];
+      data["box"][i]["energyP"]   = (float)((uint32_t) content[i][11] << 16 | (uint32_t)content[i][12]) / 1000.0;
+      data["box"][i]["energyI"]   = (float)((uint32_t) content[i][13] << 16 | (uint32_t)content[i][14]) / 1000.0;
+      data["box"][i]["currMax"]  = content[i][15];
+      data["box"][i]["currMin"]  = content[i][16];
+      data["box"][i]["logStr"]   = getAscii(i, 17,32);
+      data["box"][i]["wdTmOut"]  = content[i][49];
+      data["box"][i]["standby"]  = content[i][50];
+      data["box"][i]["remLock"]  = content[i][51];
+      data["box"][i]["currLim"]  = content[i][53];
+      data["box"][i]["currFs"]   = content[i][54];
+      data["box"][i]["load"]     = lm_getWbLimit(i+1);
+      data["box"][i]["resCode"]  = String(modbusResultCode[i], HEX);
+    }
     data["modbus"]["state"]["lastTm"]  = modbusLastTime;
     data["modbus"]["state"]["millis"]  = millis();
-
-    for (int i = 0; i < cfgCntWb; i++) {
-      data["boxes"][i]["busId"]    = i+1;
-      data["boxes"][i]["version"]  = String(content[i][0], HEX);
-      data["boxes"][i]["chgStat"]  = content[i][1];
-      data["boxes"][i]["currL1"]   = content[i][2];
-      data["boxes"][i]["currL2"]   = content[i][3];
-      data["boxes"][i]["currL3"]   = content[i][4];
-      data["boxes"][i]["pcbTemp"]  = content[i][5];
-      data["boxes"][i]["voltL1"]   = content[i][6];
-      data["boxes"][i]["voltL2"]   = content[i][7];
-      data["boxes"][i]["voltL3"]   = content[i][8];
-      data["boxes"][i]["extLock"]  = content[i][9];
-      data["boxes"][i]["power"]    = content[i][10];
-      data["boxes"][i]["energyP"]   = (float)((uint32_t) content[i][11] << 16 | (uint32_t)content[i][12]) / 1000.0;
-      data["boxes"][i]["energyI"]   = (float)((uint32_t) content[i][13] << 16 | (uint32_t)content[i][14]) / 1000.0;
-      data["boxes"][i]["currMax"]  = content[i][15];
-      data["boxes"][i]["currMin"]  = content[i][16];
-      data["boxes"][i]["logStr"]   = getAscii(i, 17,32);
-      data["boxes"][i]["wdTmOut"]  = content[i][49];
-      data["boxes"][i]["standby"]  = content[i][50];
-      data["boxes"][i]["remLock"]  = content[i][51];
-      data["boxes"][i]["currLim"]  = content[i][53];
-      data["boxes"][i]["currFs"]   = content[i][54];
-    
-      data["load"][i]   = lm_getWbLimit(i+1);
-      data["resCode"][i]   = String(modbusResultCode[i], HEX);
-    }
+    data["wifi"]["bssid"] = WiFi.BSSIDstr();
+    uint8_t qrssi = WiFi.RSSI();
+    data["wifi"]["rssi"] = qrssi;
+    data["wifi"]["signal"] = getSignalQuality(qrssi);
+    data["wifi"]["channel"] = WiFi.channel();
 
     String response;
     serializeJson(data, response);
