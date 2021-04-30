@@ -1,5 +1,7 @@
 // Copyright (c) 2021 steff393
 
+#include "globalConfig.h"
+
 #ifndef MBCOMM_H
 #define MBCOMM_H
 

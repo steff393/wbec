@@ -6,6 +6,7 @@
 #include "ESPAsyncTCP.h"
 #include "ESPAsyncWebServer.h"
 #include "globalConfig.h"
+#include "goEmulator.h"
 #include "LittleFS.h"
 #include "loadManager.h"
 #include "mbComm.h"
@@ -199,6 +200,77 @@ void initWebserver() {
     Serial.println(response);
     request->send(200, "application/json", response);
   });
+
+  server.on("/status", HTTP_GET, [](AsyncWebServerRequest *request) {
+    DynamicJsonDocument data(1024); 
+    uint8_t i = 0;
+
+    switch(content[i][1]) {
+      case 2:  data["car"] = "1"; data["alw"] = "0"; break;
+      case 3:  data["car"] = "1"; data["alw"] = "1"; break;
+      case 4:  data["car"] = "3"; data["alw"] = "0"; break;
+      case 5:  data["car"] = "3"; data["alw"] = "1"; break;
+      case 6:  data["car"] = "3"; data["alw"] = "0"; break;   // alternatively 4
+      case 7:  data["car"] = "2"; data["alw"] = "1"; break;
+      default: data["car"] = "0"; data["alw"] = "0"; data["err"] = "10"; break; 
+    }
+    data["amp"] = String(content[i][53]/10);
+    data["err"] = "0";
+    data["stp"] = "0";
+    data["tmp"] = String(content[i][5]);
+    data["dws"] = String(goE_getDws());
+    data["ubi"] = "0";
+    data["eto"] = String(((uint32_t) content[i][13] << 16 | (uint32_t)content[i][14]) / 100);
+    data["nrg"][0] = content[i][6]; // L1
+    data["nrg"][1] = content[i][7]; // L2
+    data["nrg"][2] = content[i][8]; // L3
+    data["nrg"][3] = 0;
+    data["nrg"][4] = content[i][2]; // L1
+    data["nrg"][5] = content[i][3]; // L2
+    data["nrg"][6] = content[i][4]; // L3
+    data["nrg"][7] = 0;
+    data["nrg"][8] = 0;
+    data["nrg"][9] = 0;
+    data["nrg"][10] = 0;
+    data["nrg"][11] = content[i][10] / 10;
+    data["nrg"][12] = 0;
+    data["nrg"][13] = 0;
+    data["nrg"][14] = 0;
+    data["nrg"][15] = 0;
+    data["fwv"] = "40";
+
+    String response;
+    serializeJson(data, response);
+    Serial.println(response);
+    request->send(200, "application/json", response);
+  });
+
+server.on("/mqtt", HTTP_GET, [](AsyncWebServerRequest *request) {
+    DynamicJsonDocument data(1024);
+    uint8_t i = 0;
+    String cmd;
+
+    if (request->hasParam("payload")) {
+      Serial.println(request->getParam("payload")->value());
+      cmd = request->getParam("payload")->value().substring(0,3);
+      Serial.println(cmd);
+      Serial.println(request->getParam("payload")->value().substring(4));
+      if (cmd == "alw") {
+        data["alw"] = request->getParam("payload")->value().substring(4); // text after index 3
+        data["amp"] = "0";
+      }
+      if (cmd == "amp") {
+        data["alw"] = "0";
+        data["amp"] = request->getParam("payload")->value().substring(4); // text after index 3
+      }
+    }
+
+    String response;
+    serializeJson(data, response);
+    Serial.println(response);
+    request->send(200, "application/json", response);
+  });
+
 
   AsyncCallbackJsonWebHandler *handler = new AsyncCallbackJsonWebHandler("/post-message", [](AsyncWebServerRequest *request, JsonVariant &json) {
     StaticJsonDocument<200> data;

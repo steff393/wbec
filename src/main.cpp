@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <ArduinoOTA.h>
 #include "globalConfig.h"
+#include "goEmulator.h"
 #include "LittleFS.h"
 #include "mbComm.h"
 #include "SPIFFSEditor.h"
@@ -21,7 +22,13 @@ void setup() {
     Serial.println("An Error has occurred while mounting LittleFS");
     return;
   }
-
+/*
+  if (!saveConfig()) {
+    Serial.println("Failed to save initial config");
+  } else {
+    Serial.println("Config saved");
+  }
+*/
   if (!loadConfig()) {
     Serial.println("Failed to load config");
     return;
@@ -52,5 +59,6 @@ void loop() {
   ArduinoOTA.handle();
   if(!_handlingOTA) {
     mb_handle();
+    goE_handle();
   }
 }
