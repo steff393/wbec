@@ -83,7 +83,11 @@ http://192.168.xx.yy/json
       "chgStat": 0,
       ...
       "load": 0,
+<<<<<<< HEAD
       "resCode": "e4"
+=======
+      "resCode": "0"
+>>>>>>> 9e902bcad8f37f76a52c4d42dd11e780f061eeba
     }
   ],
   "modbus": {
