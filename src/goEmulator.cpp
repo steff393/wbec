@@ -40,7 +40,7 @@ void goE_setPayload(String payload) {
 			alw = 0;
 		}
 	}
-	if (cmd == "amp") {
+	if (cmd == "amp" || cmd == "amx") {
 		// go-e has 1A resolution, wbec has 0.1A resulotion
 		val = val * 10;
 		// set current
