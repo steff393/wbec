@@ -5,17 +5,19 @@ The Heidelberg Wallbox Energy Control is a high quality wallbox, but it offers o
 Goal of this project is to establish an Wifi interface, which also acts as Modbus master (for local external load management) and to rebuild a part of the Combox functionality.  
 
 ## Features (as of now)
+- Integration into openWB and EVCC (under test)
 - Communication via Modbus working
 - Registers can be read and are transmitted to serial debug terminal
 - Registers can be read/written via JSON web interface
 - Standby of Wallbox is inhibited by sending every 10s the register 257 with value 4
 - Prepared for supporting up to all 16 connected boxes
 - Simple prototype of a local load management
-- Update via WiFi (OTA)
-- Access point mode, to configure your WiFi network/password
+- Update via WiFi (OTA), e.g. with PlatformIO
+- Access point mode, to configure your WiFi network/password (s. Wiki)
 
 ## Contact
 In case of any questions, feel free to send a mail (wbec393@gmail.com) or open an issue  ;-)
+When you're interested in a ready-to-use black-box, then please send a mail.
 
 ## Materials
 - Heidelberg Wallbox Energy Control
@@ -40,21 +42,15 @@ First simple web interface:
   <img src="https://i.ibb.co/kKSkL1X/wbec-Web-Interface.png">
 </p>
 
-Get current status (here for 3 configured wallboxes, but only 1 connected):
+Get current status (here for 2 configured wallboxes, but only 1 connected):
 ```c++
 http://192.168.xx.yy/json
 
 {
-  "modbus": {
-    "cfg": {
-      "cycleTm": 10000
-    },
-    "state": {
-      "lastTm": 185055,
-      "millis": 186817
-    }
+  "wbec": {
+    "version": "v0.0.2"
   },
-  "boxes": [
+  "box": [
     {
       "busId": 1,
       "version": "108",
@@ -77,67 +73,31 @@ http://192.168.xx.yy/json
       "standby": 4,
       "remLock": 1,
       "currLim": 130,
-      "currFs": 0
+      "currFs": 0,
+      "load": 0,
+      "resCode": "0"
     },
     {
       "busId": 2,
       "version": "0",
       "chgStat": 0,
-      "currL1": 0,
-      "currL2": 0,
-      "currL3": 0,
-      "pcbTemp": 0,
-      "voltL1": 0,
-      "voltL2": 0,
-      "voltL3": 0,
-      "extLock": 0,
-      "power": 0,
-      "energyP": 0,
-      "energyI": 0,
-      "currMax": 0,
-      "currMin": 0,
-      "logStr": "",
-      "wdTmOut": 0,
-      "standby": 0,
-      "remLock": 0,
-      "currLim": 0,
-      "currFs": 0
-    },
-    {
-      "busId": 3,
-      "version": "0",
-      "chgStat": 0,
-      "currL1": 0,
-      "currL2": 0,
-      "currL3": 0,
-      "pcbTemp": 0,
-      "voltL1": 0,
-      "voltL2": 0,
-      "voltL3": 0,
-      "extLock": 0,
-      "power": 0,
-      "energyP": 0,
-      "energyI": 0,
-      "currMax": 0,
-      "currMin": 0,
-      "logStr": "",
-      "wdTmOut": 0,
-      "standby": 0,
-      "remLock": 0,
-      "currLim": 0,
-      "currFs": 0
+      ...
+      "load": 0,
+      "resCode": "e4"
     }
   ],
-  "load": [
-    0,
-    0,
-    0
-  ],
-  "resCode": [
-    "0",
-    "e4",
-    "e4"
-  ]
+  "modbus": {
+    "state": {
+      "lastTm": 2852819,
+      "millis": 2855489
+    }
+  },
+  "wifi": {
+    "bssid": "00:1F:3F:15:29:7E",
+    "rssi": -76,
+    "signal": 48,
+    "channel": 11
+  }
 }
 ```
 
