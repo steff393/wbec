@@ -35,6 +35,8 @@ void setup() {
   } 
 
   WiFiManager wifiManager;
+  Serial.print("\nLoaded cfgApSsid: "); Serial.println(cfgApSsid);
+  Serial.print("Loaded cfgApPass: "); Serial.println(cfgApPass);
   wifiManager.autoConnect(cfgApSsid, cfgApPass);
 
   // setup the Webserver
