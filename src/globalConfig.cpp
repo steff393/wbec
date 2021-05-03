@@ -4,10 +4,12 @@
 #include <ArduinoJson.h>
 #include <LittleFS.h>
 
-const char* cfgApSsid;	// SSID of the initial Access Point
-const char* cfgApPass;  // Password of the initial Access Point
-uint8_t cfgCntWb;		    // number of connected wallboxes in the system
-uint8_t cfgMbCycleTime;	// cycle time of the modbus (in seconds)
+char cfgWbecVersion[8];	          // wbec version
+char cfgBuildDate[11];	          // wbec build date
+char cfgApSsid[32];	              // SSID of the initial Access Point
+char cfgApPass[63];               // Password of the initial Access Point
+uint8_t cfgCntWb;		              // number of connected wallboxes in the system
+uint8_t cfgMbCycleTime;	          // cycle time of the modbus (in seconds)
 
 
 bool createConfig() {
@@ -15,10 +17,12 @@ bool createConfig() {
 
   // wbec default configuration parameters
   // -------------------------------------
-  doc["cfgApSsid"]      = "wbec";
-  doc["cfgApPass"]      = "wbec1234"; // older version had "cebw1234"
-  doc["cfgCntWb"]       = "1";
-  doc["cfgMbCycleTime"] = "3";
+  doc["cfgWbecVersion"]         = "v0.0.2+";
+  doc["cfgBuildDate"]           = "2021-05-03";
+  doc["cfgApSsid"]              = "wbec";
+  doc["cfgApPass"]              = "wbec1234"; // older version had "cebw1234"
+  doc["cfgCntWb"]               = "1";
+  doc["cfgMbCycleTime"]         = "3";
   // -------------------------------------
 
   File configFile = LittleFS.open("/cfg.json", "w");
@@ -65,13 +69,15 @@ bool loadConfig() {
     return false;
   }
 
-  cfgApSsid       = doc["cfgApSsid"];
-  cfgApPass       = doc["cfgApPass"];
-  cfgCntWb        = doc["cfgCntWb"];
-  cfgMbCycleTime  = doc["cfgMbCycleTime"]; 
+  strncpy(cfgWbecVersion,     doc["cfgWbecVersion"],      sizeof(cfgWbecVersion));
+  strncpy(cfgBuildDate,       doc["cfgBuildDate"],        sizeof(cfgBuildDate));
+  strncpy(cfgApSsid,          doc["cfgApSsid"],           sizeof(cfgApSsid));
+  strncpy(cfgApPass,          doc["cfgApPass"],           sizeof(cfgApPass));
+  cfgCntWb                  = doc["cfgCntWb"];
+  cfgMbCycleTime            = doc["cfgMbCycleTime"]; 
 
-  Serial.print("\nLoaded cfgApSsid: "); Serial.println(cfgApSsid);
-  Serial.print("Loaded cfgApPass: "); Serial.println(cfgApPass);
+  Serial.print("\nLoaded cfgWbecVersion: "); Serial.println(cfgWbecVersion);
+  Serial.print("Loaded cfgBuildDate: "); Serial.println(cfgBuildDate);
   Serial.print("Loaded cfgCntWb: "); Serial.println(cfgCntWb);
   return true;
 }

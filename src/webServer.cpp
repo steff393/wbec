@@ -161,7 +161,8 @@ void initWebserver() {
     }
 
     // provide the complete content
-    data["wbec"]["version"] = "v0.0.2";
+    data["wbec"]["version"] = cfgWbecVersion;
+    data["wbec"]["bldDate"] = cfgBuildDate;
     for (int i = 0; i < cfgCntWb; i++) {
       data["box"][i]["busId"]    = i+1;
       data["box"][i]["version"]  = String(content[i][0], HEX);

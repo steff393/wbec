@@ -15,13 +15,13 @@
 #define PIN_RO							2		// GPIO2, NodeMCU pin D4, RX --> connect to RO 
 #define PIN_DE_RE					  4		// GPIO4, NodeMCU pin D2     --> connect to DE & RE
 
-
-extern const char* cfgApSsid;		// SSID of the initial Access Point
-extern const char* cfgApPass; 	// password of the initial Access Point
-extern uint8_t cfgCntWb;				// number of connected wallboxes in the system
-extern uint8_t cfgMbCycleTime;	// cycle time of the modbus (in seconds)
+extern char cfgWbecVersion[7];	          // wbec version
+extern char cfgBuildDate[10];	          	// wbec build date
+extern char cfgApSsid[32];	              // SSID of the initial Access Point
+extern char cfgApPass[63];               	// Password of the initial Access Point
+extern uint8_t cfgCntWb;									// number of connected wallboxes in the system
+extern uint8_t cfgMbCycleTime;						// cycle time of the modbus (in seconds)
 
 extern bool loadConfig();
-//extern bool saveConfig();
 
 #endif	/* GLOBALCONFIG_H */
