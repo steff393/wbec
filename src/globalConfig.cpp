@@ -10,11 +10,38 @@ uint8_t cfgCntWb;		    // number of connected wallboxes in the system
 uint8_t cfgMbCycleTime;	// cycle time of the modbus (in seconds)
 
 
+bool createConfig() {
+  StaticJsonDocument<1024> doc;
+
+  // wbec default configuration parameters
+  // -------------------------------------
+  doc["cfgApSsid"]      = "wbec";
+  doc["cfgApPass"]      = "wbec1234"; // older version had "cebw1234"
+  doc["cfgCntWb"]       = "1";
+  doc["cfgMbCycleTime"] = "3";
+  // -------------------------------------
+
+  File configFile = LittleFS.open("/cfg.json", "w");
+  if (!configFile) {
+    return(false);
+  }
+
+  serializeJson(doc, configFile);
+  return (true);
+}
+
+
 bool loadConfig() {
   File configFile = LittleFS.open("/cfg.json", "r");
   if (!configFile) {
-    Serial.println("Failed to open config file");
-    return(false);
+    Serial.println("Failed to open config file... Creating default config...");
+    if (createConfig()) {
+      Serial.println("Successful!");
+      configFile = LittleFS.open("/cfg.json", "r");
+    } else {
+      Serial.println("Failed to create default config... Please try to erase flash");
+      return(false);
+    }
   }
 
   size_t size = configFile.size();
@@ -31,7 +58,7 @@ bool loadConfig() {
   // use configFile.readString instead.
   configFile.readBytes(buf.get(), size);
 
-  StaticJsonDocument<200> doc;
+  StaticJsonDocument<1024> doc;
   auto error = deserializeJson(doc, buf.get());
   if (error) {
     Serial.println("Failed to parse config file");
@@ -48,20 +75,3 @@ bool loadConfig() {
   Serial.print("Loaded cfgCntWb: "); Serial.println(cfgCntWb);
   return true;
 }
-
-/*
-bool saveConfig() {
-  StaticJsonDocument<200> doc;
-  doc["cfgApSsid"] = "----";
-  doc["cfgApPass"] = "--------";
-
-  File configFile = LittleFS.open("/cfg.json", "w");
-  if (!configFile) {
-    Serial.println("Failed to open config file for writing");
-    return false;
-  }
-
-  serializeJson(doc, configFile);
-  return true;
-}
-*/

@@ -17,18 +17,13 @@ bool _handlingOTA = false;
 
 void setup() {
   Serial.begin(115200);
-
+  Serial.println("Starting wbec ;-)");
+  
   if(!LittleFS.begin()){ 
     Serial.println("An Error has occurred while mounting LittleFS");
     return;
   }
-/*
-  if (!saveConfig()) {
-    Serial.println("Failed to save initial config");
-  } else {
-    Serial.println("Config saved");
-  }
-*/
+
   if (!loadConfig()) {
     Serial.println("Failed to load config");
     return;
