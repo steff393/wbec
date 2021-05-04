@@ -21,8 +21,8 @@ bool createConfig() {
   doc["cfgBuildDate"]           = "2021-05-03";
   doc["cfgApSsid"]              = "wbec";
   doc["cfgApPass"]              = "wbec1234"; // older version had "cebw1234"
-  doc["cfgCntWb"]               = "1";
-  doc["cfgMbCycleTime"]         = "3";
+  doc["cfgCntWb"]               = 1;
+  doc["cfgMbCycleTime"]         = 3;
   // -------------------------------------
 
   File configFile = LittleFS.open("/cfg.json", "w");
