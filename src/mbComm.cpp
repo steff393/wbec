@@ -19,15 +19,22 @@ uint32_t  modbusLastTime = 0;
 uint8_t   modbusResultCode[WB_CNT];
 uint8_t   msgCnt = 0;
 uint8_t   id = 0;
-uint16_t  StdByDisable = 4;
 uint8_t   writeId  = 0;
 uint16_t  writeReg = 0;
 uint16_t  writeVal = 0;
 
 
 void timeout(uint8_t id) {
-	for (int i =  1; i <= 16; i++) { content[id][i] = 0;	}
-	for (int i = 49; i <= 54; i++) { content[id][i] = 0;	}
+	if (cfgStandby == 4) {
+		// standby disabled => timeout indicates a failure => reset all
+		for (int i =  1; i <= 16; i++) { content[id][i] = 0;	}
+		for (int i = 49; i <= 54; i++) { content[id][i] = 0;	}
+	} else {
+		// standby enabled => timeout is normal, but the following should avoid to consider 'old' values as valid
+		for (int i =  2; i <= 12; i++) { content[id][i] = 0;	}
+		content[id][53] = 0;
+	}
+	
 }
 
 
@@ -68,7 +75,7 @@ void mb_handle() {
 					case 1: if (!modbusResultCode[id]) { mb.readIreg (id+1, 100,              &content[id][15],  17); } break;
 					case 2: if (!modbusResultCode[id]) { mb.readIreg (id+1, 117,              &content[id][32],  17); } break;
 					case 3: if (!modbusResultCode[id]) { mb.readHreg (id+1, REG_WD_TIME_OUT,  &content[id][49],   5); } break;
-					case 4: if (!modbusResultCode[id]) { mb.writeHreg(id+1, REG_STANDBY_CTRL, &StdByDisable,      1); } break;
+					case 4: if (!modbusResultCode[id]) { mb.writeHreg(id+1, REG_STANDBY_CTRL, &cfgStandby,        1); } break;
 					default: ; // do nothing, will be handled below
 				}
 				id++;
@@ -76,7 +83,8 @@ void mb_handle() {
 					id = 0;
 					msgCnt++;
 				}
-				if (msgCnt > 4) {
+				if (msgCnt > 4 || 
+				   (msgCnt > 3 && modbusLastTime != 0)) {						// write the REG_STANDBY_CTRL only on the very first loop
 					msgCnt = 0;
 					Serial.print("Time:");Serial.println(millis()-modbusLastTime);
 					modbusLastTime = millis();

@@ -10,6 +10,7 @@ char cfgApSsid[32];	              // SSID of the initial Access Point
 char cfgApPass[63];               // Password of the initial Access Point
 uint8_t cfgCntWb;		              // number of connected wallboxes in the system
 uint8_t cfgMbCycleTime;	          // cycle time of the modbus (in seconds)
+uint16_t cfgStandby;               // Standby Function Control: 0 = enable standby, 4 = disable standby
 
 
 bool createConfig() {
@@ -18,11 +19,12 @@ bool createConfig() {
   // wbec default configuration parameters
   // -------------------------------------
   doc["cfgWbecVersion"]         = "v0.0.2+";
-  doc["cfgBuildDate"]           = "2021-05-03";
+  doc["cfgBuildDate"]           = "2021-05-07";
   doc["cfgApSsid"]              = "wbec";
   doc["cfgApPass"]              = "wbec1234"; // older version had "cebw1234"
   doc["cfgCntWb"]               = 1;
   doc["cfgMbCycleTime"]         = 3;
+  doc["cfgStandby"]             = 4;
   // -------------------------------------
 
   File configFile = LittleFS.open("/cfg.json", "w");
@@ -75,6 +77,7 @@ bool loadConfig() {
   strncpy(cfgApPass,          doc["cfgApPass"],           sizeof(cfgApPass));
   cfgCntWb                  = doc["cfgCntWb"];
   cfgMbCycleTime            = doc["cfgMbCycleTime"]; 
+  cfgStandby                = doc["cfgStandby"]; 
 
   Serial.print("\nLoaded cfgWbecVersion: "); Serial.println(cfgWbecVersion);
   Serial.print("Loaded cfgBuildDate: "); Serial.println(cfgBuildDate);

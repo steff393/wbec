@@ -21,6 +21,7 @@ extern char cfgApSsid[32];	              // SSID of the initial Access Point
 extern char cfgApPass[63];               	// Password of the initial Access Point
 extern uint8_t cfgCntWb;									// number of connected wallboxes in the system
 extern uint8_t cfgMbCycleTime;						// cycle time of the modbus (in seconds)
+extern uint16_t cfgStandby;               // Standby Function Control: 0 = enable standby, 4 = disable standby
 
 extern bool loadConfig();
 
