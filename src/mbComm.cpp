@@ -90,7 +90,6 @@ void mb_handle() {
 					Serial.print("Time:");Serial.println(millis()-modbusLastTime);
 					modbusLastTime = millis();
 					// 1st trial implementation of a simple loadManager
-					lm_setWbState(id, content[id][1], content[id][16], content[id][15]);
 					lm_updateWbLimits();
 				}
       }

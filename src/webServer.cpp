@@ -186,7 +186,7 @@ void initWebserver() {
       data["box"][i]["remLock"]  = content[i][51];
       data["box"][i]["currLim"]  = content[i][53];
       data["box"][i]["currFs"]   = content[i][54];
-      data["box"][i]["load"]     = lm_getWbLimit(i+1);
+      data["box"][i]["load"]     = lm_getWbLimit(i);
       data["box"][i]["resCode"]  = String(modbusResultCode[i], HEX);
     }
     data["modbus"]["state"]["lastTm"]  = modbusLastTime;
