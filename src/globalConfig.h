@@ -15,13 +15,15 @@
 #define PIN_RO							2		// GPIO2, NodeMCU pin D4, RX --> connect to RO 
 #define PIN_DE_RE					  4		// GPIO4, NodeMCU pin D2     --> connect to DE & RE
 
-extern char cfgWbecVersion[7];	          // wbec version
-extern char cfgBuildDate[10];	          	// wbec build date
+extern char cfgWbecVersion[];	          	// wbec version
+extern char cfgBuildDate[];	          		// wbec build date
+
 extern char cfgApSsid[32];	              // SSID of the initial Access Point
 extern char cfgApPass[63];               	// Password of the initial Access Point
 extern uint8_t cfgCntWb;									// number of connected wallboxes in the system
 extern uint8_t cfgMbCycleTime;						// cycle time of the modbus (in seconds)
-extern uint16_t cfgStandby;               // Standby Function Control: 0 = enable standby, 4 = disable standby
+extern uint16_t cfgMbTimeout;							// Reg. 257: Modbus timeout (in milliseconds)
+extern uint16_t cfgStandby;               // Reg. 258: Standby Function Control: 0 = enable standby, 4 = disable standby
 
 extern bool loadConfig();
 

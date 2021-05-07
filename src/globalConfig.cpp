@@ -4,13 +4,15 @@
 #include <ArduinoJson.h>
 #include <LittleFS.h>
 
-char cfgWbecVersion[8];	          // wbec version
-char cfgBuildDate[11];	          // wbec build date
+char cfgWbecVersion[]     = "v0.0.2+";          // wbec version
+char cfgBuildDate[]       = "2021-05-07";	      // wbec build date
+
 char cfgApSsid[32];	              // SSID of the initial Access Point
 char cfgApPass[63];               // Password of the initial Access Point
 uint8_t cfgCntWb;		              // number of connected wallboxes in the system
 uint8_t cfgMbCycleTime;	          // cycle time of the modbus (in seconds)
-uint16_t cfgStandby;               // Standby Function Control: 0 = enable standby, 4 = disable standby
+uint16_t cfgMbTimeout;					  // Reg. 257: Modbus timeout (in milliseconds)
+uint16_t cfgStandby;              // Reg. 258: Standby Function Control: 0 = enable standby, 4 = disable standby
 
 
 bool createConfig() {
@@ -18,12 +20,11 @@ bool createConfig() {
 
   // wbec default configuration parameters
   // -------------------------------------
-  doc["cfgWbecVersion"]         = "v0.0.2+";
-  doc["cfgBuildDate"]           = "2021-05-07";
   doc["cfgApSsid"]              = "wbec";
   doc["cfgApPass"]              = "wbec1234"; // older version had "cebw1234"
   doc["cfgCntWb"]               = 1;
   doc["cfgMbCycleTime"]         = 3;
+  doc["cfgMbTimeout"]           = 60000;  
   doc["cfgStandby"]             = 4;
   // -------------------------------------
 
@@ -71,12 +72,11 @@ bool loadConfig() {
     return false;
   }
 
-  strncpy(cfgWbecVersion,     doc["cfgWbecVersion"],      sizeof(cfgWbecVersion));
-  strncpy(cfgBuildDate,       doc["cfgBuildDate"],        sizeof(cfgBuildDate));
   strncpy(cfgApSsid,          doc["cfgApSsid"],           sizeof(cfgApSsid));
   strncpy(cfgApPass,          doc["cfgApPass"],           sizeof(cfgApPass));
   cfgCntWb                  = doc["cfgCntWb"];
   cfgMbCycleTime            = doc["cfgMbCycleTime"]; 
+  cfgMbTimeout              = doc["cfgMbTimeout"];
   cfgStandby                = doc["cfgStandby"]; 
 
   Serial.print("\nLoaded cfgWbecVersion: "); Serial.println(cfgWbecVersion);
