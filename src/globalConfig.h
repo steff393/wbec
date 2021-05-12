@@ -11,9 +11,9 @@
 #define CURR_ABS_MIN			 60		// absolute possible lower limit for current
 #define CURR_ABS_MAX			160		// absolute possible upper limit for current
 
-#define PIN_DI							5		// GPIO5, NodeMCU pin D1, TX --> connect to DI 
-#define PIN_RO							2		// GPIO2, NodeMCU pin D4, RX --> connect to RO 
-#define PIN_DE_RE					  4		// GPIO4, NodeMCU pin D2     --> connect to DE & RE
+#define PIN_DI							5		// GPIO5, NodeMCU pin D1 --> connect to DI (Transmit to Modbus)
+#define PIN_RO							2		// GPIO2, NodeMCU pin D4 --> connect to RO (Receive from Modbus)
+#define PIN_DE_RE					  4		// GPIO4, NodeMCU pin D2 --> connect to DE & RE
 
 extern char cfgWbecVersion[];	          	// wbec version
 extern char cfgBuildDate[];	          		// wbec build date
