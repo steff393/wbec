@@ -6,6 +6,7 @@
 #include "goEmulator.h"
 #include "LittleFS.h"
 #include "mbComm.h"
+#include "mqtt.h"
 #include "SPIFFSEditor.h"
 #include "wlan_key.h"
 #define WIFI_MANAGER_USE_ASYNC_WEB_SERVER
@@ -48,6 +49,7 @@ void setup() {
   });
 
   mb_setup();
+  mqtt_begin();
   Serial.print("Boot time: ");Serial.println(millis());
 }
 
@@ -57,5 +59,6 @@ void loop() {
   if(!_handlingOTA) {
     mb_handle();
     goE_handle();
+    mqtt_handle();
   }
 }
