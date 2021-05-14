@@ -89,8 +89,8 @@ void mqtt_handle() {
 
 void mqtt_publish(uint8_t i) {
 	// publish the contents of box i
-	String topic;
-	String payload;
+	String header = String("openWB/set/lp/" + i);
+	boolean retain = true;
 	uint8_t ps = 0;
 	uint8_t cs = 0;
 	switch(content[i][1]) {
@@ -102,23 +102,18 @@ void mqtt_publish(uint8_t i) {
 		case 7:  ps = 1; cs = 1; break;
 		default: ps = 0; cs = 0; break; 
 	}
-	topic = String("openWB/set/lp/" + i + "/plugStat");
-	payload = String(ps);
-	client.publish(topic.c_str(), payload.c_str(), retain);
 
-	topic = String("openWB/set/lp/" + i + "/chargeStat");
-	payload = String(cs);
-	client.publish(topic.c_str(), payload.c_str(), retain);
+	client.publish(String(header + "/plugStat").c_str(), String(ps).c_str(), retain);
+	client.publish(String(header + "/chargeStat").c_str(), String(cs).c_str(), retain);
 
-	
-	client.publish(String("openWB/set/lp/" + i + "/W").c_str(), String(cs).c_str(), retain);
-
+	client.publish(String(header + "/W").c_str(),          String(cs).c_str(), retain);
+	client.publish(String(header + "/kWhCounter").c_str(), String(cs).c_str(), retain);
 }
 
 
 
 
-	data["alw"] = String(alw);
+/* 	data["alw"] = String(alw);
 	data["amp"] = String(amp);
 	data["err"] = "0";
 	data["stp"] = "0";
@@ -142,4 +137,4 @@ void mqtt_publish(uint8_t i) {
 	data["nrg"][13] = 0;
 	data["nrg"][14] = 0;
 	data["nrg"][15] = 0;
-	data["fwv"] = "40";
+	data["fwv"] = "40"; */
