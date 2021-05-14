@@ -16,23 +16,25 @@ uint32_t 	lastReconnect = 0;
 void callback(char* _topic, byte* payload, uint8_t length)
 {
 	String topic = String(_topic);
-	char *buffer = (char *) malloc(length);
-	strcpy(buffer, (char *)payload);
-	
+
 	// handle received message
 	Serial.print("MQTT: Received: "); Serial.print(topic); Serial.print(", Payload: ");
+
+	char buffer[length];
 	for (uint8_t i = 0; i < length; i++) {
 		Serial.print((char)payload[i]);
+		buffer[i] = (char)payload[i];
 	}
+	buffer[length] = '\0';
 
 	if (topic.startsWith("openWB/lp/") && topic.endsWith("/AConfigured")) {
-		uint8_t val = String(buffer).toInt();
+		uint8_t val = String(buffer).toInt();				// Alternative: toFloat()
 		uint8_t i   = topic.substring(10,11).toInt() - 1;		// id of the box
 		// openWB has 1A resolution, wbec has 0.1A resulotion
 		val = val * 10;
 		// set current
 		if (val == 0 || (val >= CURR_ABS_MIN && val <= CURR_ABS_MAX)) {
-			Serial.print(" Write to box: "); Serial.print(i); Serial.print(" Value: "); Serial.println(val); 
+			Serial.print(", Write to box: "); Serial.print(i); Serial.print(" Value: "); Serial.println(val); 
 			mb_writeReg(i, REG_CURR_LIMIT, val);
 		}
 	}
@@ -56,8 +58,7 @@ void reconnect() {
 	{
 		Serial.println("connected");
 		//once connected to MQTT broker, subscribe command if any
-		client.subscribe("openWB/lp/1/AConfigured");
-		//client.subscribe("openWB/lp/+/AConfigured");
+		client.subscribe("openWB/lp/+/AConfigured");
 	} else {
 		Serial.print("failed, rc=");
 		Serial.print(client.state());
