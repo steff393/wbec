@@ -52,7 +52,7 @@ bool cbWrite(Modbus::ResultCode event, uint16_t transactionId, void* data) {
 	if (event) {
 		timeout(id);
 	}
-  Serial.printf_P("Request result: 0x%02X, BusID: %d\n", event, /*ESP.getFreeHeap()*/ mb.slave());
+  Serial.printf_P("MB  : ResultCode: 0x%02X, BusID: %d\n", event, mb.slave());
   return true;
 }
 
@@ -81,12 +81,15 @@ void mb_handle() {
       if (!mb.slave()) {
 				//Serial.print(millis());Serial.print(": Sending to BusID: ");Serial.print(id+1);Serial.print(" with msgCnt = ");Serial.println(msgCnt);
 				switch(msgCnt) {
-					case 0:                              mb.readIreg(id+1,    4,              &content[id][0] ,  15, cbWrite); break;
-					case 1: if (!modbusResultCode[id]) { mb.readIreg (id+1, 100,              &content[id][15],  17); } break;
-					case 2: if (!modbusResultCode[id]) { mb.readIreg (id+1, 117,              &content[id][32],  17); } break;
-					case 3: if (!modbusResultCode[id]) { mb.readHreg (id+1, REG_WD_TIME_OUT,  &content[id][49],   5); } break;
-					case 4: if (!modbusResultCode[id]) { mb.writeHreg(id+1, REG_WD_TIME_OUT,  &cfgMbTimeout,      1); } break;
-					case 5: if (!modbusResultCode[id]) { mb.writeHreg(id+1, REG_STANDBY_CTRL, &cfgStandby,        1); } break;
+					case 0:                                                       mb.readIreg (id+1,   4,              &content[id][0] ,  15, cbWrite); break;
+					case 1: if (!modbusResultCode[id])                          { mb.readIreg (id+1, 100,              &content[id][15],  17); } break;
+					case 2: if (!modbusResultCode[id])                          { mb.readIreg (id+1, 117,              &content[id][32],  17); } break;
+					case 3: if (!modbusResultCode[id])                          { mb.readHreg (id+1, REG_WD_TIME_OUT,  &content[id][49],   1); } break;
+					case 4: if (!modbusResultCode[id] && content[id][0] > 263)  { mb.readHreg (id+1, REG_STANDBY_CTRL, &content[id][50],   1); } break;	// Can't be read in FW 0x0107 = 263dec
+					case 5: if (!modbusResultCode[id])                          { mb.readHreg (id+1, REG_REMOTE_LOCK,  &content[id][51],   1); } break;
+					case 6: if (!modbusResultCode[id])                          { mb.readHreg (id+1, REG_CURR_LIMIT,   &content[id][53],   2); } break;
+					case 7: if (!modbusResultCode[id])                          { mb.writeHreg(id+1, REG_WD_TIME_OUT,  &cfgMbTimeout,      1); } break;
+					case 8: if (!modbusResultCode[id])                          { mb.writeHreg(id+1, REG_STANDBY_CTRL, &cfgStandby,        1); } break;
 					default: ; // do nothing, will be handled below
 				}
 				id++;
@@ -94,10 +97,10 @@ void mb_handle() {
 					id = 0;
 					msgCnt++;
 				}
-				if (msgCnt > 5 || 
-				   (msgCnt > 4 && modbusLastTime != 0)) {						// write the REG_WD_TIME_OUT and REG_STANDBY_CTRL only on the very first loop
+				if (msgCnt > 8 || 
+				   (msgCnt > 7 && modbusLastTime != 0)) {						// write the REG_WD_TIME_OUT and REG_STANDBY_CTRL only on the very first loop
 					msgCnt = 0;
-					Serial.print("Time:");Serial.println(millis()-modbusLastTime);
+					//Serial.print("Time:");Serial.println(millis()-modbusLastTime);
 					modbusLastTime = millis();
 					// 1st trial implementation of a simple loadManager
 					lm_updateWbLimits();
@@ -119,6 +122,6 @@ void mb_writeReg(uint8_t id, uint16_t reg, uint16_t val) {
 	if (rbIn == rbOut) {
 		// we have overwritten an not-sent value -> set rbOut to next element, otherwise complete ring would be skipped
 		if (++rbOut >= RINGBUF_SIZE) {rbOut = 0;}		// increment pointer, but take care of overflow
-		Serial.println("MB: Overflow of ring buffer");
+		Serial.println("MB  : Overflow of ring buffer");
 	}
 }
