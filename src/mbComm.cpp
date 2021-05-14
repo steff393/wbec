@@ -20,10 +20,17 @@ uint32_t  modbusLastTime = 0;
 uint8_t   modbusResultCode[WB_CNT];
 uint8_t   msgCnt = 0;
 uint8_t   id = 0;
-uint8_t   writeId  = 0;
-uint16_t  writeReg = 0;
-uint16_t  writeVal = 0;
 
+typedef struct rb_struct {
+	uint8_t   id;
+	uint16_t reg;
+	uint16_t val;
+} rb_t;
+
+#define RINGBUF_SIZE 20
+rb_t 		rb[RINGBUF_SIZE];			// ring buffer
+uint8_t rbIn;									// last element, which was written to ring buffer
+uint8_t rbOut;								// last element, which was read from ring buffer
 
 void timeout(uint8_t id) {
 	if (cfgStandby == 4) {
@@ -59,12 +66,14 @@ void mb_setup() {
 
 
 void mb_handle() {
-	if (writeReg) {
-		if (!mb.slave()) {
-			mb.writeHreg(writeId + 1, writeReg, &writeVal,  1, cbWrite); 
-			writeId	 = 0;
-			writeReg = 0;
-			writeVal = 0;
+	// When pointers of the ring buffer are not equal, then there is something to send
+	if (rbOut != rbIn) {
+		if (!mb.slave()) {			// check, if bus available
+			if (++rbOut >= RINGBUF_SIZE) {rbOut = 0;}		// increment pointer, but take care of overflow
+			// if box is not in timeout, then send out
+			//if (!modbusResultCode[id]) {
+				mb.writeHreg(rb[rbOut].id + 1, rb[rbOut].reg, &rb[rbOut].val,  1, cbWrite); 
+			//}
 		}
 	}
 
@@ -103,7 +112,13 @@ void mb_handle() {
 
 
 void mb_writeReg(uint8_t id, uint16_t reg, uint16_t val) {
-	writeId  = id;
-	writeReg = reg;
-	writeVal = val;
+	if (++rbIn >= RINGBUF_SIZE) {rbIn = 0;}		// increment pointer, but take care of overflow
+	rb[rbIn].id  =  id;
+	rb[rbIn].reg = reg;
+	rb[rbIn].val = val;
+	if (rbIn == rbOut) {
+		// we have overwritten an not-sent value -> set rbOut to next element, otherwise complete ring would be skipped
+		if (++rbOut >= RINGBUF_SIZE) {rbOut = 0;}		// increment pointer, but take care of overflow
+		Serial.println("MB: Overflow of ring buffer");
+	}
 }
