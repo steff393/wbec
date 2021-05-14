@@ -68,8 +68,9 @@ void mb_handle() {
 					case 1: if (!modbusResultCode[id]) { mb.readIreg (id+1, 100,              &content[id][15],  17); } break;
 					case 2: if (!modbusResultCode[id]) { mb.readIreg (id+1, 117,              &content[id][32],  17); } break;
 					case 3: if (!modbusResultCode[id]) { mb.readHreg (id+1, REG_WD_TIME_OUT,  &content[id][49],   1); } break;
-					case 4: if (!modbusResultCode[id]) { mb.readHreg (id+1, REG_REMOTE_LOCK,  &content[id][51],   4); } break;
-					case 5: if (!modbusResultCode[id]) { mb.writeHreg(id+1, REG_STANDBY_CTRL, &StdByDisable,      1); } break;
+					case 4: if (!modbusResultCode[id]) { mb.readHreg (id+1, REG_REMOTE_LOCK,  &content[id][51],   1); } break;
+					case 5: if (!modbusResultCode[id]) { mb.readHreg (id+1, REG_CURR_LIMIT,   &content[id][53],   2); } break;
+					case 6: if (!modbusResultCode[id]) { mb.writeHreg(id+1, REG_STANDBY_CTRL, &StdByDisable,      1); } break;
 					default: ; // do nothing, will be handled below
 				}
 				id++;
@@ -77,7 +78,7 @@ void mb_handle() {
 					id = 0;
 					msgCnt++;
 				}
-				if (msgCnt > 5) {
+				if (msgCnt > 6) {
 					msgCnt = 0;
 					Serial.print("Time:");Serial.println(millis()-modbusLastTime);
 					modbusLastTime = millis();
