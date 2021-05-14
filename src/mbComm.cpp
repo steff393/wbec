@@ -1,8 +1,9 @@
-// Copyright (c) 2021 steff393
+// Copyright (c) 2021 steff393, MIT license
 
 #include <Arduino.h>
 #include "globalConfig.h"
 #include "mbComm.h"
+#include "mqtt.h"
 #include <ModbusRTU.h>
 #include "loadManager.h"
 #include <SoftwareSerial.h>
@@ -91,6 +92,8 @@ void mb_handle() {
 					modbusLastTime = millis();
 					// 1st trial implementation of a simple loadManager
 					lm_updateWbLimits();
+					// publish received data to MQTT
+					mqtt_publish(id);
 				}
       }
     }

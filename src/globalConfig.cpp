@@ -1,4 +1,4 @@
-// Copyright (c) 2021 steff393
+// Copyright (c) 2021 steff393, MIT license
 // based on https://github.com/esp8266/Arduino/blob/master/libraries/esp8266/examples/ConfigFile/ConfigFile.ino
 
 #include <ArduinoJson.h>
@@ -7,12 +7,13 @@
 char cfgWbecVersion[]     = "v0.0.2+";          // wbec version
 char cfgBuildDate[]       = "2021-05-13";	      // wbec build date
 
-char cfgApSsid[32];	              // SSID of the initial Access Point
-char cfgApPass[63];               // Password of the initial Access Point
-uint8_t cfgCntWb;		              // number of connected wallboxes in the system
-uint8_t cfgMbCycleTime;	          // cycle time of the modbus (in seconds)
-uint16_t cfgMbTimeout;					  // Reg. 257: Modbus timeout (in milliseconds)
-uint16_t cfgStandby;              // Reg. 258: Standby Function Control: 0 = enable standby, 4 = disable standby
+char     cfgApSsid[32];	              // SSID of the initial Access Point
+char     cfgApPass[63];               // Password of the initial Access Point
+uint8_t  cfgCntWb;		                // number of connected wallboxes in the system
+uint8_t  cfgMbCycleTime;	            // cycle time of the modbus (in seconds)
+uint16_t cfgMbTimeout;					      // Reg. 257: Modbus timeout (in milliseconds)
+uint16_t cfgStandby;                  // Reg. 258: Standby Function Control: 0 = enable standby, 4 = disable standby
+char     cfgMqttIp[16];              	// IP address of MQTT broker, "" to disable MQTT
 
 
 bool createConfig() {
@@ -26,6 +27,7 @@ bool createConfig() {
   doc["cfgMbCycleTime"]         = 3;
   doc["cfgMbTimeout"]           = 60000;  
   doc["cfgStandby"]             = 4;
+  doc["cfgMqttIp"]              = "";
   // -------------------------------------
 
   File configFile = LittleFS.open("/cfg.json", "w");
@@ -78,6 +80,7 @@ bool loadConfig() {
   cfgMbCycleTime            = doc["cfgMbCycleTime"]; 
   cfgMbTimeout              = doc["cfgMbTimeout"];
   cfgStandby                = doc["cfgStandby"]; 
+  strncpy(cfgMqttIp,          doc["cfgMqttIp"],           sizeof(cfgMqttIp));
 
   Serial.print("\nLoaded cfgWbecVersion: "); Serial.println(cfgWbecVersion);
   Serial.print("Loaded cfgBuildDate: "); Serial.println(cfgBuildDate);
