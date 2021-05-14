@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
+#include "mbComm.h"
 #include <PubSubClient.h>
 
 const char* mqtt_server = "192.168.178.39";
@@ -86,6 +87,59 @@ void mqtt_handle() {
 }
 
 
-void mqtt_publish(uint8_t id, uint8_t plugStat, uint8_t chargeStat, uint16_t W, uint32_t kWhCounter) {
+void mqtt_publish(uint8_t i) {
+	// publish the contents of box i
+	String topic;
+	String payload;
+	uint8_t ps = 0;
+	uint8_t cs = 0;
+	switch(content[i][1]) {
+		case 2:  ps = 0; cs = 0; break;
+		case 3:  ps = 0; cs = 0; break;
+		case 4:  ps = 1; cs = 0; break;
+		case 5:  ps = 1; cs = 0; break;
+		case 6:  ps = 1; cs = 0; break;
+		case 7:  ps = 1; cs = 1; break;
+		default: ps = 0; cs = 0; break; 
+	}
+	topic = String("openWB/set/lp/" + i + "/plugStat");
+	payload = String(ps);
+	client.publish(topic.c_str(), payload.c_str(), retain);
+
+	topic = String("openWB/set/lp/" + i + "/chargeStat");
+	payload = String(cs);
+	client.publish(topic.c_str(), payload.c_str(), retain);
+
 	
+	client.publish(String("openWB/set/lp/" + i + "/W").c_str(), String(cs).c_str(), retain);
+
 }
+
+
+
+
+	data["alw"] = String(alw);
+	data["amp"] = String(amp);
+	data["err"] = "0";
+	data["stp"] = "0";
+	data["tmp"] = String(content[i][5]);
+	data["dws"] = String(((uint32_t) content[i][13] << 16 | (uint32_t)content[i][14]) - energyI);
+	data["ubi"] = "0";
+	data["eto"] = String(((uint32_t) content[i][13] << 16 | (uint32_t)content[i][14]) / 100);
+	data["nrg"][0] = content[i][6]; // L1
+	data["nrg"][1] = content[i][7]; // L2
+	data["nrg"][2] = content[i][8]; // L3
+	data["nrg"][3] = 0;
+	data["nrg"][4] = content[i][2]; // L1
+	data["nrg"][5] = content[i][3]; // L2
+	data["nrg"][6] = content[i][4]; // L3
+	data["nrg"][7] = 0;
+	data["nrg"][8] = 0;
+	data["nrg"][9] = 0;
+	data["nrg"][10] = 0;
+	data["nrg"][11] = content[i][10] / 10;
+	data["nrg"][12] = 0;
+	data["nrg"][13] = 0;
+	data["nrg"][14] = 0;
+	data["nrg"][15] = 0;
+	data["fwv"] = "40";
