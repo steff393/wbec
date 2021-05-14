@@ -13,8 +13,26 @@ uint32_t 	lastReconnect = 0;
 char 			msg[50];
 uint8_t 	value = 0;
 
+
+void callback(char* topic, byte* payload, uint8_t length)
+{
+    // handle received message
+		Serial.print("MQTT received: ");
+		Serial.print(topic);
+		Serial.print(", ");
+		for (uint8_t i = 0; i < length; i++) {
+    	Serial.print((char)payload[i]);
+  	}
+		Serial.print(", len: ");
+		Serial.println(length);
+
+}
+
+
 void mqtt_begin() {
   client.setServer(mqtt_server, 1883);
+	client.setCallback(callback);
+	
 }
 
 void mqtt_reconnect() {
@@ -27,7 +45,7 @@ void mqtt_reconnect() {
 	{
 		Serial.println("connected");
 		//once connected to MQTT broker, subscribe command if any
-		client.subscribe("openWB");
+		client.subscribe("openWB/lp/2/AConfigured");
 	} else {
 		Serial.print("failed, rc=");
 		Serial.print(client.state());
@@ -46,7 +64,7 @@ void mqtt_handle() {
   }
 
   client.loop();
-	
+
   if (now - lastMsg > 5000) {
     lastMsg = now;           
 		boolean retain = true;
@@ -60,6 +78,14 @@ void mqtt_handle() {
 		client.publish("openWB/set/evu/VPhase2", "232", retain);
 		client.publish("openWB/set/evu/VPhase3", "233", retain);
 		client.publish("openWB/set/evu/HzFrequenz", "50", retain);
+
+		client.publish("openWB/set/lp/2/plugStat", "1", retain);
+		client.publish("openWB/set/lp/2/chargeStat", "1", retain);
 		Serial.print("MQTT sent, state "); Serial.println(client.state());
   }
+}
+
+
+void mqtt_publish(uint8_t id, uint8_t plugStat, uint8_t chargeStat, uint16_t W, uint32_t kWhCounter) {
+	
 }

@@ -25,10 +25,8 @@ void goE_handle() {
 void goE_setPayload(String payload) {
 	String cmd;
 	uint16_t val = 0;
-	cmd = payload.substring(0,3);
-	val = payload.substring(4).toInt();
-	Serial.println(cmd);
-	Serial.println(val);
+	cmd = payload.substring(0,3);					// first 4 chars, e.g. "amx="
+	val = payload.substring(4).toInt();		// everything after "="
 	if (cmd == "alw") {
 		if (val == 1) {
 			// charging allowed

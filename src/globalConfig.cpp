@@ -5,7 +5,7 @@
 #include <LittleFS.h>
 
 char cfgWbecVersion[]     = "v0.0.2+";          // wbec version
-char cfgBuildDate[]       = "2021-05-07";	      // wbec build date
+char cfgBuildDate[]       = "2021-05-13";	      // wbec build date
 
 char cfgApSsid[32];	              // SSID of the initial Access Point
 char cfgApPass[63];               // Password of the initial Access Point
