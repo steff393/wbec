@@ -1,4 +1,4 @@
-// Copyright (c) 2021 steff393
+// Copyright (c) 2021 steff393, MIT license
 
 #include <Arduino.h>
 #include "AsyncJson.h"
@@ -16,7 +16,7 @@
 #include <WiFiManager.h>
 
 AsyncWebServer server(80);
-
+boolean resetRequested = false;
 
 void onRequest(AsyncWebServerRequest *request){
   //Handle Unknown Request
@@ -84,7 +84,7 @@ uint8_t getSignalQuality(int rssi)
     return quality;
 }
 
-void initWebserver() {
+void webServer_begin() {
 	// respond to GET requests on URL /heap
   server.on("/heap", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(200, "text/plain", String(ESP.getFreeHeap()));
@@ -101,6 +101,14 @@ void initWebserver() {
 
   server.on("/cfg", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(LittleFS, "/cfg.json", "application/json");
+  });
+
+  server.on("/delete_cfg", HTTP_GET, [](AsyncWebServerRequest *request){
+    if (LittleFS.remove("/cfg.json")) {
+      request->send_P(200, "text/plain", "cfg.json successfully deleted, resetting defaults at next startup");
+    } else {
+      request->send_P(200, "text/plain", "cfg.json could not be deleted");
+    }
   });
 
   server.on("/web", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -134,6 +142,11 @@ void initWebserver() {
   server.on("/current", HTTP_GET, [](AsyncWebServerRequest *request){
     float tmp = content[0][53] / 10.0;
     request->send_P(200, "text/plain", String(tmp).c_str());
+  });
+
+  server.on("/reset", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(200, "text/plain", String("Resetting the ESP8266..."));
+    resetRequested = true;
   });
 
   server.on("/resetwifi", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -247,3 +260,8 @@ server.on("/mqtt", HTTP_GET, [](AsyncWebServerRequest *request) {
   server.onRequestBody(onBody);
 }
 
+void webServer_handle() {
+  if (resetRequested){
+    ESP.restart();
+  }
+}

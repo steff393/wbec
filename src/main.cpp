@@ -1,4 +1,4 @@
-// Copyright (c) 2021 steff393
+// Copyright (c) 2021 steff393, MIT license
 
 #include <Arduino.h>
 #include <ArduinoOTA.h>
@@ -36,7 +36,7 @@ void setup() {
   wifiManager.autoConnect(ssid, pass);
 
   // setup the Webserver
-  initWebserver();
+  webServer_begin();
   server.begin();
 
   // setup the OTA server
@@ -60,5 +60,6 @@ void loop() {
     mb_handle();
     goE_handle();
     mqtt_handle();
+    webServer_handle();
   }
 }
