@@ -106,12 +106,12 @@ void mqtt_publish(uint8_t i) {
 	client.publish(String(header + "/chargeStat").c_str(), String(cs).c_str(), retain);
 
 	client.publish(String(header + "/W").c_str(),          String(content[i][10]).c_str(), retain);
-	client.publish(String(header + "/kWhCounter").c_str(), String(((uint32_t) content[i][13] << 16 | (uint32_t)content[i][14]) / 1000).c_str(), retain);
+	client.publish(String(header + "/kWhCounter").c_str(), String((float)((uint32_t) content[i][13] << 16 | (uint32_t)content[i][14]) / 1000.0, 3).c_str(), retain);
 	client.publish(String(header + "/VPhase1").c_str(),    String(content[i][6]).c_str(), retain);
 	client.publish(String(header + "/VPhase2").c_str(),    String(content[i][7]).c_str(), retain);
 	client.publish(String(header + "/VPhase3").c_str(),    String(content[i][8]).c_str(), retain);
-	client.publish(String(header + "/APhase1").c_str(),    String(content[i][2]).c_str(), retain);
-	client.publish(String(header + "/APhase2").c_str(),    String(content[i][3]).c_str(), retain);
-	client.publish(String(header + "/APhase3").c_str(),    String(content[i][4]).c_str(), retain);
+	client.publish(String(header + "/APhase1").c_str(),    String((float)content[i][2] / 10.0, 1).c_str(), retain);
+	client.publish(String(header + "/APhase2").c_str(),    String((float)content[i][3] / 10.0, 1).c_str(), retain);
+	client.publish(String(header + "/APhase3").c_str(),    String((float)content[i][4] / 10.0, 1).c_str(), retain);
 	Serial.print("MQTT: Publish to "); Serial.println(header);
 }
