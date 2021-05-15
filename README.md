@@ -5,15 +5,16 @@ The Heidelberg Wallbox Energy Control is a high quality wallbox, but it offers o
 Goal of this project is to establish an Wifi interface, which also acts as Modbus master (for local external load management) and to rebuild a part of the Combox functionality.  
 
 ## Features (as of now)
-- Integration into openWB and EVCC (under test)
-- Communication via Modbus working
-- Registers can be read and are transmitted to serial debug terminal
-- Registers can be read/written via JSON web interface
-- Standby of Wallbox is inhibited by sending every 10s the register 257 with value 4
-- Prepared for supporting up to all 16 connected boxes
+- Works with openWB, EVCC, Solaranzeige (by emulation of go-echarger API)
+- Support of MQTT communication to openWB
+- Prepared for supporting up to all 16 connected boxes (up to 8 openWB load points)
+- Modbus registers can be read/written via JSON web interface
+- Standby of Wallbox can be configured
+- Simple prototype of a web interface
 - Simple prototype of a local load management
 - Update via WiFi (OTA), e.g. with PlatformIO
 - Access point mode, to configure your WiFi network/password (s. Wiki)
+- < 1W power consumption (for controlling up to 16 boxes)
 
 ## Contact
 In case of any questions, feel free to send a mail (wbec393@gmail.com) or open an issue  ;-)
@@ -25,7 +26,7 @@ When you're interested in a ready-to-use black-box, then please send a mail.
 - TTL-RS485-Adapter
 
 <p align="center">
-  <img src="/images/wbec.jpg">
+  <img src="/images/wbec.jpg">  <img src="https://user-images.githubusercontent.com/73853447/117866120-0e9e6700-b297-11eb-9cd1-4a33e714bceb.PNG">
 </p>
 
 ## Switch configuration of wallbox
@@ -37,7 +38,7 @@ S5 = 0000
 S6 = 0100 (terminator 120 Ohm, only on last box)  
 
 ## Examples
-First simple web interface:
+First simple web interface (might be removed again in future, as there are better alternatives with openWB, EVCC, ...):
 <p align="center">
   <img src="https://i.ibb.co/kKSkL1X/wbec-Web-Interface.png">
 </p>
@@ -49,6 +50,7 @@ http://192.168.xx.yy/json
 {
   "wbec": {
     "version": "v0.0.2"
+    "bldDate": "2021-05-14"
   },
   "box": [
     {

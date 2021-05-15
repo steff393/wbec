@@ -8,7 +8,6 @@
 #include "mbComm.h"
 #include "mqtt.h"
 #include "SPIFFSEditor.h"
-#include "wlan_key.h"
 #define WIFI_MANAGER_USE_ASYNC_WEB_SERVER
 #include <WiFiManager.h>
 #include "webServer.h"
@@ -18,7 +17,7 @@ bool _handlingOTA = false;
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("Starting wbec ;-)");
+  Serial.println("\n\nStarting wbec ;-)");
   
   if(!LittleFS.begin()){ 
     Serial.println("An Error has occurred while mounting LittleFS");

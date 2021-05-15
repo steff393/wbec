@@ -4,8 +4,8 @@
 #include <ArduinoJson.h>
 #include <LittleFS.h>
 
-char cfgWbecVersion[]     = "v0.0.2+";          // wbec version
-char cfgBuildDate[]       = "2021-05-14";	      // wbec build date
+char cfgWbecVersion[]     = "v0.1.0";           // wbec version
+char cfgBuildDate[]       = "2021-05-15";	      // wbec build date
 
 char     cfgApSsid[32];	              // SSID of the initial Access Point
 char     cfgApPass[63];               // Password of the initial Access Point
