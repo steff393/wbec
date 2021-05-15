@@ -40,7 +40,7 @@ void setup() {
   server.begin();
 
   // setup the OTA server
-  ArduinoOTA.setHostname(otaHost);
+  ArduinoOTA.setHostname("wbec");
   ArduinoOTA.begin();
 
   ArduinoOTA.onStart([]() 
