@@ -6,6 +6,7 @@
 #include "mbComm.h"
 #include <PubSubClient.h>
 
+#define MAX_LP 8							// maximum supported loadpoints by openWB
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -58,7 +59,13 @@ void reconnect() {
 	{
 		Serial.println("connected");
 		//once connected to MQTT broker, subscribe command if any
-		client.subscribe("openWB/lp/+/AConfigured");
+		for (int i = 0; i < cfgCntWb; i++) {
+			if (i >= MAX_LP) {break;}		// openWB doesn't support more load points
+			String topic = "openWB/lp/+/AConfigured";
+			topic.setCharAt(10, char(i + 1 + '0'));
+			client.subscribe(topic.c_str());
+			
+		}
 	} else {
 		Serial.print("failed, rc=");
 		Serial.print(client.state());
@@ -83,10 +90,9 @@ void mqtt_handle() {
 
 
 void mqtt_publish(uint8_t i) {
-	if (strcmp(cfgMqttIp, "") == 0 || i >= 8) {
-		return;	// openWB only supports 8 load points
+	if (strcmp(cfgMqttIp, "") == 0 || i >= MAX_LP) {
+		return;	// openWB doesn't support more load points
 	}
-
 	// publish the contents of box i
 	String header = String("openWB/set/lp/") + String(i + 1);
 	boolean retain = true;
