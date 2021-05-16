@@ -3,7 +3,10 @@
 #include <Arduino.h>
 #include "AsyncJson.h"
 #include "ArduinoJson.h"
+#include "logger.h"
 #include "mbComm.h"
+
+const uint8_t m = 4;
 
 uint32_t energyI = 0;
 uint8_t  chgStat_old = 0;
@@ -90,6 +93,6 @@ String goE_getStatus() {
 
 	String response;
 	serializeJson(data, response);
-	Serial.println(response);
+	log(m, response);
 	return(response);
 }

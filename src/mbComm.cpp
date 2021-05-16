@@ -2,12 +2,14 @@
 
 #include <Arduino.h>
 #include "globalConfig.h"
+#include "logger.h"
 #include "mbComm.h"
 #include "mqtt.h"
 #include <ModbusRTU.h>
 #include "loadManager.h"
 #include <SoftwareSerial.h>
 
+const uint8_t m = 1;
 
 // receivePin, transmitPin, inverse_logic, bufSize, isrBufSize
 SoftwareSerial S(PIN_RO, PIN_DI);
@@ -52,8 +54,8 @@ bool cbWrite(Modbus::ResultCode event, uint16_t transactionId, void* data) {
 	if (event) {
 		timeout(id);
 	}
-  Serial.printf_P("MB  : ResultCode: 0x%02X, BusID: %d\n", event, mb.slave());
-  return true;
+  log(m, "ResultCode: 0x" + String(event, HEX) + ", BusID: "+ mb.slave());
+	return(true);
 }
 
 
@@ -122,6 +124,6 @@ void mb_writeReg(uint8_t id, uint16_t reg, uint16_t val) {
 	if (rbIn == rbOut) {
 		// we have overwritten an not-sent value -> set rbOut to next element, otherwise complete ring would be skipped
 		rbOut = (rbOut+1) % RINGBUF_SIZE; 		// increment pointer, but take care of overflow
-		Serial.println("MB  : Overflow of ring buffer");
+		log(m, "Overflow of ring buffer");
 	}
 }

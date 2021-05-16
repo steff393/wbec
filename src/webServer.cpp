@@ -9,11 +9,14 @@
 #include "goEmulator.h"
 #include "LittleFS.h"
 #include "loadManager.h"
+#include "logger.h"
 #include "mbComm.h"
 #include "SPIFFSEditor.h"
 #include "webServer.h"
 #define WIFI_MANAGER_USE_ASYNC_WEB_SERVER
 #include <WiFiManager.h>
+
+const uint8_t m = 3;
 
 AsyncWebServer server(80);
 boolean resetRequested = false;
@@ -176,6 +179,7 @@ void webServer_begin() {
     // provide the complete content
     data["wbec"]["version"] = cfgWbecVersion;
     data["wbec"]["bldDate"] = cfgBuildDate;
+    data["wbec"]["timeNow"] = log_time();
     for (int i = 0; i < cfgCntWb; i++) {
       data["box"][i]["busId"]    = i+1;
       data["box"][i]["version"]  = String(content[i][0], HEX);
@@ -212,7 +216,7 @@ void webServer_begin() {
 
     String response;
     serializeJson(data, response);
-    Serial.println(response);
+    log(m, response);
     request->send(200, "application/json", response);
   });
 
@@ -224,7 +228,7 @@ void webServer_begin() {
 server.on("/mqtt", HTTP_GET, [](AsyncWebServerRequest *request) {
     // set values
     if (request->hasParam("payload")) {
-      Serial.println(request->getParam("payload")->value());
+      log(m, "/mqtt payload: " + request->getParam("payload")->value());
       goE_setPayload(request->getParam("payload")->value());
     }
     // response

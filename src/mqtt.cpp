@@ -3,10 +3,13 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include "globalConfig.h"
+#include "logger.h"
 #include "mbComm.h"
 #include <PubSubClient.h>
 
 #define MAX_LP 8							// maximum supported loadpoints by openWB
+
+const uint8_t m = 2;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -19,8 +22,7 @@ void callback(char* _topic, byte* payload, uint8_t length)
 	String topic = String(_topic);
 
 	// handle received message
-	Serial.print("MQTT: Received: "); Serial.print(topic); Serial.print(", Payload: ");
-
+	log(m, "Received: " + topic + ", Payload: ", false);
 	char buffer[length];
 	for (uint8_t i = 0; i < length; i++) {
 		Serial.print((char)payload[i]);
@@ -35,7 +37,7 @@ void callback(char* _topic, byte* payload, uint8_t length)
 		val = val * 10;
 		// set current
 		if (val == 0 || (val >= CURR_ABS_MIN && val <= CURR_ABS_MAX)) {
-			Serial.print(", Write to box: "); Serial.print(i); Serial.print(" Value: "); Serial.println(val); 
+			log(0, ", Write to box: " + String(i) + " Value: " + String(val));
 			mb_writeReg(i, REG_CURR_LIMIT, val);
 		}
 	}
@@ -50,26 +52,23 @@ void mqtt_begin() {
 }
 
 void reconnect() {
-  Serial.print("Attempting MQTT connection...");
+	log(m, "Attempting MQTT connection...", false);
 	// Create a random client ID
 	String clientId = "wbec-";
 	clientId += String(random(0xffff), HEX);
 	// Attempt to connect
 	if (client.connect(clientId.c_str()))				// alternative: client.connect(clientId,userName,passWord)
 	{
-		Serial.println("connected");
+		log(0, "connected");
 		//once connected to MQTT broker, subscribe command if any
 		for (int i = 0; i < cfgCntWb; i++) {
 			if (i >= MAX_LP) {break;}		// openWB doesn't support more load points
 			String topic = "openWB/lp/+/AConfigured";
 			topic.setCharAt(10, char(i + 1 + '0'));
 			client.subscribe(topic.c_str());
-			
 		}
 	} else {
-		Serial.print("failed, rc=");
-		Serial.print(client.state());
-		Serial.println(" try again in 5 seconds");
+		log(m, String("failed, rc=") + client.state() + " try again in 5 seconds");
 	}
 }
 
@@ -119,5 +118,5 @@ void mqtt_publish(uint8_t i) {
 	client.publish(String(header + "/APhase1").c_str(),    String((float)content[i][2] / 10.0, 1).c_str(), retain);
 	client.publish(String(header + "/APhase2").c_str(),    String((float)content[i][3] / 10.0, 1).c_str(), retain);
 	client.publish(String(header + "/APhase3").c_str(),    String((float)content[i][4] / 10.0, 1).c_str(), retain);
-	Serial.print("MQTT: Publish to "); Serial.println(header);
+	log(m, "Publish to " + header);
 }

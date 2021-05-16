@@ -5,6 +5,7 @@
 #include "globalConfig.h"
 #include "goEmulator.h"
 #include "LittleFS.h"
+#include "logger.h"
 #include "mbComm.h"
 #include "mqtt.h"
 #include "SPIFFSEditor.h"
@@ -38,6 +39,8 @@ void setup() {
   webServer_begin();
   server.begin();
 
+  logger_begin();
+
   // setup the OTA server
   ArduinoOTA.setHostname("wbec");
   ArduinoOTA.begin();
@@ -56,6 +59,7 @@ void setup() {
 void loop() {
   ArduinoOTA.handle();
   if(!_handlingOTA) {
+    logger_handle();
     mb_handle();
     goE_handle();
     mqtt_handle();
