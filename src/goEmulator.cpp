@@ -10,7 +10,7 @@ const uint8_t m = 4;
 
 uint32_t energyI = 0;
 uint8_t  chgStat_old = 0;
-uint8_t  alw = 0;
+uint8_t  alw = 1;
 uint8_t  amp = 0;
 uint8_t  i = 0;
 
