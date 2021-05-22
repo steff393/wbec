@@ -2,10 +2,14 @@
 // based on https://github.com/esp8266/Arduino/blob/master/libraries/esp8266/examples/ConfigFile/ConfigFile.ino
 
 #include <ArduinoJson.h>
+#include "globalConfig.h"
 #include <LittleFS.h>
+#include "logger.h"
 
-char cfgWbecVersion[]     = "v0.1.0";           // wbec version
-char cfgBuildDate[]       = "2021-05-15";	      // wbec build date
+const uint8_t m = 5;
+
+char cfgWbecVersion[]     = "v0.1.0+";          // wbec version
+char cfgBuildDate[]       = "2021-05-22";	      // wbec build date
 
 char     cfgApSsid[32];	              // SSID of the initial Access Point
 char     cfgApPass[63];               // Password of the initial Access Point
@@ -14,6 +18,7 @@ uint8_t  cfgMbCycleTime;	            // cycle time of the modbus (in seconds)
 uint16_t cfgMbTimeout;					      // Reg. 257: Modbus timeout (in milliseconds)
 uint16_t cfgStandby;                  // Reg. 258: Standby Function Control: 0 = enable standby, 4 = disable standby
 char     cfgMqttIp[16];              	// IP address of MQTT broker, "" to disable MQTT
+uint8_t  cfgMqttLp[WB_CNT];           // Array with assignments to openWB loadpoints, e.g. [4,2,0,1]: Box0 = LP4, Box1 = LP2, Box2 = no MQTT, Box3 = LP1
 
 
 bool createConfig() {
@@ -28,6 +33,7 @@ bool createConfig() {
   doc["cfgMbTimeout"]           = 60000;  
   doc["cfgStandby"]             = 4;
   doc["cfgMqttIp"]              = "";
+  doc["cfgMqttLp"]              = serialized("[]");   // already serialized
   // -------------------------------------
 
   File configFile = LittleFS.open("/cfg.json", "w");
@@ -82,8 +88,20 @@ bool loadConfig() {
   cfgStandby                = doc["cfgStandby"]; 
   strncpy(cfgMqttIp,          doc["cfgMqttIp"],           sizeof(cfgMqttIp));
 
-  Serial.print("\nLoaded cfgWbecVersion: "); Serial.println(cfgWbecVersion);
-  Serial.print("Loaded cfgBuildDate: "); Serial.println(cfgBuildDate);
-  Serial.print("Loaded cfgCntWb: "); Serial.println(cfgCntWb);
+  log(m, "cfgWbecVersion: " + String(cfgWbecVersion));
+  log(m, "cfgBuildDate: "   + String(cfgBuildDate));
+  log(m, "cfgCntWb: "       + String(cfgCntWb));
+
+  for (uint8_t i = 0; i < WB_CNT; i++) {
+    if (i < doc["cfgMqttLp"].size()) {
+      cfgMqttLp[i]            = doc["cfgMqttLp"][i];
+    } else {
+      cfgMqttLp[i]            = 0;
+    }
+    if (cfgMqttLp[i] > OPENWB_MAX_LP) {
+      cfgMqttLp[i]            = 0;
+    }
+    //log(m, "cfgMqttLp[" + String(i) + "]: " + cfgMqttLp[i]); 
+  }
   return true;
 }

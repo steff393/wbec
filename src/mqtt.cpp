@@ -7,8 +7,6 @@
 #include "mbComm.h"
 #include <PubSubClient.h>
 
-#define MAX_LP 8							// maximum supported loadpoints by openWB
-
 const uint8_t m = 2;
 
 WiFiClient espClient;
@@ -32,13 +30,23 @@ void callback(char* _topic, byte* payload, uint8_t length)
 
 	if (topic.startsWith("openWB/lp/") && topic.endsWith("/AConfigured")) {
 		uint8_t val = String(buffer).toInt();				// Alternative: toFloat()
-		uint8_t i   = topic.substring(10,11).toInt() - 1;		// id of the box
-		// openWB has 1A resolution, wbec has 0.1A resulotion
-		val = val * 10;
-		// set current
-		if (val == 0 || (val >= CURR_ABS_MIN && val <= CURR_ABS_MAX)) {
-			log(0, ", Write to box: " + String(i) + " Value: " + String(val));
-			mb_writeReg(i, REG_CURR_LIMIT, val);
+		uint8_t lp  = topic.substring(10,11).toInt();		// loadpoint nr.
+		uint8_t i   = 0;
+
+		// search, which index fits to loadpoint, first element will be selected
+		for (int i = 0; i < cfgCntWb; i++) {
+			if (cfgMqttLp[i] == lp) {break;}
+		}
+		if (cfgMqttLp[i] == lp) {
+			// openWB has 1A resolution, wbec has 0.1A resulotion
+			val = val * 10;
+			// set current
+			if (val == 0 || (val >= CURR_ABS_MIN && val <= CURR_ABS_MAX)) {
+				log(0, ", Write to box: " + String(i) + " Value: " + String(val));
+				mb_writeReg(i, REG_CURR_LIMIT, val);
+			}
+		} else {
+			log(0, ", no box assigned");
 		}
 	}
 }
@@ -62,7 +70,7 @@ void reconnect() {
 		log(0, "connected");
 		//once connected to MQTT broker, subscribe command if any
 		for (int i = 0; i < cfgCntWb; i++) {
-			if (i >= MAX_LP) {break;}		// openWB doesn't support more load points
+			if (i >= OPENWB_MAX_LP) {break;}		// openWB doesn't support more load points
 			String topic = "openWB/lp/+/AConfigured";
 			topic.setCharAt(10, char(i + 1 + '0'));
 			client.subscribe(topic.c_str());
@@ -89,11 +97,11 @@ void mqtt_handle() {
 
 
 void mqtt_publish(uint8_t i) {
-	if (strcmp(cfgMqttIp, "") == 0 || i >= MAX_LP) {
-		return;	// openWB doesn't support more load points
+	if (strcmp(cfgMqttIp, "") == 0 || cfgMqttLp[i] == 0) {
+		return;	// do nothing, when Mqtt is not configured, or box has no loadpoint assigned
 	}
 	// publish the contents of box i
-	String header = String("openWB/set/lp/") + String(i + 1);
+	String header = String("openWB/set/lp/") + String(cfgMqttLp[i]);
 	boolean retain = true;
 	uint8_t ps = 0;
 	uint8_t cs = 0;

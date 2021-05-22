@@ -7,7 +7,7 @@
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "europe.pool.ntp.org", 3600, 60000); // GMT+1 and update every minute
 
-const char *mod[5] = {"", "MB  ", "MQTT", "WEBS", "GO-E"};
+const char *mod[6] = {"", "MB  ", "MQTT", "WEBS", "GO-E", "CFG "};
 
 boolean getDstGermany(uint32_t unixtime) {
   
