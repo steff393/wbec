@@ -107,8 +107,12 @@ void webServer_begin() {
   });
 
   server.on("/bootlog", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/boot.log", "text/plain");
-    // TODO: Fehlerbehandlung wenn Datei nicht existiert
+    request->send(200, "text/plain", log_getBuffer());
+  });
+
+  server.on("/bootlog_reset", HTTP_GET, [](AsyncWebServerRequest *request){
+    log_freeBuffer();
+    request->send(200, "text/plain", "Cleared");
   });
 
   server.on("/delete_cfg", HTTP_GET, [](AsyncWebServerRequest *request){

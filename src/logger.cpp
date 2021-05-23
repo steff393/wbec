@@ -9,7 +9,7 @@ WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "europe.pool.ntp.org", 3600, 60000); // GMT+1 and update every minute
 
 const char *mod[6] = {"", "MB  ", "MQTT", "WEBS", "GO-E", "CFG "};
-char bootLog[8000];
+char bootLog[5000];
 boolean written = false;
 
 boolean getDstGermany(uint32_t unixtime) {
@@ -95,24 +95,18 @@ void log(uint8_t module, String msg, boolean newLine /* =true */) {
 
   if (strlen(bootLog)+strlen(output.c_str()) < sizeof(bootLog)-10) {
     strcat(bootLog, output.c_str());
-  } else {
-    if (written == false) {
-      written = true;
-      Serial.print(timeClient.getFormattedTime() + ": " + String("LOG ") + ": Writing boot.log ...");
-      File logFile = LittleFS.open("/boot.log", "w");
-      if (!logFile) {
-        Serial.println("Failure");
-      } else {
-        Serial.println(logFile.println(bootLog));
-        logFile.close();
-        Serial.println("Success");
-      }
-    }
-    // TODO: Evtl. gar nicht speichern, sondern einfach RAM durch Webserver ausgeben
-  }
+  } 
 }
 
 String log_time() {
 	return(timeClient.getFormattedTime());
 }
 
+char* log_getBuffer() {
+  return(bootLog);
+}
+
+void log_freeBuffer() {
+  // set string-end character to first position to indicate an empty string
+  bootLog[0]=0;
+}
