@@ -9,12 +9,13 @@
 const uint8_t m = 5;
 
 char cfgWbecVersion[]     = "v0.1.0+";          // wbec version
-char cfgBuildDate[]       = "2021-05-22";	      // wbec build date
+char cfgBuildDate[]       = "2021-05-23";	      // wbec build date
 
 char     cfgApSsid[32];	              // SSID of the initial Access Point
 char     cfgApPass[63];               // Password of the initial Access Point
 uint8_t  cfgCntWb;		                // number of connected wallboxes in the system
 uint8_t  cfgMbCycleTime;	            // cycle time of the modbus (in seconds)
+uint16_t cfgMbDelay;					        // delay time of the modbus before sending new message (in milliseconds)
 uint16_t cfgMbTimeout;					      // Reg. 257: Modbus timeout (in milliseconds)
 uint16_t cfgStandby;                  // Reg. 258: Standby Function Control: 0 = enable standby, 4 = disable standby
 char     cfgMqttIp[16];              	// IP address of MQTT broker, "" to disable MQTT
@@ -30,6 +31,7 @@ bool createConfig() {
   doc["cfgApPass"]              = "wbec1234"; // older version had "cebw1234"
   doc["cfgCntWb"]               = 1;
   doc["cfgMbCycleTime"]         = 3;
+  doc["cfgMbDelay"]             = 100;
   doc["cfgMbTimeout"]           = 60000;  
   doc["cfgStandby"]             = 4;
   doc["cfgMqttIp"]              = "";
@@ -80,13 +82,14 @@ bool loadConfig() {
     return false;
   }
 
-  strncpy(cfgApSsid,          doc["cfgApSsid"],           sizeof(cfgApSsid));
-  strncpy(cfgApPass,          doc["cfgApPass"],           sizeof(cfgApPass));
-  cfgCntWb                  = doc["cfgCntWb"];
-  cfgMbCycleTime            = doc["cfgMbCycleTime"]; 
-  cfgMbTimeout              = doc["cfgMbTimeout"];
-  cfgStandby                = doc["cfgStandby"]; 
-  strncpy(cfgMqttIp,          doc["cfgMqttIp"],           sizeof(cfgMqttIp));
+  strncpy(cfgApSsid,          doc["cfgApSsid"]            | "wbec",             sizeof(cfgApSsid));
+  strncpy(cfgApPass,          doc["cfgApPass"]            | "wbec1234",         sizeof(cfgApPass));
+  cfgCntWb                  = doc["cfgCntWb"]             | 1;
+  cfgMbCycleTime            = doc["cfgMbCycleTime"]       | 3; 
+  cfgMbDelay                = doc["cfgMbDelay"]           | 100UL; 
+  cfgMbTimeout              = doc["cfgMbTimeout"]         | 60000UL;
+  cfgStandby                = doc["cfgStandby"]           | 4UL; 
+  strncpy(cfgMqttIp,          doc["cfgMqttIp"]            | "",                 sizeof(cfgMqttIp));
 
   log(m, "cfgWbecVersion: " + String(cfgWbecVersion));
   log(m, "cfgBuildDate: "   + String(cfgBuildDate));

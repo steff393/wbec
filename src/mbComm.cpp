@@ -19,6 +19,7 @@ ModbusRTU mb;
 uint16_t  content[WB_CNT][55];
 
 uint32_t  modbusLastTime = 0;
+uint32_t  modbusLastMsgSentTime = 0;
 uint8_t   modbusResultCode[WB_CNT];
 uint8_t   msgCnt = 0;
 uint8_t   id = 0;
@@ -33,6 +34,16 @@ typedef struct rb_struct {
 rb_t 		rb[RINGBUF_SIZE];			// ring buffer
 uint8_t rbIn  = 0;				  	// last element, which was written to ring buffer
 uint8_t rbOut = 0;						// last element, which was read from ring buffer
+
+boolean mb_available() {
+	// don't allow new msg, when communication is still active (ca.30ms) or minimum delay time not exceeded
+	if (mb.slave() || millis() - modbusLastMsgSentTime < cfgMbDelay) {
+		return(false);
+	} else {
+		return(true);
+	}
+}
+
 
 void timeout(uint8_t id) {
 	if (cfgStandby == 4) {
@@ -53,8 +64,9 @@ bool cbWrite(Modbus::ResultCode event, uint16_t transactionId, void* data) {
 	modbusResultCode[id] = event;
 	if (event) {
 		timeout(id);
+		log(m, "Comm-Failure BusID " + String(mb.slave()));
 	}
-  log(m, "ResultCode: 0x" + String(event, HEX) + ", BusID: "+ mb.slave());
+  //log(m, "ResultCode: 0x" + String(event, HEX) + ", BusID: "+ mb.slave());
 	return(true);
 }
 
@@ -70,30 +82,35 @@ void mb_setup() {
 void mb_handle() {
 	// When pointers of the ring buffer are not equal, then there is something to send
 	if (rbOut != rbIn) {
-		if (!mb.slave()) {			// check, if bus available
+		if (mb_available()) {			// check, if bus available
 			rbOut = (rbOut+1) % RINGBUF_SIZE; 		// increment pointer, but take care of overflow
 			// if box is not in timeout, then send out
 			//if (!modbusResultCode[id]) {
 				mb.writeHreg(rb[rbOut].id + 1, rb[rbOut].reg, &rb[rbOut].val,  1, cbWrite); 
+				modbusLastMsgSentTime = millis();
 			//}
 		}
 	}
 
-	if (modbusLastTime == 0 || millis() > modbusLastTime + (cfgMbCycleTime*1000)) {
-      if (!mb.slave()) {
+	if (modbusLastTime == 0 || millis() - modbusLastTime > (cfgMbCycleTime*1000)) {
+      if (mb_available()) {
 				//Serial.print(millis());Serial.print(": Sending to BusID: ");Serial.print(id+1);Serial.print(" with msgCnt = ");Serial.println(msgCnt);
+				if (!modbusResultCode[id]) {
+					//log(m, String(millis()) + ": BusID=" + (id+1) + ",msgCnt=" + msgCnt);
+				}
 				switch(msgCnt) {
 					case 0:                                                       mb.readIreg (id+1,   4,              &content[id][0] ,  15, cbWrite); break;
-					case 1: if (!modbusResultCode[id])                          { mb.readIreg (id+1, 100,              &content[id][15],  17); } break;
-					case 2: if (!modbusResultCode[id])                          { mb.readIreg (id+1, 117,              &content[id][32],  17); } break;
-					case 3: if (!modbusResultCode[id])                          { mb.readHreg (id+1, REG_WD_TIME_OUT,  &content[id][49],   1); } break;
-					case 4: if (!modbusResultCode[id] && content[id][0] > 263)  { mb.readHreg (id+1, REG_STANDBY_CTRL, &content[id][50],   1); } break;	// Can't be read in FW 0x0107 = 263dec
-					case 5: if (!modbusResultCode[id])                          { mb.readHreg (id+1, REG_REMOTE_LOCK,  &content[id][51],   1); } break;
-					case 6: if (!modbusResultCode[id])                          { mb.readHreg (id+1, REG_CURR_LIMIT,   &content[id][53],   2); } break;
-					case 7: if (!modbusResultCode[id])                          { mb.writeHreg(id+1, REG_WD_TIME_OUT,  &cfgMbTimeout,      1); } break;
-					case 8: if (!modbusResultCode[id])                          { mb.writeHreg(id+1, REG_STANDBY_CTRL, &cfgStandby,        1); } break;
-					default: ; // do nothing, will be handled below
+					case 1: if (!modbusResultCode[id])                          { mb.readIreg (id+1, 100,              &content[id][15],  17, cbWrite); } break;
+					case 2: if (!modbusResultCode[id])                          { mb.readIreg (id+1, 117,              &content[id][32],  17, cbWrite); } break;
+					case 3: if (!modbusResultCode[id])                          { mb.readHreg (id+1, REG_WD_TIME_OUT,  &content[id][49],   1, cbWrite); } break;
+					case 4: if (!modbusResultCode[id] && content[id][0] > 263)  { mb.readHreg (id+1, REG_STANDBY_CTRL, &content[id][50],   1, cbWrite); } break;	// Can't be read in FW 0x0107 = 263dec
+					case 5: if (!modbusResultCode[id])                          { mb.readHreg (id+1, REG_REMOTE_LOCK,  &content[id][51],   1, cbWrite); } break;
+					case 6: if (!modbusResultCode[id])                          { mb.readHreg (id+1, REG_CURR_LIMIT,   &content[id][53],   2, cbWrite); } break;
+					case 7: if (!modbusResultCode[id])                          { mb.writeHreg(id+1, REG_WD_TIME_OUT,  &cfgMbTimeout,      1, cbWrite); } break;
+					case 8: if (!modbusResultCode[id])                          { mb.writeHreg(id+1, REG_STANDBY_CTRL, &cfgStandby,        1, cbWrite); } break;
+					default: ; // do nothing, should not happen
 				}
+				modbusLastMsgSentTime = millis();
 				id++;
 				if (id >= cfgCntWb) {
 					id = 0;
