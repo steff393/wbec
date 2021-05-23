@@ -20,13 +20,9 @@ Goal of this project is to establish an Wifi interface, which also acts as Modbu
 In case of any questions, feel free to send a mail (wbec393@gmail.com) or open an issue  ;-)
 When you're interested in a ready-to-use black-box, then please send a mail.
 
-## Materials
-- Heidelberg Wallbox Energy Control
-- NodeMCU, ESP8266
-- TTL-RS485-Adapter
-
+## Pictures
 <p align="center">
-  <img src="/images/wbec.jpg">  <img src="https://user-images.githubusercontent.com/73853447/117866120-0e9e6700-b297-11eb-9cd1-4a33e714bceb.PNG">
+  <img src="/images/wbec.jpg"> <br> <img src="https://user-images.githubusercontent.com/73853447/117866120-0e9e6700-b297-11eb-9cd1-4a33e714bceb.PNG">
 </p>
 
 ## Switch configuration of wallbox
@@ -113,3 +109,8 @@ Set Watchdog timeout:
 ```c++
 http://192.168.xx.yy/json?wdTmOut=20000
 ```
+
+## Support the project
+You like wbec? Please [star this project on GitHub](https://github.com/steff393/wbec/stargazers)!
+
+What? You don't like it but you *love* it?  When wbec helps you in using your wallbox more efficiently, you can also [![](https://img.shields.io/badge/send%20me%20a%20small%20gift-paypal-blue.svg?style=flat-square)](https://paypal.me/steff393)
