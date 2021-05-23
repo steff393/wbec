@@ -21,6 +21,7 @@ uint16_t  content[WB_CNT][55];
 uint32_t  modbusLastTime = 0;
 uint32_t  modbusLastMsgSentTime = 0;
 uint8_t   modbusResultCode[WB_CNT];
+uint8_t   modbusFailureCnt[WB_CNT];
 uint8_t   msgCnt = 0;
 uint8_t   id = 0;
 
@@ -63,9 +64,21 @@ bool cbWrite(Modbus::ResultCode event, uint16_t transactionId, void* data) {
   int id = mb.slave()-1;
 	modbusResultCode[id] = event;
 	if (event) {
-		timeout(id);
 		log(m, "Comm-Failure BusID " + String(mb.slave()));
+		if (modbusFailureCnt[id] < 250) {
+			modbusFailureCnt[id]++;
+		}
+		if (modbusFailureCnt[id] == 10) {
+			// too many consecutive timeouts --> reset values
+			log(m, "Timeout BusID " + String(mb.slave()));
+			timeout(id);
+		}
+	} else
+	{
+		// no failure
+		modbusFailureCnt[id] = 0;
 	}
+	
   //log(m, "ResultCode: 0x" + String(event, HEX) + ", BusID: "+ mb.slave());
 	return(true);
 }
