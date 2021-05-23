@@ -124,6 +124,10 @@ void mb_handle() {
 					default: ; // do nothing, should not happen
 				}
 				modbusLastMsgSentTime = millis();
+				if (msgCnt == 6) {
+					// after reading the current limit --> publish received data to MQTT
+					mqtt_publish(id);
+				}
 				id++;
 				if (id >= cfgCntWb) {
 					id = 0;
@@ -136,8 +140,6 @@ void mb_handle() {
 					modbusLastTime = millis();
 					// 1st trial implementation of a simple loadManager
 					lm_updateWbLimits();
-					// publish received data to MQTT
-					mqtt_publish(id);
 				}
       }
     }

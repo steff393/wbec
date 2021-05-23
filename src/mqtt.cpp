@@ -23,18 +23,17 @@ void callback(char* _topic, byte* payload, uint8_t length)
 	log(m, "Received: " + topic + ", Payload: ", false);
 	char buffer[length];
 	for (uint8_t i = 0; i < length; i++) {
-		Serial.print((char)payload[i]);
+		log(0, String((char)payload[i]), false);
 		buffer[i] = (char)payload[i];
 	}
-	buffer[length] = '\0';
+	buffer[length] = '\0';			// add string termination
 
 	if (topic.startsWith("openWB/lp/") && topic.endsWith("/AConfigured")) {
 		uint8_t val = String(buffer).toInt();				// Alternative: toFloat()
 		uint8_t lp  = topic.substring(10,11).toInt();		// loadpoint nr.
-		uint8_t i   = 0;
-
+		uint8_t i;
 		// search, which index fits to loadpoint, first element will be selected
-		for (int i = 0; i < cfgCntWb; i++) {
+		for (i = 0; i < cfgCntWb; i++) {
 			if (cfgMqttLp[i] == lp) {break;}
 		}
 		if (cfgMqttLp[i] == lp) {
@@ -69,11 +68,12 @@ void reconnect() {
 	{
 		log(0, "connected");
 		//once connected to MQTT broker, subscribe command if any
-		for (int i = 0; i < cfgCntWb; i++) {
-			if (i >= OPENWB_MAX_LP) {break;}		// openWB doesn't support more load points
+		for (uint8_t i = 0; i < cfgCntWb; i++) {
 			String topic = "openWB/lp/+/AConfigured";
-			topic.setCharAt(10, char(i + 1 + '0'));
-			client.subscribe(topic.c_str());
+			if (cfgMqttLp[i] != 0) {
+				topic.setCharAt(10, char(cfgMqttLp[i] + '0'));
+				client.subscribe(topic.c_str());
+			}
 		}
 	} else {
 		log(m, String("failed, rc=") + client.state() + " try again in 5 seconds");

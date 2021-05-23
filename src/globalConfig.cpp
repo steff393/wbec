@@ -8,7 +8,7 @@
 
 const uint8_t m = 5;
 
-char cfgWbecVersion[]     = "v0.1.0+";          // wbec version
+char cfgWbecVersion[]     = "v0.2.0";          // wbec version
 char cfgBuildDate[]       = "2021-05-23";	      // wbec build date
 
 char     cfgApSsid[32];	              // SSID of the initial Access Point

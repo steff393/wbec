@@ -108,5 +108,5 @@ char* log_getBuffer() {
 
 void log_freeBuffer() {
   // set string-end character to first position to indicate an empty string
-  bootLog[0]=0;
+  bootLog[0] = '\0';
 }
