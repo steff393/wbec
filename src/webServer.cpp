@@ -106,6 +106,11 @@ void webServer_begin() {
     request->send(LittleFS, "/cfg.json", "application/json");
   });
 
+  server.on("/bootlog", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/boot.log", "text/plain");
+    // TODO: Fehlerbehandlung wenn Datei nicht existiert
+  });
+
   server.on("/delete_cfg", HTTP_GET, [](AsyncWebServerRequest *request){
     if (LittleFS.remove("/cfg.json")) {
       request->send_P(200, "text/plain", "cfg.json successfully deleted, resetting defaults at next startup");

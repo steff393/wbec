@@ -2,12 +2,15 @@
 
 #include <Arduino.h>
 #include <ESP8266mDNS.h>
+#include "LittleFS.h"
 #include <NTPClient.h>
 
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "europe.pool.ntp.org", 3600, 60000); // GMT+1 and update every minute
 
 const char *mod[6] = {"", "MB  ", "MQTT", "WEBS", "GO-E", "CFG "};
+char bootLog[8000];
+boolean written = false;
 
 boolean getDstGermany(uint32_t unixtime) {
   
@@ -79,13 +82,34 @@ void logger_handle() {
 }
 
 void log(uint8_t module, String msg, boolean newLine /* =true */) {
-	if (module) {
-		Serial.print(timeClient.getFormattedTime() + ": " + String(mod[module]) + ": ");
+	String output;
+
+  if (module) {
+    output = timeClient.getFormattedTime() + ": " + String(mod[module]) + ": ";
 	}
-	Serial.print(msg);
+  output += msg;
 	if (newLine) {
-		Serial.print("\n");
+		output += "\n";
 	}
+  Serial.print(output);
+
+  if (strlen(bootLog)+strlen(output.c_str()) < sizeof(bootLog)-10) {
+    strcat(bootLog, output.c_str());
+  } else {
+    if (written == false) {
+      written = true;
+      Serial.print(timeClient.getFormattedTime() + ": " + String("LOG ") + ": Writing boot.log ...");
+      File logFile = LittleFS.open("/boot.log", "w");
+      if (!logFile) {
+        Serial.println("Failure");
+      } else {
+        Serial.println(logFile.println(bootLog));
+        logFile.close();
+        Serial.println("Success");
+      }
+    }
+    // TODO: Evtl. gar nicht speichern, sondern einfach RAM durch Webserver ausgeben
+  }
 }
 
 String log_time() {
