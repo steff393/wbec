@@ -37,18 +37,23 @@ bool createConfig() {
   doc["cfgMqttIp"]              = "";
   doc["cfgMqttLp"]              = serialized("[]");   // already serialized
   // -------------------------------------
-
+  
   File configFile = LittleFS.open("/cfg.json", "w");
   if (!configFile) {
     return(false);
   }
-
+  
   serializeJson(doc, configFile);
+  configFile.close();
   return (true);
 }
 
 
 bool loadConfig() {
+  boolean fail = false;
+  StaticJsonDocument<1024> doc;
+  size_t size;
+
   File configFile = LittleFS.open("/cfg.json", "r");
   if (!configFile) {
     Serial.println("Failed to open config file... Creating default config...");
@@ -57,29 +62,41 @@ bool loadConfig() {
       configFile = LittleFS.open("/cfg.json", "r");
     } else {
       Serial.println("Failed to create default config... Please try to erase flash");
-      return(false);
+      //return(false);
+      fail = true;
     }
   }
 
-  size_t size = configFile.size();
-  if (size > 1024) {
-    Serial.println("Config file size is too large");
-    return(false);
+  if (!fail) {
+    size = configFile.size();
+    if (size > 1024) {
+      Serial.println("Config file size is too large");
+      //return(false);
+      fail = true;
+    }
   }
 
-  // Allocate a buffer to store contents of the file.
-  std::unique_ptr<char[]> buf(new char[size]);
+  if (!fail) {
+    // Allocate a buffer to store contents of the file.
+    std::unique_ptr<char[]> buf(new char[size]);
 
-  // We don't use String here because ArduinoJson library requires the input
-  // buffer to be mutable. If you don't use ArduinoJson, you may as well
-  // use configFile.readString instead.
-  configFile.readBytes(buf.get(), size);
+    // We don't use String here because ArduinoJson library requires the input
+    // buffer to be mutable. If you don't use ArduinoJson, you may as well
+    // use configFile.readString instead.
+    configFile.readBytes(buf.get(), size);
+    
+    auto error = deserializeJson(doc, buf.get());
+    if (error) {
+      Serial.print("Failed to parse config file: "); Serial.println(error.c_str());
+      //return(false);
+      fail = true;
+    }
+  }
 
-  StaticJsonDocument<1024> doc;
-  auto error = deserializeJson(doc, buf.get());
-  if (error) {
-    Serial.println("Failed to parse config file");
-    return false;
+  if (fail) {
+    // a failure in the sequence above previously lead to a 'dead' box -> better take default values instead to allow user to correct the cfg.json
+    Serial.println("Taking default config");
+    deserializeJson(doc, "{}");
   }
 
   strncpy(cfgApSsid,          doc["cfgApSsid"]            | "wbec",             sizeof(cfgApSsid));
