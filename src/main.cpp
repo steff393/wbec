@@ -25,10 +25,7 @@ void setup() {
     return;
   }
 
-  if (!loadConfig()) {
-    Serial.println("Failed to load config");
-    return;
-  } 
+  loadConfig();
 
   WiFiManager wifiManager;
   char ssid[32]; strcpy(ssid, cfgApSsid);

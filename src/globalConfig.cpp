@@ -42,17 +42,16 @@ bool createConfig() {
   if (!configFile) {
     return(false);
   }
-  
+
   serializeJson(doc, configFile);
   configFile.close();
   return (true);
 }
 
 
-bool loadConfig() {
-  boolean fail = false;
+StaticJsonDocument<1024> checkConfig() {
   StaticJsonDocument<1024> doc;
-  size_t size;
+  deserializeJson(doc, "{}");
 
   File configFile = LittleFS.open("/cfg.json", "r");
   if (!configFile) {
@@ -62,42 +61,37 @@ bool loadConfig() {
       configFile = LittleFS.open("/cfg.json", "r");
     } else {
       Serial.println("Failed to create default config... Please try to erase flash");
-      //return(false);
-      fail = true;
+      Serial.println("Taking default config");
+      return(doc);
     }
   }
 
-  if (!fail) {
-    size = configFile.size();
-    if (size > 1024) {
-      Serial.println("Config file size is too large");
-      //return(false);
-      fail = true;
-    }
-  }
-
-  if (!fail) {
-    // Allocate a buffer to store contents of the file.
-    std::unique_ptr<char[]> buf(new char[size]);
-
-    // We don't use String here because ArduinoJson library requires the input
-    // buffer to be mutable. If you don't use ArduinoJson, you may as well
-    // use configFile.readString instead.
-    configFile.readBytes(buf.get(), size);
-    
-    auto error = deserializeJson(doc, buf.get());
-    if (error) {
-      Serial.print("Failed to parse config file: "); Serial.println(error.c_str());
-      //return(false);
-      fail = true;
-    }
-  }
-
-  if (fail) {
-    // a failure in the sequence above previously lead to a 'dead' box -> better take default values instead to allow user to correct the cfg.json
+  size_t size = configFile.size();
+  if (size > 1024) {
+    Serial.println("Config file size is too large");
     Serial.println("Taking default config");
-    deserializeJson(doc, "{}");
+    return(doc);
   }
+
+  // Allocate a buffer to store contents of the file.
+  std::unique_ptr<char[]> buf(new char[size]);
+
+  // We don't use String here because ArduinoJson library requires the input
+  // buffer to be mutable. If you don't use ArduinoJson, you may as well
+  // use configFile.readString instead.
+  configFile.readBytes(buf.get(), size);
+  
+  auto error = deserializeJson(doc, buf.get());
+  if (error) {
+    Serial.print("Failed to parse config file: "); Serial.println(error.c_str());
+    Serial.println("Taking default config");
+  }
+  return(doc);
+}
+
+void loadConfig() {
+  StaticJsonDocument<1024> doc;
+  doc = checkConfig();
 
   strncpy(cfgApSsid,          doc["cfgApSsid"]            | "wbec",             sizeof(cfgApSsid));
   strncpy(cfgApPass,          doc["cfgApPass"]            | "wbec1234",         sizeof(cfgApPass));
@@ -123,5 +117,4 @@ bool loadConfig() {
     }
     //log(m, "cfgMqttLp[" + String(i) + "]: " + cfgMqttLp[i]); 
   }
-  return true;
 }
