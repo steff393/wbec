@@ -49,28 +49,24 @@ bool createConfig() {
 }
 
 
-StaticJsonDocument<1024> checkConfig() {
-  StaticJsonDocument<1024> doc;
-  deserializeJson(doc, "{}");
-
+boolean checkConfig(StaticJsonDocument<1024> doc) {
   File configFile = LittleFS.open("/cfg.json", "r");
   if (!configFile) {
-    Serial.println("Failed to open config file... Creating default config...");
+    log(m, "Failed to open config file... Creating default config...");
     if (createConfig()) {
       Serial.println("Successful!");
+      log(0, "Successful!");
       configFile = LittleFS.open("/cfg.json", "r");
     } else {
-      Serial.println("Failed to create default config... Please try to erase flash");
-      Serial.println("Taking default config");
-      return(doc);
+      log(m, "Failed to create default config... Please try to erase flash");
+      return(false);
     }
   }
 
   size_t size = configFile.size();
   if (size > 1024) {
-    Serial.println("Config file size is too large");
-    Serial.println("Taking default config");
-    return(doc);
+    log(m, "Config file size is too large");
+    return(false);
   }
 
   // Allocate a buffer to store contents of the file.
@@ -83,15 +79,18 @@ StaticJsonDocument<1024> checkConfig() {
   
   auto error = deserializeJson(doc, buf.get());
   if (error) {
-    Serial.print("Failed to parse config file: "); Serial.println(error.c_str());
-    Serial.println("Taking default config");
+    log(m, "Failed to parse config file: " + String(error.c_str()));
+    return(false);
   }
-  return(doc);
+  return(true);
 }
 
 void loadConfig() {
   StaticJsonDocument<1024> doc;
-  doc = checkConfig();
+  if (!checkConfig(doc)) {
+    log(m, "Using default config");
+    deserializeJson(doc, "{}");
+  }
 
   strncpy(cfgApSsid,          doc["cfgApSsid"]            | "wbec",             sizeof(cfgApSsid));
   strncpy(cfgApPass,          doc["cfgApPass"]            | "wbec1234",         sizeof(cfgApPass));
