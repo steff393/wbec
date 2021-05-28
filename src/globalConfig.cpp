@@ -49,7 +49,7 @@ bool createConfig() {
 }
 
 
-boolean checkConfig(StaticJsonDocument<1024> doc) {
+boolean checkConfig(JsonDocument& doc) {
   File configFile = LittleFS.open("/cfg.json", "r");
   if (!configFile) {
     log(m, "Failed to open config file... Creating default config...");
@@ -82,6 +82,11 @@ boolean checkConfig(StaticJsonDocument<1024> doc) {
     log(m, "Failed to parse config file: " + String(error.c_str()));
     return(false);
   }
+  configFile.close();
+  
+  //configFile = LittleFS.open("/cfg.json", "r");
+  //log(m, configFile.readString());
+  //configFile.close();
   return(true);
 }
 
