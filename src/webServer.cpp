@@ -11,6 +11,7 @@
 #include "loadManager.h"
 #include "logger.h"
 #include "mbComm.h"
+#include "phaseCtrl.h"
 #include "SPIFFSEditor.h"
 #include "webServer.h"
 #define WIFI_MANAGER_USE_ASYNC_WEB_SERVER
@@ -234,7 +235,7 @@ void webServer_begin() {
     request->send(200, "application/json", goE_getStatus());
   });
 
-server.on("/mqtt", HTTP_GET, [](AsyncWebServerRequest *request) {
+  server.on("/mqtt", HTTP_GET, [](AsyncWebServerRequest *request) {
     // set values
     if (request->hasParam("payload")) {
       log(m, "/mqtt payload: " + request->getParam("payload")->value());
@@ -244,6 +245,12 @@ server.on("/mqtt", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(200, "application/json", goE_getStatus());
   });
 
+  server.on("/phaseCtrl", HTTP_GET, [](AsyncWebServerRequest *request){
+    if (request->hasParam("ph")) {
+      pc_requestPhase(request->getParam("ph")->value().toInt());
+    }
+    request->send_P(200, "text/plain", String(pc_getState()).c_str());
+  });
 
   AsyncCallbackJsonWebHandler *handler = new AsyncCallbackJsonWebHandler("/post-message", [](AsyncWebServerRequest *request, JsonVariant &json) {
     StaticJsonDocument<200> data;

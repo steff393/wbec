@@ -8,7 +8,7 @@
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "europe.pool.ntp.org", 3600, 60000); // GMT+1 and update every minute
 
-const char *mod[6] = {"", "MB  ", "MQTT", "WEBS", "GO-E", "CFG "};
+const char *mod[7] = {"", "MB  ", "MQTT", "WEBS", "GO-E", "CFG ", "1P3P"};
 char bootLog[5000];
 boolean written = false;
 

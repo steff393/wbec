@@ -8,8 +8,8 @@
 
 const uint8_t m = 5;
 
-char cfgWbecVersion[]     = "v0.2.0";          // wbec version
-char cfgBuildDate[]       = "2021-05-23";	      // wbec build date
+char cfgWbecVersion[]     = "v0.2.0+";          // wbec version
+char cfgBuildDate[]       = "2021-05-29";	      // wbec build date
 
 char     cfgApSsid[32];	              // SSID of the initial Access Point
 char     cfgApPass[63];               // Password of the initial Access Point
@@ -83,7 +83,7 @@ boolean checkConfig(JsonDocument& doc) {
     return(false);
   }
   configFile.close();
-  
+
   //configFile = LittleFS.open("/cfg.json", "r");
   //log(m, configFile.readString());
   //configFile.close();

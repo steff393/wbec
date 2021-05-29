@@ -7,6 +7,7 @@
 #include "mqtt.h"
 #include <ModbusRTU.h>
 #include "loadManager.h"
+#include "phaseCtrl.h"
 #include <SoftwareSerial.h>
 
 const uint8_t m = 1;
@@ -149,6 +150,11 @@ void mb_handle() {
 
 
 void mb_writeReg(uint8_t id, uint16_t reg, uint16_t val) {
+	if (pc_switchInProgress() && id == 0 && reg == REG_CURR_LIMIT) {
+		// when switching of phases is in progress, then just backup the requested current
+		pc_backupRequest(val);
+		return;
+	}
 	rbIn = (rbIn+1) % RINGBUF_SIZE; 		// increment pointer, but take care of overflow
 	rb[rbIn].id  =  id;
 	rb[rbIn].reg = reg;
