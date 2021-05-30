@@ -218,7 +218,7 @@ void webServer_begin() {
     }
     data["modbus"]["state"]["lastTm"]  = modbusLastTime;
     data["modbus"]["state"]["millis"]  = millis();
-    data["wifi"]["bssid"] = WiFi.BSSIDstr();
+    data["wifi"]["mac"] = WiFi.macAddress();
     int qrssi = WiFi.RSSI();
     data["wifi"]["rssi"] = qrssi;
     data["wifi"]["signal"] = getSignalQuality(qrssi);
