@@ -25,6 +25,7 @@ uint8_t   modbusResultCode[WB_CNT];
 uint8_t   modbusFailureCnt[WB_CNT];
 uint8_t   msgCnt = 0;
 uint8_t   id = 0;
+uint8_t   msgCnt0_lastId = 255;
 
 typedef struct rb_struct {
 	uint8_t   id;
@@ -109,11 +110,16 @@ void mb_handle() {
 	if (modbusLastTime == 0 || millis() - modbusLastTime > (cfgMbCycleTime*1000)) {
       if (mb_available()) {
 				//Serial.print(millis());Serial.print(": Sending to BusID: ");Serial.print(id+1);Serial.print(" with msgCnt = ");Serial.println(msgCnt);
+				if (msgCnt0_lastId != 255) {
+					// msgCnt=0 was recently sent => content is updated => publish to MQTT
+					mqtt_publish(msgCnt0_lastId);
+					msgCnt0_lastId = 255;
+				}
 				if (!modbusResultCode[id]) {
 					//log(m, String(millis()) + ": BusID=" + (id+1) + ",msgCnt=" + msgCnt);
 				}
 				switch(msgCnt) {
-					case 0:                                                       mb.readIreg (id+1,   4,              &content[id][0] ,  15, cbWrite); break;
+					case 0:                                                       mb.readIreg (id+1,   4,              &content[id][0] ,  15, cbWrite); msgCnt0_lastId = id; break;
 					case 1: if (!modbusResultCode[id])                          { mb.readIreg (id+1, 100,              &content[id][15],  17, cbWrite); } break;
 					case 2: if (!modbusResultCode[id])                          { mb.readIreg (id+1, 117,              &content[id][32],  17, cbWrite); } break;
 					case 3: if (!modbusResultCode[id])                          { mb.readHreg (id+1, REG_WD_TIME_OUT,  &content[id][49],   1, cbWrite); } break;
@@ -125,10 +131,6 @@ void mb_handle() {
 					default: ; // do nothing, should not happen
 				}
 				modbusLastMsgSentTime = millis();
-				if (msgCnt == 6) {
-					// after reading the current limit --> publish received data to MQTT
-					mqtt_publish(id);
-				}
 				id++;
 				if (id >= cfgCntWb) {
 					id = 0;
