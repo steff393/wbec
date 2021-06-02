@@ -1,18 +1,18 @@
 # wbec
 Wifi interface to Heidelberg **W**all**B**ox **E**nergy **C**ontrol using ESP8266  
   
-The Heidelberg Wallbox Energy Control is a high quality wallbox, but it offers only a Modbus interface.
-Goal of this project is to establish an Wifi interface, which also acts as Modbus master (for local external load management) and to rebuild a part of the Combox functionality.  
+The Heidelberg Wallbox Energy Control is a high quality wallbox, but it offers only a Modbus RTU interface.
+Goal of this project is to establish an Wifi interface, which also acts as Modbus master (for local external load management).  
 
 ## Features (as of now)
-- Works with openWB, EVCC, Solaranzeige (by emulation of go-echarger API)
+- Works with openWB, EVCC, Solaranzeige (by emulation of go-echarger API or via MQTT)
 - Support of MQTT communication to openWB
 - Prepared for supporting up to all 16 connected boxes (up to 8 openWB load points)
 - Modbus registers can be read/written via JSON web interface
 - Standby of Wallbox can be configured
 - Simple prototype of a web interface
 - Simple prototype of a local load management
-- Update via WiFi (OTA), e.g. with PlatformIO
+- Update via WiFi (OTA), e.g. with PlatformIO or simply via Web browser (s. Wiki)
 - Access point mode, to configure your WiFi network/password (s. Wiki)
 - < 1W power consumption (for controlling up to 16 boxes)
 
@@ -91,7 +91,7 @@ http://192.168.xx.yy/json
     }
   },
   "wifi": {
-    "bssid": "00:1F:3F:15:29:7E",
+    "mac": "00:1F:3F:15:29:7E",
     "rssi": -76,
     "signal": 48,
     "channel": 11

@@ -4,12 +4,12 @@
 #include <ArduinoOTA.h>
 #include "globalConfig.h"
 #include "goEmulator.h"
-#include "LittleFS.h"
+#include <LittleFS.h>
 #include "logger.h"
 #include "mbComm.h"
 #include "mqtt.h"
 #include "phaseCtrl.h"
-#include "SPIFFSEditor.h"
+#include <SPIFFSEditor.h>
 #define WIFI_MANAGER_USE_ASYNC_WEB_SERVER
 #include <WiFiManager.h>
 #include "webServer.h"
