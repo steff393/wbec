@@ -3,6 +3,8 @@
 #include <Arduino.h>
 #include "AsyncJson.h"
 #include "ArduinoJson.h"
+#include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
 #include "ESPAsyncTCP.h"
 #include "ESPAsyncWebServer.h"
 #include "globalConfig.h"
@@ -18,6 +20,8 @@
 #include <WiFiManager.h>
 
 const uint8_t m = 3;
+
+const char* serverIndex = "<form method='POST' action='/update' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>";
 
 AsyncWebServer server(80);
 boolean resetRequested = false;
@@ -252,6 +256,53 @@ void webServer_begin() {
     request->send_P(200, "text/plain", String(pc_getState()).c_str());
   });
 
+  // OTA via http, based on https://gist.github.com/JMishou/60cb762047b735685e8a09cd2eb42a60
+  server.on("/ota", HTTP_GET, [](AsyncWebServerRequest *request){
+    AsyncWebServerResponse *response = request->beginResponse(200, "text/html", serverIndex);
+    response->addHeader("Connection", "close");
+    response->addHeader("Access-Control-Allow-Origin", "*");
+    request->send(response);
+  });
+
+  server.on("/update", HTTP_POST, [](AsyncWebServerRequest *request){
+    // the request handler is triggered after the upload has finished... 
+    // create the response, add header, and send response
+    AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", (Update.hasError())?"FAIL":"OK");
+    response->addHeader("Connection", "close");
+    response->addHeader("Access-Control-Allow-Origin", "*");
+    resetRequested = true;  // Tell the main loop to restart the ESP
+    request->send(response);
+  },[](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final){
+    //Upload handler chunks in data
+    
+    if(!index){ // if index == 0 then this is the first frame of data
+      Serial.printf("UploadStart: %s\n", filename.c_str());
+      Serial.setDebugOutput(true);
+      
+      // calculate sketch space required for the update
+      uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
+      if(!Update.begin(maxSketchSpace)){//start with max available size
+        Update.printError(Serial);
+      }
+      Update.runAsync(true); // tell the updaterClass to run in async mode
+    }
+
+    //Write chunked data to the free sketch space
+    if(Update.write(data, len) != len){
+        Update.printError(Serial);
+    }
+    
+    if(final){ // if the final flag is set then this is the last frame of data
+      if(Update.end(true)){ //true to set the size to the current progress
+          Serial.printf("Update Success: %u B\nRebooting...\n", index+len);
+        } else {
+          Update.printError(Serial);
+        }
+        Serial.setDebugOutput(false);
+    }
+  });
+  // OTA via http (end)
+
   AsyncCallbackJsonWebHandler *handler = new AsyncCallbackJsonWebHandler("/post-message", [](AsyncWebServerRequest *request, JsonVariant &json) {
     StaticJsonDocument<200> data;
     if (json.is<JsonArray>())
@@ -267,6 +318,8 @@ void webServer_begin() {
     request->send(200, "application/json", response);
     Serial.println(response);
   });
+
+  
   server.addHandler(handler);
 
   // add the SPIFFSEditor, which can be opened via "/edit"
