@@ -45,37 +45,37 @@ http://192.168.xx.yy/json
 
 {
   "wbec": {
-    "version": "v0.0.2"
-    "bldDate": "2021-05-14"
+    "version": "v0.2.0"         // wbec version
+    "bldDate": "2021-05-23"     // wbec build date
   },
   "box": [
-    {
-      "busId": 1,
-      "version": "108",
-      "chgStat": 2,
-      "currL1": 0,
-      "currL2": 0,
-      "currL3": 0,
-      "pcbTemp": 333,
-      "voltL1": 232,
-      "voltL2": 9,
-      "voltL3": 9,
-      "extLock": 1,
-      "power": 0,
-      "energyP": 0,
-      "energyI": 0.003,
-      "currMax": 16,
-      "currMin": 6,
+    {                           // s. also https://wallbox.heidelberg.com/wp-content/uploads/2021/04/EC_ModBus_register_table_20210222.pdf
+      "busId": 1,               // Modbus bus id (as configured by DIP switches)
+      "version": "108",         // Modbus Register-Layouts Version, e.g. 1.0.8
+      "chgStat": 2,             // Charging State
+      "currL1": 0,              // L1 - Current RMS (in 0.1A)
+      "currL2": 0,              // L2 - Current RMS (in 0.1A)
+      "currL3": 0,              // L3 - Current RMS (in 0.1A)
+      "pcbTemp": 333,           // PCB-Temperatur (in 0.1°C)
+      "voltL1": 232,            // Voltage L1 - N rms in Volt
+      "voltL2": 9,              // Voltage L2 - N rms in Volt
+      "voltL3": 9,              // Voltage L3 - N rms in Volt
+      "extLock": 1,             // extern lock state
+      "power": 0,               // Power (L1+L2+L3) in VA
+      "energyP": 0,             // Energy since PowerOn (in kWh)
+      "energyI": 0.003,         // Energy since Installation (in kWh)
+      "currMax": 16,            // Hardware configuration maximal current (in 0.1A)
+      "currMin": 6,             // Hardware configuration minimal current (in 0.1A)
       "logStr": "<item no> <mfgDate> <serial>",
-      "wdTmOut": 15000,
-      "standby": 4,
-      "remLock": 1,
-      "currLim": 130,
-      "currFs": 0,
-      "load": 0,
-      "resCode": "0"
+      "wdTmOut": 15000,         // ModBus-Master WatchDog Timeout (in ms)
+      "standby": 4,             // Standby Function Control 
+      "remLock": 1,             // Remote lock (only if extern lock unlocked) 
+      "currLim": 130,           // Maximal current command
+      "currFs": 0,              // FailSafe Current configuration 
+      "load": 0,                // wbec load management
+      "resCode": "0"            // Result code of last Modbus message (0 = ok)
     },
-    {
+    {                           // Values of 2nd box ...
       "busId": 2,
       "version": "0",
       "chgStat": 0,
@@ -86,15 +86,15 @@ http://192.168.xx.yy/json
   ],
   "modbus": {
     "state": {
-      "lastTm": 2852819,
-      "millis": 2855489
+      "lastTm": 2852819,        // Timestamp of last Modbus message (in ms)
+      "millis": 2855489         // Time since start of wbec (in ms)
     }
   },
   "wifi": {
-    "mac": "00:1F:3F:15:29:7E",
-    "rssi": -76,
-    "signal": 48,
-    "channel": 11
+    "mac": "00:1F:3F:15:29:7E", // wbec MAC address
+    "rssi": -76,                // WiFi signal
+    "signal": 48,               // WiFi signal quality (in %)
+    "channel": 11               // WiFi channel
   }
 }
 ```
