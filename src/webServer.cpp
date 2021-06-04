@@ -183,10 +183,22 @@ void webServer_begin() {
     if (request->hasParam("wdTmOut")) {
       mb_writeReg(id, REG_WD_TIME_OUT, request->getParam("wdTmOut")->value().toInt());
     }
+    if (request->hasParam("remLock")) {
+      uint16_t val = request->getParam("remLock")->value().toInt();
+      if (val <= 1) {
+        mb_writeReg(id, REG_REMOTE_LOCK, val);
+      }
+    }
     if (request->hasParam("currLim")) {
       uint16_t val = request->getParam("currLim")->value().toInt();
       if (val == 0 || (val >= CURR_ABS_MIN && val <= CURR_ABS_MAX)) {
         mb_writeReg(id, REG_CURR_LIMIT, val);
+      }
+    }
+    if (request->hasParam("currFs")) {
+      uint16_t val = request->getParam("currFs")->value().toInt();
+      if (val == 0 || (val >= CURR_ABS_MIN && val <= CURR_ABS_MAX)) {
+        mb_writeReg(id, REG_CURR_LIMIT_FS, val);
       }
     }
 

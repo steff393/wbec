@@ -9,6 +9,7 @@
 #define REG_STANDBY_CTRL	258		// modbus register for "Standby Function Control"
 #define REG_REMOTE_LOCK 	259		// modbus register for "Remote lock (only if extern lock unlocked)"
 #define REG_CURR_LIMIT		261		// modbus register for "Maximal current command"
+#define REG_CURR_LIMIT_FS 262		// modbus register for "FailSafe Current configuration (in case loss of Modbus communication)"
 
 #define CURR_ABS_MIN			 60		// absolute possible lower limit for current
 #define CURR_ABS_MAX			160		// absolute possible upper limit for current

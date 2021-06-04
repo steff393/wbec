@@ -17,8 +17,9 @@ Goal of this project is to establish an Wifi interface, which also acts as Modbu
 - < 1W power consumption (for controlling up to 16 boxes)
 
 ## Contact
-In case of any questions, feel free to send a mail (wbec393@gmail.com) or open an issue  ;-)
-When you're interested in a ready-to-use black-box, then please send a mail.
+In case of any questions, feel free to send a mail (wbec393@gmail.com) or open an issue  ;-)  
+When you're interested in a ready-to-use black-box, then please send a mail.  
+Please also take a look to the [Wiki](https://github.com/steff393/wbec/wiki).
 
 ## Pictures
 <p align="center">
