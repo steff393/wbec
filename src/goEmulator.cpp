@@ -9,7 +9,7 @@
 const uint8_t m = 4;
 
 uint32_t energyI = 0;
-uint8_t  chgStat_old = 0;
+uint16_t chgStat_old = 0;
 uint8_t  alw = 1;
 uint8_t  amp = 0;
 uint8_t  i = 0;
@@ -20,6 +20,7 @@ void goE_handle() {
 		// charging started --> store energy count
 		energyI = (uint32_t) content[i][13] << 16 | (uint32_t)content[i][14];
 	}
+	chgStat_old = content[i][1];
 	// update the amp value
 	amp = content[i][53] / 10;
 }
