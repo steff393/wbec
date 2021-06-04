@@ -5,7 +5,7 @@ The Heidelberg Wallbox Energy Control is a high quality wallbox, but it offers o
 Goal of this project is to establish an Wifi interface, which also acts as Modbus master (for local external load management).  
 
 ## Features (as of now)
-- Works with openWB, EVCC, Solaranzeige (by emulation of go-echarger API or via MQTT)
+- Works with openWB, EVCC, Solaranzeige (by emulation of go-eCharger API or via MQTT)
 - Support of MQTT communication to openWB
 - Prepared for supporting up to all 16 connected boxes (up to 8 openWB load points)
 - Modbus registers can be read/written via JSON web interface
@@ -109,6 +109,19 @@ Set Watchdog timeout:
 ```c++
 http://192.168.xx.yy/json?wdTmOut=20000
 ```
+
+## go-eCharger API
+wbec can partly emulate the API of Go-eCharger (https://github.com/goecharger/go-eCharger-API-v1) via the following HTTP commands:
+```c++
+Read:
+http://x.x.x.x/status
+{"car":"1","alw":"1","amp":"6","err":"0","stp":"0","tmp":"307","dws":"5955","ubi":"0","eto":"59","nrg":[231,232,234,0,0,0,0,0,0,0,0,0,0,0,0,0],"fwv":"40"}
+
+Write:
+http://x.x.x.x/mqtt?payload=...
+```
+
+This offers a simple way to integrate wbec into Energy Management Systems, which support go-eCharger, but not the Heidelberg Energy Control, such as EVCC or Solaranzeige.  
 
 ## Support the project
 You like wbec? Please [star this project on GitHub](https://github.com/steff393/wbec/stargazers)!
