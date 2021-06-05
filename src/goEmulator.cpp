@@ -145,7 +145,7 @@ String goE_getStatus() {
 	data["nrg"][15] = 0;
 	data["fwv"] = "40";
 	data["sse"] = "000000";
-	data["ama"] = String(content[i][15] / 10);
+	data["ama"] = String(content[i][15]);
 	data["ust"] = "2";
 
 	String response;
