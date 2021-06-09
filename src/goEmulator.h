@@ -4,7 +4,7 @@
 #define GOEMULATOR_H
 
 extern void 		goE_handle();
-extern void     goE_setPayload(String payload);
-extern String		goE_getStatus();
+extern void     goE_setPayload(String payload, uint8_t id);
+extern String		goE_getStatus(uint8_t id, boolean fromApp);
 
 #endif /* GOEMULATOR_H */

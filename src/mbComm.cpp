@@ -49,6 +49,20 @@ boolean mb_available() {
 }
 
 
+String mb_getAscii(uint8_t id, uint8_t from, uint8_t len) {
+  char ch;
+  String ret = "";
+  // translate the uint16 values into a String
+  for (int i = from; i < (from + len) ; i++) {
+    ch = (char) (content[id][i] & 0x00FF);
+    ret += ch;
+    ch = (char) (content[id][i] >> 8);
+    ret += ch;
+  }
+  return(ret);
+}
+
+
 void timeout(uint8_t id) {
 	if (cfgStandby == 4) {
 		// standby disabled => timeout indicates a failure => reset all

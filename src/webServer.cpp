@@ -66,18 +66,6 @@ String processor(const String& var){
   } else return(String("notFound"));
 }
 
-String getAscii(uint8_t id, uint8_t from, uint8_t len) {
-  char ch;
-  String ret = "";
-  // translate the uint16 values into a String
-  for (int i = from; i < (from + len) ; i++) {
-    ch = (char) (content[id][i] & 0x00FF);
-    ret += ch;
-    ch = (char) (content[id][i] >> 8);
-    ret += ch;
-  }
-  return(ret);
-}
 
 uint8_t getSignalQuality(int rssi)
 {
@@ -223,7 +211,7 @@ void webServer_begin() {
       data["box"][i]["energyI"]   = (float)((uint32_t) content[i][13] << 16 | (uint32_t)content[i][14]) / 1000.0;
       data["box"][i]["currMax"]  = content[i][15];
       data["box"][i]["currMin"]  = content[i][16];
-      data["box"][i]["logStr"]   = getAscii(i, 17,32);
+      data["box"][i]["logStr"]   = mb_getAscii(i, 17,32);
       data["box"][i]["wdTmOut"]  = content[i][49];
       data["box"][i]["standby"]  = content[i][50];
       data["box"][i]["remLock"]  = content[i][51];
@@ -247,18 +235,36 @@ void webServer_begin() {
   });
 
   server.on("/status", HTTP_GET, [](AsyncWebServerRequest *request) {
-    // forward to goEmulator
-    request->send(200, "application/json", goE_getStatus());
+    uint8_t id = 0;
+    boolean fromApp = false;
+    if (request->hasParam("box")) {
+      fromApp = true;
+      id = request->getParam("box")->value().toInt();
+      if (id >= WB_CNT) {
+        id = 0;
+      }
+    }
+    request->send(200, "application/json", goE_getStatus(id, fromApp));
   });
 
   server.on("/mqtt", HTTP_GET, [](AsyncWebServerRequest *request) {
     // set values
+    uint8_t id = 0;
+    boolean fromApp = false;
+    if (request->hasParam("box")) {
+      fromApp = true;
+      id = request->getParam("box")->value().toInt();
+      if (id >= WB_CNT) {
+        id = 0;
+      }
+    }
+    
     if (request->hasParam("payload")) {
       log(m, "/mqtt payload: " + request->getParam("payload")->value());
-      goE_setPayload(request->getParam("payload")->value());
+      goE_setPayload(request->getParam("payload")->value(), id);
     }
     // response
-    request->send(200, "application/json", goE_getStatus());
+    request->send(200, "application/json", goE_getStatus(id, fromApp));
   });
 
   server.on("/phaseCtrl", HTTP_GET, [](AsyncWebServerRequest *request){
