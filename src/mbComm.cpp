@@ -28,9 +28,10 @@ uint8_t   id = 0;
 uint8_t   msgCnt0_lastId = 255;
 
 typedef struct rb_struct {
-	uint8_t   id;
-	uint16_t reg;
-	uint16_t val;
+	uint8_t   id;				// box id (0..WB_CNT)
+	uint16_t reg;				// register
+	uint16_t val;				// value
+	uint16_t * buf;			// write: null  read: buffer where to write the response
 } rb_t;
 
 #define RINGBUF_SIZE 20
@@ -99,11 +100,12 @@ void mb_handle() {
 	if (rbOut != rbIn) {
 		if (mb_available()) {			// check, if bus available
 			rbOut = (rbOut+1) % RINGBUF_SIZE; 		// increment pointer, but take care of overflow
-			// if box is not in timeout, then send out
-			//if (!modbusResultCode[id]) {
-				mb.writeHreg(rb[rbOut].id + 1, rb[rbOut].reg, &rb[rbOut].val,  1, cbWrite); 
-				modbusLastMsgSentTime = millis();
-			//}
+			if (rb[rbOut].buf != NULL) {
+				mb.readHreg (rb[rbOut].id + 1, rb[rbOut].reg,  rb[rbOut].buf, 1, cbWrite);
+			} else {
+				mb.writeHreg(rb[rbOut].id + 1, rb[rbOut].reg, &rb[rbOut].val, 1, cbWrite); 
+			}
+			modbusLastMsgSentTime = millis();
 		}
 	}
 
@@ -161,9 +163,19 @@ void mb_writeReg(uint8_t id, uint16_t reg, uint16_t val) {
 	rb[rbIn].id  =  id;
 	rb[rbIn].reg = reg;
 	rb[rbIn].val = val;
+	rb[rbIn].buf = 0;
 	if (rbIn == rbOut) {
 		// we have overwritten an not-sent value -> set rbOut to next element, otherwise complete ring would be skipped
 		rbOut = (rbOut+1) % RINGBUF_SIZE; 		// increment pointer, but take care of overflow
 		log(m, "Overflow of ring buffer");
+	}
+
+	// direct read back, when current register was modified
+	if (reg == REG_CURR_LIMIT && ((rbIn+1) % RINGBUF_SIZE != rbOut)) {	// ... but reading is not worth an overflow (with loosing data)
+		rbIn = (rbIn+1) % RINGBUF_SIZE; 		// increment pointer, but take care of overflow
+		rb[rbIn].id  =  id;
+		rb[rbIn].reg = reg;
+		rb[rbIn].val = 0;
+		rb[rbIn].buf = &content[id][53];
 	}
 }
