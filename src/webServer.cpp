@@ -275,7 +275,7 @@ void webServer_begin() {
   });
 
   // OTA via http, based on https://gist.github.com/JMishou/60cb762047b735685e8a09cd2eb42a60
-  server.on("/ota", HTTP_GET, [](AsyncWebServerRequest *request){
+  server.on("/update", HTTP_GET, [](AsyncWebServerRequest *request){
     AsyncWebServerResponse *response = request->beginResponse(200, "text/html", serverIndex);
     response->addHeader("Connection", "close");
     response->addHeader("Access-Control-Allow-Origin", "*");
