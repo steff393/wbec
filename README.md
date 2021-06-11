@@ -1,12 +1,42 @@
+< scroll down for English version and additional information >
+
+# wbec
+WLAN-Anbindung der Heidelberg **W**all**B**ox **E**nergy **C**ontrol über ESP8266  
+  
+Die Heidelberg Wallbox Energy Control ist eine hochwertige Ladestation, bietet aber nur Modbus RTU als Schnittstelle.  
+Ziel des Projekts ist es, eine WLAN-Schnittstelle zu entwickeln, die gleichzeitig die Modbus-Leader-Funktion übernimmt.  
+
+## Funktionen (bisher)
+- Anbindung an openWB, EVCC, Solaranzeige (per tlw. Emulation der go-eCharger API)
+- MQTT-Kommunikation mit openWB
+- Steuerbar per Android App [Wallbox Steuerung](https://android.chk.digital/ecar-charger-control/) 
+- PV-Überschussladen, Zielladen, etc. mit den o.g. Steuerungen
+- Ansteuerung aller verbundenen Ladestationen (bis zu 16 Follower am Modbus, bis zu 8 openWB-Ladepunkte)
+- Lesen/Schreiben der Modbus-Register über ein JSON-Web-Interface 
+- Standby-Funktion der Ladestation einstellbar
+- Einfacher Prototyp einer Webseite zur Steuerung
+- Einfacher Prototyp eines lokalen Lastmanagements
+- Softwareupdate per WLAN (Over The Air), z.B. mit PlatformIO oder einfach per Browser (s. Wiki)
+- Access-Point-Modus zur initialen Einstellung des WLANs (SSID/Passwort, s. Wiki)
+- Weniger als 1W Strombedarf (trotz Ansteuerung von bis zu 16 Ladestationen)
+
+## Kontakt
+Bei Fragen gerne einfach eine Mail schicken (wbec393@gmail.com) oder einen Issue eröffnen ;-)  
+Bei Interesse an einer fertig gelöteten/programmierten "ready-to-use" Black-Box bitte ebenfalls eine Mail schicken.  
+Bitte schaut auch ins [Wiki](https://github.com/steff393/wbec/wiki).  
+  
+  
+  
 # wbec
 Wifi interface to Heidelberg **W**all**B**ox **E**nergy **C**ontrol using ESP8266  
   
 The Heidelberg Wallbox Energy Control is a high quality wallbox, but it offers only a Modbus RTU interface.
-Goal of this project is to establish an Wifi interface, which also acts as Modbus master (for local external load management).  
+Goal of this project is to establish an Wifi interface, which also acts as Modbus master.  
 
 ## Features (as of now)
-- Works with openWB, EVCC, Solaranzeige (by emulation of go-eCharger API or via MQTT)
+- Works with openWB, EVCC, Solaranzeige (by emulation of parts of the go-eCharger API)
 - Support of MQTT communication to openWB
+- Support of Android App [Wallbox Steuerung](https://android.chk.digital/ecar-charger-control/) 
 - Prepared for supporting up to all 16 connected boxes (up to 8 openWB load points)
 - Modbus registers can be read/written via JSON web interface
 - Standby of Wallbox can be configured
@@ -46,8 +76,8 @@ http://192.168.xx.yy/json
 
 {
   "wbec": {
-    "version": "v0.2.0"         // wbec version
-    "bldDate": "2021-05-23"     // wbec build date
+    "version": "v0.3.0"         // wbec version
+    "bldDate": "2021-06-10"     // wbec build date
   },
   "box": [
     {                           // s. also https://wallbox.heidelberg.com/wp-content/uploads/2021/04/EC_ModBus_register_table_20210222.pdf
@@ -117,6 +147,7 @@ wbec can partly emulate the API of Go-eCharger (https://github.com/goecharger/go
 Read:
 http://x.x.x.x/status
 {"car":"1","alw":"1","amp":"6","err":"0","stp":"0","tmp":"307","dws":"5955","ubi":"0","eto":"59","nrg":[231,232,234,0,0,0,0,0,0,0,0,0,0,0,0,0],"fwv":"40"}
+{"version":"B","car":"1","err":"0","alw":"1","amp":"6","amx":"6","stp":"0","pha":"63","tmp":"307","dws":"0","dwo":"0","uby":"0","eto":"59","nrg":[233,234,233,0,0,0,0,0,0,0,0,0,0,0,0,0],"fwv":"40","sse":"123456","ama":"16","ust":"2"}
 
 Write:
 http://x.x.x.x/mqtt?payload=...

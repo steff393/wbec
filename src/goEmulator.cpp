@@ -105,6 +105,7 @@ String goE_getStatus(uint8_t id, boolean fromApp) {
 	if (fromApp) {
 		data["oem"]="wbec";
 		data["typ"]="Heidelberg Energy Control";
+		data["box"]="0";
 	}
 	data["version"] = "B";
 	switch(content[id][1]) {
@@ -128,7 +129,7 @@ String goE_getStatus(uint8_t id, boolean fromApp) {
 	if (content[id][7] > 200) { pha+=18; } // 0001 0010
 	if (content[id][8] > 200) { pha+=36; } // 0010 0100
 	data["pha"] = String(pha);
-	data["tmp"] = String(content[id][5]);
+	data["tmp"] = String(content[id][5] / 10);
 	data["dws"] = String((((uint32_t) content[id][13] << 16 | (uint32_t)content[id][14]) - box[id].energyI) * 360);
 	data["dwo"] = String(box[id].dwo);
 	data["uby"] = "0";
@@ -149,10 +150,11 @@ String goE_getStatus(uint8_t id, boolean fromApp) {
 	data["nrg"][13] = 0;
 	data["nrg"][14] = 0;
 	data["nrg"][15] = 0;
-	data["fwv"] = "40";
+	data["fwv"] = "040";
 	data["sse"] = mb_getAscii(id, 27,3);
 	data["ama"] = String(content[id][15]);
 	data["ust"] = "2";
+	data["ast"] = "0";
 
 	String response;
 	serializeJson(data, response);

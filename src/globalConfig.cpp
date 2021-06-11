@@ -8,8 +8,8 @@
 
 const uint8_t m = 5;
 
-char cfgWbecVersion[]     = "v0.2.0+";          // wbec version
-char cfgBuildDate[]       = "2021-06-05";	      // wbec build date
+char cfgWbecVersion[]     = "v0.3.0";          // wbec version
+char cfgBuildDate[]       = "2021-06-11";	     // wbec build date
 
 char     cfgApSsid[32];	              // SSID of the initial Access Point
 char     cfgApPass[63];               // Password of the initial Access Point
@@ -30,7 +30,7 @@ bool createConfig() {
   doc["cfgApSsid"]              = "wbec";
   doc["cfgApPass"]              = "wbec1234"; // older version had "cebw1234"
   doc["cfgCntWb"]               = 1;
-  doc["cfgMbCycleTime"]         = 3;
+  doc["cfgMbCycleTime"]         = 10;
   doc["cfgMbDelay"]             = 100;
   doc["cfgMbTimeout"]           = 60000;  
   doc["cfgStandby"]             = 4;
@@ -100,7 +100,7 @@ void loadConfig() {
   strncpy(cfgApSsid,          doc["cfgApSsid"]            | "wbec",             sizeof(cfgApSsid));
   strncpy(cfgApPass,          doc["cfgApPass"]            | "wbec1234",         sizeof(cfgApPass));
   cfgCntWb                  = doc["cfgCntWb"]             | 1;
-  cfgMbCycleTime            = doc["cfgMbCycleTime"]       | 3; 
+  cfgMbCycleTime            = doc["cfgMbCycleTime"]       | 10; 
   cfgMbDelay                = doc["cfgMbDelay"]           | 100UL; 
   cfgMbTimeout              = doc["cfgMbTimeout"]         | 60000UL;
   cfgStandby                = doc["cfgStandby"]           | 4UL; 
