@@ -285,7 +285,13 @@ void webServer_begin() {
   server.on("/update", HTTP_POST, [](AsyncWebServerRequest *request){
     // the request handler is triggered after the upload has finished... 
     // create the response, add header, and send response
-    AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", (Update.hasError())?"FAIL":"OK");
+    String html;
+    if (Update.hasError()) {
+      html = String("FAIL<BR>") + serverIndex;
+    } else {
+      html = String("OK<BR>") + serverIndex;
+    }
+    AsyncWebServerResponse *response = request->beginResponse(200, "text/html", html);
     response->addHeader("Connection", "close");
     response->addHeader("Access-Control-Allow-Origin", "*");
     resetRequested = true;  // Tell the main loop to restart the ESP
