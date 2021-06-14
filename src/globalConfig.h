@@ -30,6 +30,7 @@ extern uint16_t cfgMbTimeout;							   // Reg. 257: Modbus timeout (in milliseco
 extern uint16_t cfgStandby;                  // Reg. 258: Standby Function Control: 0 = enable standby, 4 = disable standby
 extern char     cfgMqttIp[16];               // IP address of MQTT broker, "" to disable MQTT
 extern uint8_t  cfgMqttLp[WB_CNT];           // Array with assignments to openWB loadpoints, e.g. [4,2,0,1]: Box0 = LP4, Box1 = LP2, Box2 = no MQTT, Box3 = LP1
+extern char     cfgNtpServer[30];            // NTP server
 
 extern void loadConfig();
 

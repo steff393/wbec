@@ -2,11 +2,12 @@
 
 #include <Arduino.h>
 #include <ESP8266mDNS.h>
-#include "LittleFS.h"
+#include "globalConfig.h"
+#include <LittleFS.h>
 #include <NTPClient.h>
 
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, "europe.pool.ntp.org", 3600, 60000); // GMT+1 and update every minute
+NTPClient timeClient(ntpUDP, cfgNtpServer, 3600, 60000); // GMT+1 and update every minute
 
 const char *mod[7] = {"", "MB  ", "MQTT", "WEBS", "GO-E", "CFG ", "1P3P"};
 char bootLog[5000];

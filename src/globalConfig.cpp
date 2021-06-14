@@ -8,8 +8,8 @@
 
 const uint8_t m = 5;
 
-char cfgWbecVersion[]     = "v0.3.0";          // wbec version
-char cfgBuildDate[]       = "2021-06-11";	     // wbec build date
+char cfgWbecVersion[]     = "v0.3.0+";          // wbec version
+char cfgBuildDate[]       = "2021-06-14";	     // wbec build date
 
 char     cfgApSsid[32];	              // SSID of the initial Access Point
 char     cfgApPass[63];               // Password of the initial Access Point
@@ -20,6 +20,7 @@ uint16_t cfgMbTimeout;					      // Reg. 257: Modbus timeout (in milliseconds)
 uint16_t cfgStandby;                  // Reg. 258: Standby Function Control: 0 = enable standby, 4 = disable standby
 char     cfgMqttIp[16];              	// IP address of MQTT broker, "" to disable MQTT
 uint8_t  cfgMqttLp[WB_CNT];           // Array with assignments to openWB loadpoints, e.g. [4,2,0,1]: Box0 = LP4, Box1 = LP2, Box2 = no MQTT, Box3 = LP1
+char     cfgNtpServer[30];            // NTP server
 
 
 bool createConfig() {
@@ -36,6 +37,7 @@ bool createConfig() {
   doc["cfgStandby"]             = 4;
   doc["cfgMqttIp"]              = "";
   doc["cfgMqttLp"]              = serialized("[]");   // already serialized
+  doc["cfgNtpServer"]           = "europe.pool.ntp.org";
   // -------------------------------------
   
   File configFile = LittleFS.open("/cfg.json", "w");
@@ -105,6 +107,7 @@ void loadConfig() {
   cfgMbTimeout              = doc["cfgMbTimeout"]         | 60000UL;
   cfgStandby                = doc["cfgStandby"]           | 4UL; 
   strncpy(cfgMqttIp,          doc["cfgMqttIp"]            | "",                 sizeof(cfgMqttIp));
+  strncpy(cfgNtpServer,       doc["cfgNtpServer"]         | "europe.pool.ntp.org", sizeof(cfgNtpServer));
 
   log(m, "cfgWbecVersion: " + String(cfgWbecVersion));
   log(m, "cfgBuildDate: "   + String(cfgBuildDate));
