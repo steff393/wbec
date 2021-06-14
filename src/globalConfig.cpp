@@ -19,6 +19,8 @@ uint16_t cfgMbDelay;					        // delay time of the modbus before sending new 
 uint16_t cfgMbTimeout;					      // Reg. 257: Modbus timeout (in milliseconds)
 uint16_t cfgStandby;                  // Reg. 258: Standby Function Control: 0 = enable standby, 4 = disable standby
 char     cfgMqttIp[16];              	// IP address of MQTT broker, "" to disable MQTT
+char     cfgMqttUser[32];             // MQTT: Username
+char     cfgMqttPass[32];             // MQTT: Password
 uint8_t  cfgMqttLp[WB_CNT];           // Array with assignments to openWB loadpoints, e.g. [4,2,0,1]: Box0 = LP4, Box1 = LP2, Box2 = no MQTT, Box3 = LP1
 char     cfgNtpServer[30];            // NTP server
 
@@ -36,6 +38,8 @@ bool createConfig() {
   doc["cfgMbTimeout"]           = 60000;  
   doc["cfgStandby"]             = 4;
   doc["cfgMqttIp"]              = "";
+  doc["cfgMqttUser"]            = "";
+  doc["cfgMqttPass"]            = "";
   doc["cfgMqttLp"]              = serialized("[]");   // already serialized
   doc["cfgNtpServer"]           = "europe.pool.ntp.org";
   // -------------------------------------
@@ -107,6 +111,8 @@ void loadConfig() {
   cfgMbTimeout              = doc["cfgMbTimeout"]         | 60000UL;
   cfgStandby                = doc["cfgStandby"]           | 4UL; 
   strncpy(cfgMqttIp,          doc["cfgMqttIp"]            | "",                 sizeof(cfgMqttIp));
+  strncpy(cfgMqttUser,        doc["cfgMqttUser"]          | "",                 sizeof(cfgMqttUser));
+  strncpy(cfgMqttPass,        doc["cfgMqttPass"]          | "",                 sizeof(cfgMqttPass));
   strncpy(cfgNtpServer,       doc["cfgNtpServer"]         | "europe.pool.ntp.org", sizeof(cfgNtpServer));
 
   log(m, "cfgWbecVersion: " + String(cfgWbecVersion));

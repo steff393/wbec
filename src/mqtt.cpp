@@ -63,8 +63,15 @@ void reconnect() {
 	// Create a random client ID
 	String clientId = "wbec-";
 	clientId += String(random(0xffff), HEX);
+
 	// Attempt to connect
-	if (client.connect(clientId.c_str()))				// alternative: client.connect(clientId,userName,passWord)
+	boolean con = false;
+	if (strcmp(cfgMqttUser, "") != 0 && strcmp(cfgMqttPass, "") != 0) {
+		con = client.connect(clientId.c_str(), cfgMqttUser, cfgMqttPass);
+	} else {
+		con = client.connect(clientId.c_str());
+	}
+	if (con)
 	{
 		log(0, "connected");
 		//once connected to MQTT broker, subscribe command if any
