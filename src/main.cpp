@@ -20,6 +20,9 @@ bool _handlingOTA = false;
 void setup() {
   Serial.begin(115200);
   Serial.println("\n\nStarting wbec ;-)");
+
+  // define a GPIO as output
+  pinMode(PIN_RST, OUTPUT);
   
   if(!LittleFS.begin()){ 
     Serial.println("An Error has occurred while mounting LittleFS");

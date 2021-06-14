@@ -149,6 +149,18 @@ void webServer_begin() {
     request->send_P(200, "text/plain", String(tmp).c_str());
   });
 
+  server.on("/gpio", HTTP_GET, [](AsyncWebServerRequest *request){
+    // might be removed/changed depending on RFID feature
+    if (request->hasParam("on")) {
+      digitalWrite(PIN_RST, HIGH);
+      request->send(200, "text/plain", String("GPIO On"));
+    }
+    if (request->hasParam("off")) {
+      digitalWrite(PIN_RST, LOW);
+      request->send(200, "text/plain", String("GPIO Off"));
+    }    
+  });
+
   server.on("/reset", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(200, "text/plain", String("Resetting the ESP8266..."));
     resetRequested = true;
