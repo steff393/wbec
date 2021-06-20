@@ -9,6 +9,7 @@
 #include "mbComm.h"
 #include "mqtt.h"
 #include "phaseCtrl.h"
+#include "rfid.h"
 #include <SPIFFSEditor.h>
 #define WIFI_MANAGER_USE_ASYNC_WEB_SERVER
 #include <WiFiManager.h>
@@ -53,6 +54,7 @@ void setup() {
 
   mb_setup();
   mqtt_begin();
+  rfid_setup();
   Serial.print("Boot time: ");Serial.println(millis());
 }
 
@@ -65,6 +67,7 @@ void loop() {
     goE_handle();
     mqtt_handle();
     webServer_handle();
+    rfid_loop();
     //pc_handle();
   }
 }
