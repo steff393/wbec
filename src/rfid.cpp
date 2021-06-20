@@ -26,27 +26,19 @@ MFRC522 mfrc522(PIN_SS, PIN_RST);
 boolean readCards() {
   File file = LittleFS.open("/rfid.txt", "r");
   if (!file) {
-    log(m, "Failed to open RFID config file...");
+    log(m, "Disabled (rfid.txt not found)");
     return(false);
   }
-  //String data = file.readString();
-  //Serial.println("Inhalt der geöffneten Datei:");
-  //Serial.println(data); // ... und wieder ausgegeben
 
   uint8_t k = 0;
-  String data;
+  log(m, "Cards: ", false);
   while (file.available() && k < RFID_CHIP_MAX) {
     // read the first characters from each line
     strncpy(chip[k], file.readStringUntil('\n').c_str(), RFID_CHIP_LEN - 1);
-    //chip[k] = file.readStringUntil('\n'); // lesen bis Zeilenumbruch...
-    //file.readBytes(chip[k], RFID_CHIP_LEN-1);
-    Serial.print("Zeile ");
-    Serial.print(k);
-    Serial.print(": ");
-    Serial.println(chip[k]);           // ... und wieder ausgegeben
+    if (k > 0 ) { log(0, ", ", false); }
+    log(0, String(chip[k]), false);
     k++;
   }
-
 
   file.close();
   return(true);
@@ -55,7 +47,7 @@ boolean readCards() {
 
 void rfid_setup() {
   if (!readCards()) {
-    // there is no rfid.tags file => function disabled
+    // there is no rfid.txt file => function disabled
     rfid_enabled = false;
     return;
   }
@@ -84,14 +76,9 @@ void rfid_loop() {
     // wait a little longer this time to avoid multiple reads
     rfid_lastDetect = millis();
 
-    //chipID = 0;
     mfrc522.PICC_ReadCardSerial();
-    // Decode the chipID
-    //for (byte i = 0; i < mfrc522.uid.size; i++){
-    //  chipID = (chipID << 8) + mfrc522.uid.uidByte[i];
-    //  //chipID=((chipID+mfrc522.uid.uidByte[i])*10);
-    //  Serial.println(mfrc522.uid.uidByte[i]);
-    //}
+
+    // First 4 byte should be sufficient
     sprintf(chipID, "%02x%02x%02x%02x", mfrc522.uid.uidByte[0], mfrc522.uid.uidByte[1], mfrc522.uid.uidByte[2], mfrc522.uid.uidByte[3]);
     log(m, "Detected: " + String(chipID) + " ... ", false);
     
