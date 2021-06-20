@@ -116,6 +116,16 @@ void webServer_begin() {
     }
   });
 
+  server.on("/delete", HTTP_GET, [](AsyncWebServerRequest *request){
+    if (request->hasParam("file")) {
+      if (LittleFS.remove(request->getParam("file")->value())) {
+        request->send_P(200, "text/plain", "OK");
+      } else {
+        request->send_P(200, "text/plain", "FAIL");
+      }
+    }
+  }); 
+
   server.on("/web", HTTP_GET, [](AsyncWebServerRequest *request){
     uint8_t id = 0;
     if (request->hasParam("currLim")) {
