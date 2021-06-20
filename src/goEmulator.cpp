@@ -37,6 +37,7 @@ void goE_handle() {
 		// avoid unnecessary frequent calls
 		return;
 	}
+	goE_lastCall = millis();
 
 	for (uint8_t id = 0; id < cfgCntWb; id++) {
 		if ((!goE_plugged(box[id].chgStat_old) && goE_plugged(content[id][1]))  || (box[id].energyI == 0)) {
