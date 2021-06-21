@@ -5,6 +5,8 @@
 
 extern void 		rfid_setup();
 extern void 		rfid_loop();
-extern uint32_t rfid_getLastID();
+extern boolean 	rfid_getEnabled();
+extern boolean 	rfid_getReleased();
+extern char *   rfid_getLastID();
 
 #endif /* RFID_H */

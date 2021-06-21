@@ -14,6 +14,7 @@
 #include "logger.h"
 #include "mbComm.h"
 #include "phaseCtrl.h"
+#include "rfid.h"
 #include "SPIFFSEditor.h"
 #include "webServer.h"
 #define WIFI_MANAGER_USE_ASYNC_WEB_SERVER
@@ -160,15 +161,18 @@ void webServer_begin() {
   });
 
   server.on("/gpio", HTTP_GET, [](AsyncWebServerRequest *request){
-    // might be removed/changed depending on RFID feature
-    if (request->hasParam("on")) {
-      digitalWrite(PIN_RST, HIGH);
-      request->send(200, "text/plain", String("GPIO On"));
+    if (!rfid_getEnabled()) {
+      if (request->hasParam("on")) {
+        digitalWrite(PIN_RST, HIGH);
+        request->send(200, "text/plain", String("GPIO On"));
+      }
+      if (request->hasParam("off")) {
+        digitalWrite(PIN_RST, LOW);
+        request->send(200, "text/plain", String("GPIO Off"));
+      }    
+    } else {
+      request->send(200, "text/plain", String("RFID active, GPIO not possible"));
     }
-    if (request->hasParam("off")) {
-      digitalWrite(PIN_RST, LOW);
-      request->send(200, "text/plain", String("GPIO Off"));
-    }    
   });
 
   server.on("/reset", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -244,6 +248,9 @@ void webServer_begin() {
     }
     data["modbus"]["state"]["lastTm"]  = modbusLastTime;
     data["modbus"]["state"]["millis"]  = millis();
+    data["rfid"]["enabled"] = rfid_getEnabled();
+    data["rfid"]["release"] = rfid_getReleased();
+    data["rfid"]["lastId"]  = rfid_getLastID();
     data["wifi"]["mac"] = WiFi.macAddress();
     int qrssi = WiFi.RSSI();
     data["wifi"]["rssi"] = qrssi;

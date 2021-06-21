@@ -4,13 +4,16 @@
 #include "globalConfig.h"
 #include <LittleFS.h>
 #include "logger.h"
+#include "mbComm.h"
 #include <MFRC522.h>
 #include <SPI.h>
 
-const uint8_t m = 8;
+const uint8_t m  = 8;
+const uint8_t id = 0;
 
 #define CYCLE_TIME		             500	// 500ms
 #define INHIBIT_AFTER_DETECTION   3000  // 3s wait time after a card was detected
+#define RELEASE_TIME             60000  // lock again, if car was not connected within 60s
 #define RFID_CHIP_MAX               10  // different RFID cards
 #define RFID_CHIP_LEN                9  // 4 Hex values, e.g. "0ab5c780" + string termination
 
@@ -18,7 +21,10 @@ char      chipID[RFID_CHIP_LEN];
 char      chip[RFID_CHIP_MAX][RFID_CHIP_LEN];
 uint32_t  rfid_lastCall     = 0;
 uint32_t  rfid_lastDetect   = 0;
+uint32_t  rfid_lastReleased = 0;
 boolean   rfid_enabled      = false;
+boolean   rfid_released     = false;
+uint16_t  rfid_chgStat_old 	= 0;
 
 MFRC522 mfrc522(PIN_SS, PIN_RST);
 
@@ -42,6 +48,15 @@ boolean readCards() {
 
   file.close();
   return(true);
+}
+
+
+boolean rfid_plugged(uint16_t chgStat) {
+	if (chgStat >= 4 && chgStat <= 7) {
+		return(true);
+	} else {
+		return(false);
+	}
 }
 
 
@@ -71,6 +86,16 @@ void rfid_loop() {
 	}
   rfid_lastCall = millis();
 
+  if ((rfid_plugged(rfid_chgStat_old) && !rfid_plugged(content[id][1])) || 
+    (!rfid_plugged(content[id][1]) && (rfid_lastReleased != 0) && (millis() - rfid_lastReleased > RELEASE_TIME))) {
+    // vehicle unplugged or not plugged within RELEASE_TIME --> RFID chip no longer allowed
+    rfid_released = false;
+    rfid_lastReleased = 0;
+    mb_writeReg(id, REG_CURR_LIMIT, 0);
+  }
+  rfid_chgStat_old = content[id][1];
+
+
 	// Check for new card
 	if (mfrc522.PICC_IsNewCardPresent()) {
     // wait a little longer this time to avoid multiple reads
@@ -89,10 +114,23 @@ void rfid_loop() {
     };
     if (k < RFID_CHIP_MAX) {
       log(0, "found: idx=" + String(k));
+      rfid_released = true;
+      rfid_lastReleased = millis();
+      // set current to max value
+      mb_writeReg(id, REG_CURR_LIMIT, content[id][15]);
     } else {
       log(0, "unknown");
     }
 	}
+}
+
+
+boolean rfid_getEnabled() {
+  return(rfid_enabled);
+}
+
+boolean rfid_getReleased() {
+  return(rfid_released);
 }
 
 

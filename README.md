@@ -11,6 +11,7 @@ Ziel des Projekts ist es, eine WLAN-Schnittstelle zu entwickeln, die gleichzeiti
 - MQTT-Kommunikation mit openWB
 - Steuerbar per Android App [Wallbox Steuerung](https://android.chk.digital/ecar-charger-control/) 
 - PV-Überschussladen, Zielladen, etc. mit den o.g. Steuerungen
+- RFID-Kartenleser zur Freischaltung der Wallbox mit gültiger Karte/Chip (spezielle HW nötig, s. Wiki)  
 - Ansteuerung aller verbundenen Ladestationen (bis zu 16 Follower am Modbus, bis zu 8 openWB-Ladepunkte)
 - Lesen/Schreiben der Modbus-Register über ein JSON-Web-Interface 
 - Standby-Funktion der Ladestation einstellbar
@@ -36,7 +37,8 @@ Goal of this project is to establish an Wifi interface, which also acts as Modbu
 ## Features (as of now)
 - Works with openWB, EVCC, Solaranzeige (by emulation of parts of the go-eCharger API)
 - Support of MQTT communication to openWB
-- Support of Android App [Wallbox Steuerung](https://android.chk.digital/ecar-charger-control/) 
+- Support of Android App [Wallbox Steuerung](https://android.chk.digital/ecar-charger-control/)  
+- RFID card reader for unlocking the wallbox only with valid card/chip (needs special HW, s. Wiki)  
 - Prepared for supporting up to all 16 connected boxes (up to 8 openWB load points)
 - Modbus registers can be read/written via JSON web interface
 - Standby of Wallbox can be configured
@@ -120,6 +122,11 @@ http://192.168.xx.yy/json
       "lastTm": 2852819,        // Timestamp of last Modbus message (in ms)
       "millis": 2855489         // Time since start of wbec (in ms)
     }
+  },
+  "rfid": {
+    "enabled": true,
+    "release": false,
+    "lastId": "0cb6a781"
   },
   "wifi": {
     "mac": "00:1F:3F:15:29:7E", // wbec MAC address
