@@ -9,6 +9,7 @@
 #include "mbComm.h"
 #include "mqtt.h"
 #include "phaseCtrl.h"
+#include "powerfox.h"
 #include "rfid.h"
 #include <SPIFFSEditor.h>
 #define WIFI_MANAGER_USE_ASYNC_WEB_SERVER
@@ -68,6 +69,7 @@ void loop() {
     mqtt_handle();
     webServer_handle();
     rfid_loop();
+    powerfox_loop();
     //pc_handle();
   }
 }

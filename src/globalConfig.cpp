@@ -9,7 +9,7 @@
 const uint8_t m = 5;
 
 char cfgWbecVersion[]     = "v0.3.0+";          // wbec version
-char cfgBuildDate[]       = "2021-06-21";	      // wbec build date
+char cfgBuildDate[]       = "2021-06-26";	      // wbec build date
 
 char     cfgApSsid[32];	              // SSID of the initial Access Point
 char     cfgApPass[63];               // Password of the initial Access Point
@@ -23,6 +23,9 @@ char     cfgMqttUser[32];             // MQTT: Username
 char     cfgMqttPass[32];             // MQTT: Password
 uint8_t  cfgMqttLp[WB_CNT];           // Array with assignments to openWB loadpoints, e.g. [4,2,0,1]: Box0 = LP4, Box1 = LP2, Box2 = no MQTT, Box3 = LP1
 char     cfgNtpServer[30];            // NTP server
+char     cfgFoxUser[32];              // powerfox: Username
+char     cfgFoxPass[16];              // powerfox: Password
+char     cfgFoxDevId[16];             // powerfox: DeviceId
 
 
 bool createConfig() {
@@ -42,6 +45,9 @@ bool createConfig() {
   doc["cfgMqttPass"]            = "";
   doc["cfgMqttLp"]              = serialized("[]");   // already serialized
   doc["cfgNtpServer"]           = "europe.pool.ntp.org";
+  doc["cfgFoxUser"]             = "";
+  doc["cfgFoxPass"]             = "";
+  doc["cfgFoxDevId"]            = "";
   // -------------------------------------
   
   File configFile = LittleFS.open("/cfg.json", "w");
@@ -114,6 +120,9 @@ void loadConfig() {
   strncpy(cfgMqttUser,        doc["cfgMqttUser"]          | "",                 sizeof(cfgMqttUser));
   strncpy(cfgMqttPass,        doc["cfgMqttPass"]          | "",                 sizeof(cfgMqttPass));
   strncpy(cfgNtpServer,       doc["cfgNtpServer"]         | "europe.pool.ntp.org", sizeof(cfgNtpServer));
+  strncpy(cfgFoxUser,         doc["cfgFoxUser"]           | "",                 sizeof(cfgFoxUser));
+  strncpy(cfgFoxPass,         doc["cfgFoxPass"]           | "",                 sizeof(cfgFoxPass));
+  strncpy(cfgFoxDevId,        doc["cfgFoxDevId"]          | "",                 sizeof(cfgFoxDevId));
 
   log(m, "cfgWbecVersion: " + String(cfgWbecVersion));
   log(m, "cfgBuildDate: "   + String(cfgBuildDate));
