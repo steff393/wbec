@@ -22,8 +22,7 @@ Ziel des Projekts ist es, eine WLAN-Schnittstelle zu entwickeln, die gleichzeiti
 - Weniger als 1W Strombedarf (trotz Ansteuerung von bis zu 16 Ladestationen)
 
 ## Kontakt
-Bei Fragen gerne einfach eine Mail schicken (wbec393@gmail.com) oder einen Issue eröffnen ;-)  
-Bei Interesse an einer fertig gelöteten/programmierten "ready-to-use" Black-Box bitte ebenfalls eine Mail schicken.  
+Bei Fragen gerne einfach eine Mail schicken (wbec393@gmail.com) oder einen Issue eröffnen ;-)    
 Bitte schaut auch ins [Wiki](https://github.com/steff393/wbec/wiki).  
   
   
@@ -50,7 +49,6 @@ Goal of this project is to establish an Wifi interface, which also acts as Modbu
 
 ## Contact
 In case of any questions, feel free to send a mail (wbec393@gmail.com) or open an issue  ;-)  
-When you're interested in a ready-to-use black-box, then please send a mail.  
 Please also take a look to the [Wiki](https://github.com/steff393/wbec/wiki).
 
 ## Pictures
