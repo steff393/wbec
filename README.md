@@ -22,7 +22,7 @@ Ziel des Projekts ist es, eine WLAN-Schnittstelle zu entwickeln, die gleichzeiti
 - Weniger als 1W Strombedarf (trotz Ansteuerung von bis zu 16 Ladestationen)
 
 ## Kontakt
-Bei Fragen gerne einfach eine Mail schicken (wbec393@gmail.com) oder einen Issue eröffnen ;-)    
+Bei Fragen oder wenn ihr Unterstützung beim Zusammenbauen braucht gerne einfach eine Mail schicken (wbec393@gmail.com)    
 Bitte schaut auch ins [Wiki](https://github.com/steff393/wbec/wiki).  
   
   
@@ -48,7 +48,7 @@ Goal of this project is to establish an Wifi interface, which also acts as Modbu
 - < 1W power consumption (for controlling up to 16 boxes)
 
 ## Contact
-In case of any questions, feel free to send a mail (wbec393@gmail.com) or open an issue  ;-)  
+In case of any questions or in case you need support, feel free to send a mail (wbec393@gmail.com)  ;-)  
 Please also take a look to the [Wiki](https://github.com/steff393/wbec/wiki).
 
 ## Pictures
