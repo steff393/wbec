@@ -384,6 +384,8 @@ void webServer_begin() {
   server.onNotFound(onRequest);
   server.onFileUpload(onUpload);
   server.onRequestBody(onBody);
+
+  server.begin();
 }
 
 void webServer_handle() {

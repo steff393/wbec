@@ -11,7 +11,6 @@
 #include "phaseCtrl.h"
 #include "powerfox.h"
 #include "rfid.h"
-#include <SPIFFSEditor.h>
 #define WIFI_MANAGER_USE_ASYNC_WEB_SERVER
 #include <WiFiManager.h>
 #include "webServer.h"
@@ -40,7 +39,6 @@ void setup() {
 
   // setup the Webserver
   webServer_begin();
-  server.begin();
 
   logger_begin();
 

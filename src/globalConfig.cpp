@@ -9,7 +9,7 @@
 const uint8_t m = 5;
 
 char cfgWbecVersion[]     = "v0.3.0+";          // wbec version
-char cfgBuildDate[]       = "2021-06-26";	      // wbec build date
+char cfgBuildDate[]       = "2021-07-12";	      // wbec build date
 
 char     cfgApSsid[32];	              // SSID of the initial Access Point
 char     cfgApPass[63];               // Password of the initial Access Point
@@ -33,24 +33,24 @@ bool createConfig() {
 
   // wbec default configuration parameters
   // -------------------------------------
-  doc["cfgApSsid"]              = "wbec";
-  doc["cfgApPass"]              = "wbec1234"; // older version had "cebw1234"
+  doc["cfgApSsid"]              = F("wbec");
+  doc["cfgApPass"]              = F("wbec1234"); // older version had "cebw1234"
   doc["cfgCntWb"]               = 1;
   doc["cfgMbCycleTime"]         = 10;
   doc["cfgMbDelay"]             = 100;
   doc["cfgMbTimeout"]           = 60000;  
   doc["cfgStandby"]             = 4;
-  doc["cfgMqttIp"]              = "";
-  doc["cfgMqttUser"]            = "";
-  doc["cfgMqttPass"]            = "";
+  doc["cfgMqttIp"]              = F("");
+  doc["cfgMqttUser"]            = F("");
+  doc["cfgMqttPass"]            = F("");
   doc["cfgMqttLp"]              = serialized("[]");   // already serialized
-  doc["cfgNtpServer"]           = "europe.pool.ntp.org";
-  doc["cfgFoxUser"]             = "";
-  doc["cfgFoxPass"]             = "";
-  doc["cfgFoxDevId"]            = "";
+  doc["cfgNtpServer"]           = F("europe.pool.ntp.org");
+  doc["cfgFoxUser"]             = F("");
+  doc["cfgFoxPass"]             = F("");
+  doc["cfgFoxDevId"]            = F("");
   // -------------------------------------
   
-  File configFile = LittleFS.open("/cfg.json", "w");
+  File configFile = LittleFS.open(F("/cfg.json"), "w");
   if (!configFile) {
     return(false);
   }
@@ -62,22 +62,21 @@ bool createConfig() {
 
 
 boolean checkConfig(JsonDocument& doc) {
-  File configFile = LittleFS.open("/cfg.json", "r");
+  File configFile = LittleFS.open(F("/cfg.json"), "r");
   if (!configFile) {
-    log(m, "Failed to open config file... Creating default config...");
+    log(m, F("Failed to open config file... Creating default config..."));
     if (createConfig()) {
-      Serial.println("Successful!");
-      log(0, "Successful!");
-      configFile = LittleFS.open("/cfg.json", "r");
+      log(0, F("Successful!"));
+      configFile = LittleFS.open(F("/cfg.json"), "r");
     } else {
-      log(m, "Failed to create default config... Please try to erase flash");
+      log(m, F("Failed to create default config... Please try to erase flash"));
       return(false);
     }
   }
 
   size_t size = configFile.size();
   if (size > 1024) {
-    log(m, "Config file size is too large");
+    log(m, F("Config file size is too large"));
     return(false);
   }
 
@@ -91,7 +90,7 @@ boolean checkConfig(JsonDocument& doc) {
   
   auto error = deserializeJson(doc, buf.get());
   if (error) {
-    log(m, "Failed to parse config file: " + String(error.c_str()));
+    log(m, F("Failed to parse config file: ") + String(error.c_str()));
     return(false);
   }
   configFile.close();
@@ -105,8 +104,8 @@ boolean checkConfig(JsonDocument& doc) {
 void loadConfig() {
   StaticJsonDocument<1024> doc;
   if (!checkConfig(doc)) {
-    log(m, "Using default config");
-    deserializeJson(doc, "{}");
+    log(m, F("Using default config"));
+    deserializeJson(doc, F("{}"));
   }
 
   strncpy(cfgApSsid,          doc["cfgApSsid"]            | "wbec",             sizeof(cfgApSsid));
@@ -124,9 +123,9 @@ void loadConfig() {
   strncpy(cfgFoxPass,         doc["cfgFoxPass"]           | "",                 sizeof(cfgFoxPass));
   strncpy(cfgFoxDevId,        doc["cfgFoxDevId"]          | "",                 sizeof(cfgFoxDevId));
 
-  log(m, "cfgWbecVersion: " + String(cfgWbecVersion));
-  log(m, "cfgBuildDate: "   + String(cfgBuildDate));
-  log(m, "cfgCntWb: "       + String(cfgCntWb));
+  log(m, F("cfgWbecVersion: ") + String(cfgWbecVersion));
+  log(m, F("cfgBuildDate: ")   + String(cfgBuildDate));
+  log(m, F("cfgCntWb: ")       + String(cfgCntWb));
 
   for (uint8_t i = 0; i < WB_CNT; i++) {
     if (i < doc["cfgMqttLp"].size()) {

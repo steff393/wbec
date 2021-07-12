@@ -6,6 +6,4 @@
 extern void webServer_begin();
 extern void webServer_handle();
 
-extern AsyncWebServer server;
-
 #endif /* WEBSERVER_H */
