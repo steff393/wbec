@@ -20,13 +20,13 @@ bool _handlingOTA = false;
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("\n\nStarting wbec ;-)");
+  Serial.println(F("\n\nStarting wbec ;-)"));
 
   // define a GPIO as output
   pinMode(PIN_RST, OUTPUT);
   
   if(!LittleFS.begin()){ 
-    Serial.println("An Error has occurred while mounting LittleFS");
+    Serial.println(F("An Error has occurred while mounting LittleFS"));
     return;
   }
 
@@ -55,7 +55,8 @@ void setup() {
   mqtt_begin();
   rfid_setup();
   powerfox_setup();
-  Serial.print("Boot time: ");Serial.println(millis());
+  Serial.print(F("Boot time: "));Serial.println(millis());
+  Serial.print(F("Heap: ")); Serial.println(ESP.getFreeHeap());
 }
 
 

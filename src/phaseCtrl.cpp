@@ -85,26 +85,26 @@ void httpCall(boolean state) {
 	HTTPClient http;
 	String serverPath;
 	if (state) {
-		serverPath = "http://shelly-ip/relay/0?turn=on";
+		serverPath = F("http://shelly-ip/relay/0?turn=on");
 	} else {
-		serverPath = "http://shelly-ip/relay/0?turn=off";
+		serverPath = F("http://shelly-ip/relay/0?turn=off");
 	}
-	log(m, "url:" + serverPath);
+	log(m, F("url:") + serverPath);
 
 	http.begin(client, serverPath);
 	int16_t httpResponseCode = http.GET();
 	if (httpResponseCode > 0) {
-		log(m, "HTTP Response code: " + String(httpResponseCode) + ", " + http.getString());
+		log(m, F("HTTP Response code: ") + String(httpResponseCode) + ", " + http.getString());
 	}
 	else {
-		log(m, "Error code: " + String(httpResponseCode));
+		log(m, F("Error code: ") + String(httpResponseCode));
 	}
 	http.end();
 }
 
 
 void trans_INIT() {
-	log(m, "--> INIT");
+	log(m, F("--> INIT"));
 	pcState = INIT;
 	timerCheck1p = millis();
 	timerCheck3p = millis();
@@ -112,7 +112,7 @@ void trans_INIT() {
 
 
 void trans_NORMAL_1P() {
-	log(m, "--> NORMAL_1P");
+	log(m, F("--> NORMAL_1P"));
 	pcState = NORMAL_1P;
 	if (currentBackup > 0) {
 		mb_writeReg(id, REG_CURR_LIMIT, currentBackup);
@@ -121,7 +121,7 @@ void trans_NORMAL_1P() {
 
 
 void trans_NORMAL_3P() {
-	log(m, "--> NORMAL_3P");
+	log(m, F("--> NORMAL_3P"));
 	pcState = NORMAL_3P;
 	if (currentBackup > 0) {
 		mb_writeReg(id, REG_CURR_LIMIT, currentBackup);
@@ -130,7 +130,7 @@ void trans_NORMAL_3P() {
 
 
 void trans_WAIT_0AMP() {
-	log(m, "--> WAIT_0AMP");
+	log(m, F("--> WAIT_0AMP"));
 	pcState = WAIT_0AMP;
 	timerWait0Amp       = millis();
 	timerWait0Amp_Entry = millis();
@@ -171,11 +171,11 @@ void pc_handle() {
 		case WAIT_0AMP:
 			if (pc_check0Amp()) {
 				if (getRequestedPhases() == 1) {
-					log(m, "Call Shelly OFF");
+					log(m, F("Call Shelly OFF"));
 					httpCall(false);
 				}
 				if (getRequestedPhases() == 3) {
-					log(m, "Call Shelly ON");
+					log(m, F("Call Shelly ON"));
 					httpCall(true);
 				}
 				trans_INIT();

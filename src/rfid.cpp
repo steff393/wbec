@@ -30,18 +30,18 @@ MFRC522 mfrc522(PIN_SS, PIN_RST);
 
 
 boolean readCards() {
-  File file = LittleFS.open("/rfid.txt", "r");
+  File file = LittleFS.open(F("/rfid.txt"), "r");
   if (!file) {
-    log(m, "Disabled (rfid.txt not found)");
+    log(m, F("Disabled (rfid.txt not found)"));
     return(false);
   }
 
   uint8_t k = 0;
-  log(m, "Cards: ", false);
+  log(m, F("Cards: "), false);
   while (file.available() && k < RFID_CHIP_MAX) {
     // read the first characters from each line
     strncpy(chip[k], file.readStringUntil('\n').c_str(), RFID_CHIP_LEN - 1);
-    if (k > 0 ) { log(0, ", ", false); }
+    if (k > 0 ) { log(0, F(", "), false); }
     log(0, String(chip[k]), false);
     k++;
   }
@@ -105,7 +105,7 @@ void rfid_loop() {
 
     // First 4 byte should be sufficient
     sprintf(chipID, "%02x%02x%02x%02x", mfrc522.uid.uidByte[0], mfrc522.uid.uidByte[1], mfrc522.uid.uidByte[2], mfrc522.uid.uidByte[3]);
-    log(m, "Detected: " + String(chipID) + " ... ", false);
+    log(m, F("Detected: ") + String(chipID) + F(" ... "), false);
     
     // Search if this fits to a known chip
     uint8_t k = 0;
@@ -113,13 +113,13 @@ void rfid_loop() {
       k++;
     };
     if (k < RFID_CHIP_MAX) {
-      log(0, "found: idx=" + String(k));
+      log(0, F("found: idx=") + String(k));
       rfid_released = true;
       rfid_lastReleased = millis();
       // set current to max value
       mb_writeReg(id, REG_CURR_LIMIT, content[id][15]);
     } else {
-      log(0, "unknown");
+      log(0, F("unknown"));
     }
 	}
 }

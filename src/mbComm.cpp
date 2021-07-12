@@ -81,13 +81,13 @@ bool cbWrite(Modbus::ResultCode event, uint16_t transactionId, void* data) {
   int id = mb.slave()-1;
 	modbusResultCode[id] = event;
 	if (event) {
-		log(m, "Comm-Failure BusID " + String(mb.slave()));
+		log(m, F("Comm-Failure BusID ") + String(mb.slave()));
 		if (modbusFailureCnt[id] < 250) {
 			modbusFailureCnt[id]++;
 		}
 		if (modbusFailureCnt[id] == 10) {
 			// too many consecutive timeouts --> reset values
-			log(m, "Timeout BusID " + String(mb.slave()));
+			log(m, F("Timeout BusID ") + String(mb.slave()));
 			timeout(id);
 		}
 	} else
@@ -181,7 +181,7 @@ void mb_writeReg(uint8_t id, uint16_t reg, uint16_t val) {
 	if (rbIn == rbOut) {
 		// we have overwritten an not-sent value -> set rbOut to next element, otherwise complete ring would be skipped
 		rbOut = (rbOut+1) % RINGBUF_SIZE; 		// increment pointer, but take care of overflow
-		log(m, "Overflow of ring buffer");
+		log(m, F("Overflow of ring buffer"));
 	}
 
 	// direct read back, when current register was modified

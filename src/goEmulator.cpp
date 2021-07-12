@@ -1,4 +1,4 @@
-// Copyright (c) 2021 steff393
+// Copyright (c) 2021 steff393, MIT license
 
 #include <Arduino.h>
 #include "AsyncJson.h"
@@ -72,7 +72,7 @@ void goE_setPayload(String payload, uint8_t id) {
 	uint16_t val = 0;
 	cmd = payload.substring(0,3);					// first 4 chars, e.g. "amx="
 	val = payload.substring(4).toInt();		// everything after "="
-	if (cmd == "alw") {
+	if (cmd == F("alw")) {
 		if (val == 1) {
 			// charging allowed
 			box[id].alw = 1;
@@ -84,7 +84,7 @@ void goE_setPayload(String payload, uint8_t id) {
 			mb_writeReg(id, REG_CURR_LIMIT, 0);
 		}
 	}
-	if (cmd == "amp" || cmd == "amx") {
+	if (cmd == F("amp") || cmd == F("amx")) {
 		// go-e has 1A resolution, wbec has 0.1A resulotion
 		val = val * 10;
 		// set current
@@ -93,7 +93,7 @@ void goE_setPayload(String payload, uint8_t id) {
 			mb_writeReg(id, REG_CURR_LIMIT, box[id].amp);
 		}
 	}
-	if (cmd == "dwo") {
+	if (cmd == F("dwo")) {
 		if (val <= 0xFFFFu) {
 			box[id].dwo = val;
 		}
@@ -104,27 +104,27 @@ String goE_getStatus(uint8_t id, boolean fromApp) {
 	DynamicJsonDocument data(1024); 
 
 	if (fromApp) {
-		data["oem"]="wbec";
-		data["typ"]="Heidelberg Energy Control";
-		data["box"]="0";
+		data["oem"]=F("wbec");
+		data["typ"]=F("Heidelberg Energy Control");
+		data["box"]=F("0");
 	}
-	data["version"] = "B";
+	data["version"] = F("B");
 	switch(content[id][1]) {
-		case  2:  data["car"] = "1"; data["err"] =  "0"; break;
-		case  3:  data["car"] = "1"; data["err"] =  "0"; break;
-		case  4:  data["car"] = "4"; data["err"] =  "0"; break;
-		case  5:  data["car"] = "4"; data["err"] =  "0"; break;
-		case  6:  data["car"] = "2"; data["err"] =  "0"; break;
-		case  7:  data["car"] = "2"; data["err"] =  "0"; break;
-		case  8:  data["car"] = "2"; data["err"] =  "0"; break;
-		case  9:  data["car"] = "2"; data["err"] = "10"; break;		// not sure, if 9 is really an error...
-		case 10:  data["car"] = "1"; data["err"] =  "0"; break;		// e.g. when remote locked the status will be set to F = 10 -> not clear if a vehicle is connected?!
-		default:  data["car"] = "1"; data["err"] = "10"; break; 
+		case  2:  data["car"] = F("1"); data["err"] = F( "0"); break;
+		case  3:  data["car"] = F("1"); data["err"] = F( "0"); break;
+		case  4:  data["car"] = F("4"); data["err"] = F( "0"); break;
+		case  5:  data["car"] = F("4"); data["err"] = F( "0"); break;
+		case  6:  data["car"] = F("2"); data["err"] = F( "0"); break;
+		case  7:  data["car"] = F("2"); data["err"] = F( "0"); break;
+		case  8:  data["car"] = F("2"); data["err"] = F( "0"); break;
+		case  9:  data["car"] = F("2"); data["err"] = F("10"); break;		// not sure, if 9 is really an error...
+		case 10:  data["car"] = F("1"); data["err"] = F( "0"); break;		// e.g. when remote locked the status will be set to F = 10 -> not clear if a vehicle is connected?!
+		default:  data["car"] = F("1"); data["err"] = F("10"); break; 
 	}
 	data["alw"] = String(box[id].alw);
 	data["amp"] = String(box[id].amp / 10);
 	data["amx"] = String(box[id].amp / 10);
-	data["stp"] = "0";
+	data["stp"] = F("0");
 	uint8_t pha = 0;
 	if (content[id][6] > 200) { pha+=9; } 	// 0000 1001
 	if (content[id][7] > 200) { pha+=18; } // 0001 0010
@@ -133,7 +133,7 @@ String goE_getStatus(uint8_t id, boolean fromApp) {
 	data["tmp"] = String(content[id][5] / 10);
 	data["dws"] = String((((uint32_t) content[id][13] << 16 | (uint32_t)content[id][14]) - box[id].energyI) * 360);
 	data["dwo"] = String(box[id].dwo);
-	data["uby"] = "0";
+	data["uby"] = F("0");
 	data["eto"] = String(((uint32_t) content[id][13] << 16 | (uint32_t)content[id][14]) / 100);
 	data["nrg"][0] = content[id][6]; // L1
 	data["nrg"][1] = content[id][7]; // L2
@@ -151,11 +151,11 @@ String goE_getStatus(uint8_t id, boolean fromApp) {
 	data["nrg"][13] = 0;
 	data["nrg"][14] = 0;
 	data["nrg"][15] = 0;
-	data["fwv"] = "040";
+	data["fwv"] = F("040");
 	data["sse"] = mb_getAscii(id, 27,3);
 	data["ama"] = String(content[id][15]);
-	data["ust"] = "2";
-	data["ast"] = "0";
+	data["ust"] = F("2");
+	data["ast"] = F("0");
 
 	String response;
 	serializeJson(data, response);
