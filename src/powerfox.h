@@ -3,6 +3,7 @@
 #ifndef POWERFOX_H
 #define POWERFOX_H
 
+extern void powerfox_setup();
 extern void powerfox_loop();
 
 

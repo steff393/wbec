@@ -54,6 +54,7 @@ void setup() {
   mb_setup();
   mqtt_begin();
   rfid_setup();
+  powerfox_setup();
   Serial.print("Boot time: ");Serial.println(millis());
 }
 

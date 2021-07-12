@@ -2,74 +2,71 @@
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
-#include <base64.h>
-#include <ESP8266WiFi.h>
-#include <ESP8266HTTPClient.h>
 #include "globalConfig.h"
 #include "logger.h"
-#include <WiFiClientSecure.h>
+
+#include <ESP8266HTTPClient.h>
+#include <WiFiClientSecureBearSSL.h>
+
 
 const uint8_t m = 9;
 
-#define CYCLE_TIME		   60000		// 60 s	=> 1440 calls per day (fair-use limit: 8000 per day)
+#define CYCLE_TIME		   20000		// 60 s	=> 1440 calls per day (fair-use limit: 8000 per day)
+#define MAX_API_LEN				 150		// Max accepted length of API response
 
-uint32_t powerfox_lastHandleCall       = 0;
+static uint32_t lastHandleCall       = 0;
+
+HTTPClient                *http;
+BearSSL::WiFiClientSecure *httpsClient;
+
+
+void powerfox_setup() {
+	
+}
+
 
 void powerfox_loop() {
-	if ((millis() - powerfox_lastHandleCall < CYCLE_TIME) || !strcmp(cfgFoxUser, "") || !strcmp(cfgFoxPass, "") || !strcmp(cfgFoxDevId, "")) {
-		// avoid unnecessary frequent calls and block the feature, when more than 1 wallbox is connected, due to timing reasons
+	if (((millis() - lastHandleCall < CYCLE_TIME) && lastHandleCall != 0) || 
+			!strcmp(cfgFoxUser, "") || !strcmp(cfgFoxPass, "") || !strcmp(cfgFoxDevId, "")) {
+		// avoid unnecessary frequent calls
 		return;
 	}
-	powerfox_lastHandleCall = millis();
+	lastHandleCall = millis();
 
-	WiFiClient client;
-	//WiFiClientSecure client;
-	HTTPClient http;
+	Serial.print(F("Heap before new: ")); Serial.println(ESP.getFreeHeap());
+	http = new HTTPClient();
+	httpsClient = new BearSSL::WiFiClientSecure();
+	char response[MAX_API_LEN];
+	Serial.print(F("Heap after new : ")); Serial.println(ESP.getFreeHeap());
 
-	//client.setInsecure(); //the magic line, use with caution
-	//client.connect(host, httpsPort);
+	httpsClient->setInsecure();
+	httpsClient->setBufferSizes(512,512);    // must be between 512 and 16384
+	http->begin(*httpsClient, F("https://backend.powerfox.energy/api/2.0/my/") + String(cfgFoxDevId) + F("/current"));
 
-	http.begin(client, "http://backend.powerfox.energy/api/2.0/my/" + String(cfgFoxDevId) + "/current");
-	//http.begin(client, "http://httpbin.org/basic-auth/" + String(cfgFoxUser) + "/" + cfgFoxPass);
- 
-	String auth = base64::encode(cfgFoxUser + String(":") + cfgFoxPass);
-	http.addHeader("Authorization", "Basic " + auth);
-
-	int httpCode = http.GET(); 
-
-	if (httpCode > 0) { //Check for the returning code
-
-			String payload = http.getString();
-			log(m, String(httpCode));
-			log(m, payload);
-
-			DynamicJsonDocument doc(256);
-			  // Parse JSON object
-			DeserializationError error = deserializeJson(doc, payload);
-			if (error) {
-				Serial.print(F("deserializeJson() failed: "));
-				Serial.println(error.f_str());
-				client.stop();
-				return;
-			}
-			/* { 
-				"Watt": 84.0, 
-				"Timestamp": 1566909358, 
-				"A_Plus": 276696.6, 
-				"A_Plus_HT": 193687.6, 
-				"A_Plus_NT": 83009.0, 
-				"A_Minus": 0.0, 
-				"Outdated ": false 
-			}  */
-			// Extract values
-			//log(m, String("Response: " + String(doc["user"].as<char*>())));
-			log(m, String("Response: " + String(doc["Watt"].as<float>())));
-			}
-
-	else {
-		log(m, "Error on HTTP request:");
-		log(m, String(httpCode));
+	http->setAuthorization(cfgFoxUser, cfgFoxPass);
+	http->setReuse(false);
+	uint32_t tm = millis();
+	http->GET();
+	Serial.print(F("Duration of GET: ")); Serial.println(millis() - tm);
+	
+	while (httpsClient->connected() || httpsClient->available()) {
+		if (httpsClient->available()) {
+			httpsClient->read((uint8_t*)response, MAX_API_LEN-1);
+		}
 	}
+	Serial.println(response);
+	delete http;
+  delete httpsClient;
+	Serial.print(F("Heap after del : ")); Serial.println(ESP.getFreeHeap());
 
-	http.end();
+	DynamicJsonDocument doc(256);
+	// Parse JSON object
+	DeserializationError error = deserializeJson(doc, response);
+	if (error) {
+		Serial.print(F("deserializeJson() failed: "));
+		Serial.println(error.f_str());
+		return;
+	}
+	log(m, String(F("Response: ") + String(doc["Watt"].as<float>())));
 }
+

@@ -10,7 +10,7 @@ WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, cfgNtpServer, 3600, 60000); // GMT+1 and update every minute
 
 const char *mod[10] = {"", "MB  ", "MQTT", "WEBS", "GO-E", "CFG ", "1P3P", "LLOG", "RFID", "PFOX"};
-char bootLog[5000];
+char bootLog[50];
 boolean written = false;
 
 boolean getDstGermany(uint32_t unixtime) {
@@ -94,9 +94,9 @@ void log(uint8_t module, String msg, boolean newLine /* =true */) {
 	}
   Serial.print(output);
 
-  if (strlen(bootLog)+strlen(output.c_str()) < sizeof(bootLog)-10) {
-    strcat(bootLog, output.c_str());
-  } 
+  //if (strlen(bootLog)+strlen(output.c_str()) < sizeof(bootLog)-10) {
+  //  strcat(bootLog, output.c_str());
+  //} 
 }
 
 String log_time() {
