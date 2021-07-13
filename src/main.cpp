@@ -55,8 +55,8 @@ void setup() {
   mqtt_begin();
   rfid_setup();
   powerfox_setup();
-  Serial.print(F("Boot time: "));Serial.println(millis());
-  Serial.print(F("Heap: ")); Serial.println(ESP.getFreeHeap());
+  Serial.print(F("Boot time: ")); Serial.println(millis());
+  Serial.print(F("Free heap: ")); Serial.println(ESP.getFreeHeap());
 }
 
 

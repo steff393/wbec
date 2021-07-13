@@ -14,6 +14,7 @@
 #include "logger.h"
 #include "mbComm.h"
 #include "phaseCtrl.h"
+#include "powerfox.h"
 #include "rfid.h"
 #include "SPIFFSEditor.h"
 #include "webServer.h"
@@ -259,6 +260,7 @@ void webServer_begin() {
     data[F("rfid")][F("enabled")] = rfid_getEnabled();
     data[F("rfid")][F("release")] = rfid_getReleased();
     data[F("rfid")][F("lastId")]  = rfid_getLastID();
+    data[F("pfox")][F("watt")]    = pf_getWatt();
     data[F("wifi")][F("mac")] = WiFi.macAddress();
     int qrssi = WiFi.RSSI();
     data[F("wifi")][F("rssi")] = qrssi;

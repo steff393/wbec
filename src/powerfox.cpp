@@ -13,8 +13,14 @@ const uint8_t m = 9;
 
 #define CYCLE_TIME		   20000		// 60 s	=> 1440 calls per day (fair-use limit: 8000 per day)
 #define MAX_API_LEN				 150		// Max accepted length of API response
+#define MIN_HEAP_NEEDED  15000		// This heap is minimum necessary, otherwise ESP will crash during HTTPS / TLS connection
+#define OUTDATED           600		// 10 min, after this time the value is considered outdated
+#define WATT_MIN       -100000		// 100kW Feed-in
+#define WATT_MAX        100000		// 100kW Consumption
 
 static uint32_t lastHandleCall       = 0;
+static uint32_t timestamp            = 0;
+static int32_t  watt                 = 0;
 
 HTTPClient                *http;
 BearSSL::WiFiClientSecure *httpsClient;
@@ -34,6 +40,10 @@ void powerfox_loop() {
 	lastHandleCall = millis();
 
 	Serial.print(F("Heap before new: ")); Serial.println(ESP.getFreeHeap());
+	if (ESP.getFreeHeap() < MIN_HEAP_NEEDED) {
+		log(m, F("Not enough Heap"));
+		return;
+	}
 	http = new HTTPClient();
 	httpsClient = new BearSSL::WiFiClientSecure();
 	char response[MAX_API_LEN];
@@ -63,10 +73,18 @@ void powerfox_loop() {
 	// Parse JSON object
 	DeserializationError error = deserializeJson(doc, response);
 	if (error) {
-		Serial.print(F("deserializeJson() failed: "));
-		Serial.println(error.f_str());
+		log(m, F("deserializeJson() failed: ") + String(error.f_str()));
 		return;
 	}
-	log(m, String(F("Response: ") + String(doc["Watt"].as<float>())));
+	timestamp =  doc[F("Timestamp")]        | 0;
+	watt = (int) doc[F("Watt")].as<float>();
+	log(m, F("Timestamp=") + String(timestamp) + F(", Watt=") + watt);
 }
 
+int32_t pf_getWatt() {
+	if (/*(log_unixtime - timestamp > OUTDATED) || */ (watt < WATT_MIN) || (watt > WATT_MAX)) {
+		return(0);
+	} else {
+		return(watt);
+	}
+}
