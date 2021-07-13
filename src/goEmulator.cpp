@@ -104,58 +104,58 @@ String goE_getStatus(uint8_t id, boolean fromApp) {
 	DynamicJsonDocument data(1024); 
 
 	if (fromApp) {
-		data["oem"]=F("wbec");
-		data["typ"]=F("Heidelberg Energy Control");
-		data["box"]=F("0");
+		data[F("oem")]=F("wbec");
+		data[F("typ")]=F("Heidelberg Energy Control");
+		data[F("box")]=F("0");
 	}
 	data["version"] = F("B");
 	switch(content[id][1]) {
-		case  2:  data["car"] = F("1"); data["err"] = F( "0"); break;
-		case  3:  data["car"] = F("1"); data["err"] = F( "0"); break;
-		case  4:  data["car"] = F("4"); data["err"] = F( "0"); break;
-		case  5:  data["car"] = F("4"); data["err"] = F( "0"); break;
-		case  6:  data["car"] = F("2"); data["err"] = F( "0"); break;
-		case  7:  data["car"] = F("2"); data["err"] = F( "0"); break;
-		case  8:  data["car"] = F("2"); data["err"] = F( "0"); break;
-		case  9:  data["car"] = F("2"); data["err"] = F("10"); break;		// not sure, if 9 is really an error...
-		case 10:  data["car"] = F("1"); data["err"] = F( "0"); break;		// e.g. when remote locked the status will be set to F = 10 -> not clear if a vehicle is connected?!
-		default:  data["car"] = F("1"); data["err"] = F("10"); break; 
+		case  2:  data[F("car")] = F("1"); data[F("err")] = F( "0"); break;
+		case  3:  data[F("car")] = F("1"); data[F("err")] = F( "0"); break;
+		case  4:  data[F("car")] = F("4"); data[F("err")] = F( "0"); break;
+		case  5:  data[F("car")] = F("4"); data[F("err")] = F( "0"); break;
+		case  6:  data[F("car")] = F("2"); data[F("err")] = F( "0"); break;
+		case  7:  data[F("car")] = F("2"); data[F("err")] = F( "0"); break;
+		case  8:  data[F("car")] = F("2"); data[F("err")] = F( "0"); break;
+		case  9:  data[F("car")] = F("2"); data[F("err")] = F("10"); break;		// not sure, if 9 is really an error...
+		case 10:  data[F("car")] = F("1"); data[F("err")] = F( "0"); break;		// e.g. when remote locked the status will be set to F = 10 -> not clear if a vehicle is connected?!
+		default:  data[F("car")] = F("1"); data[F("err")] = F("10"); break; 
 	}
-	data["alw"] = String(box[id].alw);
-	data["amp"] = String(box[id].amp / 10);
-	data["amx"] = String(box[id].amp / 10);
-	data["stp"] = F("0");
+	data[F("alw")] = String(box[id].alw);
+	data[F("amp")] = String(box[id].amp / 10);
+	data[F("amx")] = String(box[id].amp / 10);
+	data[F("stp")] = F("0");
 	uint8_t pha = 0;
 	if (content[id][6] > 200) { pha+=9; } 	// 0000 1001
 	if (content[id][7] > 200) { pha+=18; } // 0001 0010
 	if (content[id][8] > 200) { pha+=36; } // 0010 0100
-	data["pha"] = String(pha);
-	data["tmp"] = String(content[id][5] / 10);
-	data["dws"] = String((((uint32_t) content[id][13] << 16 | (uint32_t)content[id][14]) - box[id].energyI) * 360);
-	data["dwo"] = String(box[id].dwo);
-	data["uby"] = F("0");
-	data["eto"] = String(((uint32_t) content[id][13] << 16 | (uint32_t)content[id][14]) / 100);
-	data["nrg"][0] = content[id][6]; // L1
-	data["nrg"][1] = content[id][7]; // L2
-	data["nrg"][2] = content[id][8]; // L3
-	data["nrg"][3] = 0;
-	data["nrg"][4] = content[id][2]; // L1
-	data["nrg"][5] = content[id][3]; // L2
-	data["nrg"][6] = content[id][4]; // L3
-	data["nrg"][7] = 0;
-	data["nrg"][8] = 0;
-	data["nrg"][9] = 0;
-	data["nrg"][10] = 0;
-	data["nrg"][11] = content[id][10] / 10;
-	data["nrg"][12] = 0;
-	data["nrg"][13] = 0;
-	data["nrg"][14] = 0;
-	data["nrg"][15] = 0;
-	data["fwv"] = F("040");
-	data["sse"] = mb_getAscii(id, 27,3);
-	data["ama"] = String(content[id][15]);
-	data["ust"] = F("2");
-	data["ast"] = F("0");
+	data[F("pha")] = String(pha);
+	data[F("tmp")] = String(content[id][5] / 10);
+	data[F("dws")] = String((((uint32_t) content[id][13] << 16 | (uint32_t)content[id][14]) - box[id].energyI) * 360);
+	data[F("dwo")] = String(box[id].dwo);
+	data[F("uby")] = F("0");
+	data[F("eto")] = String(((uint32_t) content[id][13] << 16 | (uint32_t)content[id][14]) / 100);
+	data[F("nrg")][0] = content[id][6]; // L1
+	data[F("nrg")][1] = content[id][7]; // L2
+	data[F("nrg")][2] = content[id][8]; // L3
+	data[F("nrg")][3] = 0;
+	data[F("nrg")][4] = content[id][2]; // L1
+	data[F("nrg")][5] = content[id][3]; // L2
+	data[F("nrg")][6] = content[id][4]; // L3
+	data[F("nrg")][7] = 0;
+	data[F("nrg")][8] = 0;
+	data[F("nrg")][9] = 0;
+	data[F("nrg")][10] = 0;
+	data[F("nrg")][11] = content[id][10] / 10;
+	data[F("nrg")][12] = 0;
+	data[F("nrg")][13] = 0;
+	data[F("nrg")][14] = 0;
+	data[F("nrg")][15] = 0;
+	data[F("fwv")] = F("040");
+	data[F("sse")] = mb_getAscii(id, 27,3);
+	data[F("ama")] = String(content[id][15]);
+	data[F("ust")] = F("2");
+	data[F("ast")] = F("0");
 
 	String response;
 	serializeJson(data, response);

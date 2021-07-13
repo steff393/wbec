@@ -22,7 +22,7 @@
 
 const uint8_t m = 3;
 
-const char* serverIndex = "<form method='POST' action='/update' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>";
+static const char* otaPage PROGMEM = "%OTARESULT%<br><form method='POST' action='/update' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>";
 
 AsyncWebServer server(80);
 boolean resetRequested = false;
@@ -41,32 +41,42 @@ void onUpload(AsyncWebServerRequest *request, String filename, size_t index, uin
 }
 
 String processor(const String& var){
-  String ledState;
-  Serial.println(var);
-  if(var == "STATE"){
+  String commState;
+  if(var == F("STATE")){
     if(modbusResultCode[0]==0x00){
-      ledState = "ON";
+      commState = F("ON");
     }
     else{
-      ledState = "OFF";
+      commState = F("OFF");
     }
-    Serial.print(ledState);
-    return(ledState);
+    return(commState);
   }
-  else if (var == "TEMPERATURE"){
+  else if (var == F("TEMPERATURE")){
     float tmp = content[0][5] / 10.0;
     return(String(tmp));
   }
-  else if (var == "VOLTAGE"){
+  else if (var == F("VOLTAGE")){
     float tmp = content[0][6] / 10.0;
     return(String(tmp));
   }
-  else if (var == "CURRENT"){
+  else if (var == F("CURRENT")){
     float tmp = content[0][53] / 10.0;
     return(String(tmp));
-  } else return(String("notFound"));
+  } else return(String(F("notFound")));
 }
 
+String otaProcessor(const String& var){
+  if(Update.hasError()){
+    return(F("Failed"));
+  } else {
+    return(F("OK"));
+  }
+}
+
+String otaProcessorEmpty(const String& var){
+  // just replace the template string with nothing, neither ok, nor fail
+  return String();
+}
 
 uint8_t getSignalQuality(int rssi)
 {
@@ -82,106 +92,104 @@ uint8_t getSignalQuality(int rssi)
 }
 
 void webServer_begin() {
-	// respond to GET requests on URL /heap
   server.on("/heap", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(200, "text/plain", String(ESP.getFreeHeap()));
+    request->send(200, F("text/plain"), String(ESP.getFreeHeap()));
   });
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-    //request->send(200, "application/json", "{\"message\":\"Welcome\"}");
-    request->send(LittleFS, "/index.html", String(), false, processor);
+    request->send(LittleFS, F("/index.html"), String(), false, processor);
   });
 
   server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/style.css", "text/css");
+    request->send(LittleFS, F("/style.css"), F("text/css"));
   });
 
   server.on("/cfg", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/cfg.json", "application/json");
+    request->send(LittleFS, F("/cfg.json"), F("application/json"));
   });
 
   server.on("/bootlog", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(200, "text/plain", log_getBuffer());
+    request->send(200, F("text/plain"), log_getBuffer());
   });
 
   server.on("/bootlog_reset", HTTP_GET, [](AsyncWebServerRequest *request){
     log_freeBuffer();
-    request->send(200, "text/plain", "Cleared");
+    request->send(200, F("text/plain"), F("Cleared"));
   });
 
   server.on("/delete_cfg", HTTP_GET, [](AsyncWebServerRequest *request){
-    if (LittleFS.remove("/cfg.json")) {
-      request->send_P(200, "text/plain", "cfg.json successfully deleted, resetting defaults at next startup");
+    if (LittleFS.remove(F("/cfg.json"))) {
+      request->send(200, F("text/plain"), F("cfg.json successfully deleted, resetting defaults at next startup"));
     } else {
-      request->send_P(200, "text/plain", "cfg.json could not be deleted");
+      request->send(200, F("text/plain"), F("cfg.json could not be deleted"));
     }
   });
 
   server.on("/delete", HTTP_GET, [](AsyncWebServerRequest *request){
-    if (request->hasParam("file")) {
-      if (LittleFS.remove(request->getParam("file")->value())) {
-        request->send_P(200, "text/plain", "OK");
+    if (request->hasParam(F("file"))) {
+      if (LittleFS.remove(request->getParam(F("file"))->value())) {
+        request->send(200, F("text/plain"), F("OK"));
       } else {
-        request->send_P(200, "text/plain", "FAIL");
+        request->send(200, F("text/plain"), F("FAIL"));
       }
     }
   }); 
 
   server.on("/web", HTTP_GET, [](AsyncWebServerRequest *request){
     uint8_t id = 0;
-    if (request->hasParam("currLim")) {
-      uint16_t val = request->getParam("currLim")->value().toInt();
+    if (request->hasParam(F("currLim"))) {
+      uint16_t val = request->getParam(F("currLim"))->value().toInt();
       if (val == 0 || (val >= CURR_ABS_MIN && val <= CURR_ABS_MAX)) {
         mb_writeReg(id, REG_CURR_LIMIT, val);
       }
     }
-    request->send(LittleFS, "/index.html", String(), false, processor);
+    request->send(LittleFS, F("/index.html"), String(), false, processor);
   });
 
   server.on("/state", HTTP_GET, [](AsyncWebServerRequest *request){
     if(modbusResultCode[0]==0x00) {
-      request->send_P(200, "text/plain", String("ON").c_str());
+      request->send(200, F("text/plain"), F("ON"));
     } else {
-      request->send_P(200, "text/plain", String("OFF").c_str());
+      request->send(200, F("text/plain"), F("OFF"));
     }
   });
 
   server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
     float tmp = content[0][5] / 10.0;
-    request->send_P(200, "text/plain", String(tmp).c_str());
+    request->send(200, F("text/plain"), String(tmp));
   });
   
   server.on("/voltage", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(content[0][6]).c_str());
+    request->send(200, F("text/plain"), String(content[0][6]));
   });
   
   server.on("/current", HTTP_GET, [](AsyncWebServerRequest *request){
     float tmp = content[0][53] / 10.0;
-    request->send_P(200, "text/plain", String(tmp).c_str());
+    request->send(200, F("text/plain"), String(tmp));
   });
 
   server.on("/gpio", HTTP_GET, [](AsyncWebServerRequest *request){
     if (!rfid_getEnabled()) {
-      if (request->hasParam("on")) {
+      if (request->hasParam(F("on"))) {
         digitalWrite(PIN_RST, HIGH);
-        request->send(200, "text/plain", String("GPIO On"));
+        request->send(200, F("text/plain"), F("GPIO On"));
       }
-      if (request->hasParam("off")) {
+      if (request->hasParam(F("off"))) {
         digitalWrite(PIN_RST, LOW);
-        request->send(200, "text/plain", String("GPIO Off"));
+        request->send(200, F("text/plain"), F("GPIO Off"));
       }    
     } else {
-      request->send(200, "text/plain", String("RFID active, GPIO not possible"));
+      request->send(200, F("text/plain"), F("RFID active, GPIO not possible"));
     }
   });
 
   server.on("/reset", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(200, "text/plain", String("Resetting the ESP8266..."));
+    request->send(200, F("text/plain"), F("Resetting the ESP8266..."));
     resetRequested = true;
   });
 
   server.on("/resetwifi", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(200, "text/plain", String("Resetting the WiFi credentials..."));
+    request->send(200, F("text/plain"), F("Resetting the WiFi credentials..."));
     WiFiManager wm;
     wm.resetSettings();
   });
@@ -190,139 +198,132 @@ void webServer_begin() {
     DynamicJsonDocument data((cfgCntWb+2)/3  * 2048);  // always 2048 byte for 3 wallboxes
     uint8_t id = 0;
     // modify values
-    if (request->hasParam("id")) {
-      id = request->getParam("id")->value().toInt();
+    if (request->hasParam(F("id"))) {
+      id = request->getParam(F("id"))->value().toInt();
     }
 
-    if (request->hasParam("wdTmOut")) {
-      mb_writeReg(id, REG_WD_TIME_OUT, request->getParam("wdTmOut")->value().toInt());
+    if (request->hasParam(F("wdTmOut"))) {
+      mb_writeReg(id, REG_WD_TIME_OUT, request->getParam(F("wdTmOut"))->value().toInt());
     }
-    if (request->hasParam("remLock")) {
-      uint16_t val = request->getParam("remLock")->value().toInt();
+    if (request->hasParam(F("remLock"))) {
+      uint16_t val = request->getParam(F("remLock"))->value().toInt();
       if (val <= 1) {
         mb_writeReg(id, REG_REMOTE_LOCK, val);
       }
     }
-    if (request->hasParam("currLim")) {
-      uint16_t val = request->getParam("currLim")->value().toInt();
+    if (request->hasParam(F("currLim"))) {
+      uint16_t val = request->getParam(F("currLim"))->value().toInt();
       if (val == 0 || (val >= CURR_ABS_MIN && val <= CURR_ABS_MAX)) {
         mb_writeReg(id, REG_CURR_LIMIT, val);
       }
     }
-    if (request->hasParam("currFs")) {
-      uint16_t val = request->getParam("currFs")->value().toInt();
+    if (request->hasParam(F("currFs"))) {
+      uint16_t val = request->getParam(F("currFs"))->value().toInt();
       if (val == 0 || (val >= CURR_ABS_MIN && val <= CURR_ABS_MAX)) {
         mb_writeReg(id, REG_CURR_LIMIT_FS, val);
       }
     }
 
     // provide the complete content
-    data["wbec"]["version"] = cfgWbecVersion;
-    data["wbec"]["bldDate"] = cfgBuildDate;
-    data["wbec"]["timeNow"] = log_time();
+    data[F("wbec")][F("version")] = cfgWbecVersion;
+    data[F("wbec")][F("bldDate")] = cfgBuildDate;
+    data[F("wbec")][F("timeNow")] = log_time();
     for (int i = 0; i < cfgCntWb; i++) {
-      data["box"][i]["busId"]    = i+1;
-      data["box"][i]["version"]  = String(content[i][0], HEX);
-      data["box"][i]["chgStat"]  = content[i][1];
-      data["box"][i]["currL1"]   = content[i][2];
-      data["box"][i]["currL2"]   = content[i][3];
-      data["box"][i]["currL3"]   = content[i][4];
-      data["box"][i]["pcbTemp"]  = content[i][5];
-      data["box"][i]["voltL1"]   = content[i][6];
-      data["box"][i]["voltL2"]   = content[i][7];
-      data["box"][i]["voltL3"]   = content[i][8];
-      data["box"][i]["extLock"]  = content[i][9];
-      data["box"][i]["power"]    = content[i][10];
-      data["box"][i]["energyP"]   = (float)((uint32_t) content[i][11] << 16 | (uint32_t)content[i][12]) / 1000.0;
-      data["box"][i]["energyI"]   = (float)((uint32_t) content[i][13] << 16 | (uint32_t)content[i][14]) / 1000.0;
-      data["box"][i]["currMax"]  = content[i][15];
-      data["box"][i]["currMin"]  = content[i][16];
-      data["box"][i]["logStr"]   = mb_getAscii(i, 17,32);
-      data["box"][i]["wdTmOut"]  = content[i][49];
-      data["box"][i]["standby"]  = content[i][50];
-      data["box"][i]["remLock"]  = content[i][51];
-      data["box"][i]["currLim"]  = content[i][53];
-      data["box"][i]["currFs"]   = content[i][54];
-      data["box"][i]["load"]     = lm_getWbLimit(i);
-      data["box"][i]["resCode"]  = String(modbusResultCode[i], HEX);
+      data[F("box")][i][F("busId")]    = i+1;
+      data[F("box")][i][F("version")]  = String(content[i][0], HEX);
+      data[F("box")][i][F("chgStat")]  = content[i][1];
+      data[F("box")][i][F("currL1")]   = content[i][2];
+      data[F("box")][i][F("currL2")]   = content[i][3];
+      data[F("box")][i][F("currL3")]   = content[i][4];
+      data[F("box")][i][F("pcbTemp")]  = content[i][5];
+      data[F("box")][i][F("voltL1")]   = content[i][6];
+      data[F("box")][i][F("voltL2")]   = content[i][7];
+      data[F("box")][i][F("voltL3")]   = content[i][8];
+      data[F("box")][i][F("extLock")]  = content[i][9];
+      data[F("box")][i][F("power")]    = content[i][10];
+      data[F("box")][i][F("energyP")]   = (float)((uint32_t) content[i][11] << 16 | (uint32_t)content[i][12]) / 1000.0;
+      data[F("box")][i][F("energyI")]   = (float)((uint32_t) content[i][13] << 16 | (uint32_t)content[i][14]) / 1000.0;
+      data[F("box")][i][F("currMax")]  = content[i][15];
+      data[F("box")][i][F("currMin")]  = content[i][16];
+      data[F("box")][i][F("logStr")]   = mb_getAscii(i, 17,32);
+      data[F("box")][i][F("wdTmOut")]  = content[i][49];
+      data[F("box")][i][F("standby")]  = content[i][50];
+      data[F("box")][i][F("remLock")]  = content[i][51];
+      data[F("box")][i][F("currLim")]  = content[i][53];
+      data[F("box")][i][F("currFs")]   = content[i][54];
+      data[F("box")][i][F("load")]     = lm_getWbLimit(i);
+      data[F("box")][i][F("resCode")]  = String(modbusResultCode[i], HEX);
     }
-    data["modbus"]["state"]["lastTm"]  = modbusLastTime;
-    data["modbus"]["state"]["millis"]  = millis();
-    data["rfid"]["enabled"] = rfid_getEnabled();
-    data["rfid"]["release"] = rfid_getReleased();
-    data["rfid"]["lastId"]  = rfid_getLastID();
-    data["wifi"]["mac"] = WiFi.macAddress();
+    data[F("modbus")][F("state")][F("lastTm")]  = modbusLastTime;
+    data[F("modbus")][F("state")][F("millis")]  = millis();
+    data[F("rfid")][F("enabled")] = rfid_getEnabled();
+    data[F("rfid")][F("release")] = rfid_getReleased();
+    data[F("rfid")][F("lastId")]  = rfid_getLastID();
+    data[F("wifi")][F("mac")] = WiFi.macAddress();
     int qrssi = WiFi.RSSI();
-    data["wifi"]["rssi"] = qrssi;
-    data["wifi"]["signal"] = getSignalQuality(qrssi);
-    data["wifi"]["channel"] = WiFi.channel();
-
+    data[F("wifi")][F("rssi")] = qrssi;
+    data[F("wifi")][F("signal")] = getSignalQuality(qrssi);
+    data[F("wifi")][F("channel")] = WiFi.channel();
     String response;
     serializeJson(data, response);
     log(m, response);
-    request->send(200, "application/json", response);
+    request->send(200, F("application/json"), response);
   });
 
   server.on("/status", HTTP_GET, [](AsyncWebServerRequest *request) {
     uint8_t id = 0;
     boolean fromApp = false;
-    if (request->hasParam("box")) {
+    if (request->hasParam(F("box"))) {
       fromApp = true;
-      id = request->getParam("box")->value().toInt();
+      id = request->getParam(F("box"))->value().toInt();
       if (id >= WB_CNT) {
         id = 0;
       }
     }
-    request->send(200, "application/json", goE_getStatus(id, fromApp));
+    request->send(200, F("application/json"), goE_getStatus(id, fromApp));
   });
 
   server.on("/mqtt", HTTP_GET, [](AsyncWebServerRequest *request) {
     // set values
     uint8_t id = 0;
     boolean fromApp = false;
-    if (request->hasParam("box")) {
+    if (request->hasParam(F("box"))) {
       fromApp = true;
-      id = request->getParam("box")->value().toInt();
+      id = request->getParam(F("box"))->value().toInt();
       if (id >= WB_CNT) {
         id = 0;
       }
     }
     
-    if (request->hasParam("payload")) {
-      log(m, "/mqtt payload: " + request->getParam("payload")->value());
-      goE_setPayload(request->getParam("payload")->value(), id);
+    if (request->hasParam(F("payload"))) {
+      log(m, F("/mqtt payload: ") + request->getParam(F("payload"))->value());
+      goE_setPayload(request->getParam(F("payload"))->value(), id);
     }
     // response
-    request->send(200, "application/json", goE_getStatus(id, fromApp));
+    request->send(200, F("application/json"), goE_getStatus(id, fromApp));
   });
 
   server.on("/phaseCtrl", HTTP_GET, [](AsyncWebServerRequest *request){
-    if (request->hasParam("ph")) {
-      pc_requestPhase(request->getParam("ph")->value().toInt());
+    if (request->hasParam(F("ph"))) {
+      pc_requestPhase(request->getParam(F("ph"))->value().toInt());
     }
-    request->send_P(200, "text/plain", String(pc_getState()).c_str());
+    request->send(200, F("text/plain"), String(pc_getState()));
   });
 
   // OTA via http, based on https://gist.github.com/JMishou/60cb762047b735685e8a09cd2eb42a60
   server.on("/update", HTTP_GET, [](AsyncWebServerRequest *request){
-    AsyncWebServerResponse *response = request->beginResponse(200, "text/html", serverIndex);
-    response->addHeader("Connection", "close");
-    response->addHeader("Access-Control-Allow-Origin", "*");
+    AsyncWebServerResponse *response = request->beginResponse_P(200, "text/html", otaPage, otaProcessorEmpty);
+    response->addHeader(F("Connection"), F("close"));
+    response->addHeader(F("Access-Control-Allow-Origin"), F("*"));
     request->send(response);
   });
 
   server.on("/update", HTTP_POST, [](AsyncWebServerRequest *request){
     // the request handler is triggered after the upload has finished... 
     // create the response, add header, and send response
-    String html;
-    if (Update.hasError()) {
-      html = String("FAIL<BR>") + serverIndex;
-    } else {
-      html = String("OK<BR>") + serverIndex;
-    }
-    AsyncWebServerResponse *response = request->beginResponse(200, "text/html", html);
-    response->addHeader("Connection", "close");
-    response->addHeader("Access-Control-Allow-Origin", "*");
+    AsyncWebServerResponse *response = request->beginResponse_P(200, "text/html", otaPage, otaProcessor);
+    response->addHeader(F("Connection"), F("close"));
+    response->addHeader(F("Access-Control-Allow-Origin"), F("*"));
     resetRequested = true;  // Tell the main loop to restart the ESP
     request->send(response);
   },[](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final){
@@ -356,24 +357,6 @@ void webServer_begin() {
   });
   // OTA via http (end)
 
-  AsyncCallbackJsonWebHandler *handler = new AsyncCallbackJsonWebHandler("/post-message", [](AsyncWebServerRequest *request, JsonVariant &json) {
-    StaticJsonDocument<200> data;
-    if (json.is<JsonArray>())
-    {
-      data = json.as<JsonArray>();
-    }
-    else if (json.is<JsonObject>())
-    {
-      data = json.as<JsonObject>();
-    }
-    String response;
-    serializeJson(data, response);
-    request->send(200, "application/json", response);
-    Serial.println(response);
-  });
-
-  
-  server.addHandler(handler);
 
   // add the SPIFFSEditor, which can be opened via "/edit"
   server.addHandler(new SPIFFSEditor("" ,"" ,LittleFS));//http_username,http_password));
