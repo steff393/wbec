@@ -6,8 +6,9 @@
 extern void logger_begin();
 extern void logger_handle();
 
-extern void log(uint8_t module, String msg, boolean newLine=true);
-extern String log_time();
+extern void     log(uint8_t module, String msg, boolean newLine=true);
+extern String   log_time();
+extern uint32_t log_unixTime();
 
 extern char* log_getBuffer(); 
 extern void log_freeBuffer(); 

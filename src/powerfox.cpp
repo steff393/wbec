@@ -82,7 +82,7 @@ void powerfox_loop() {
 }
 
 int32_t pf_getWatt() {
-	if (/*(log_unixtime - timestamp > OUTDATED) || */ (watt < WATT_MIN) || (watt > WATT_MAX)) {
+	if ((log_unixTime() - timestamp > OUTDATED) || (watt < WATT_MIN) || (watt > WATT_MAX)) {
 		return(0);
 	} else {
 		return(watt);

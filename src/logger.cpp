@@ -103,6 +103,10 @@ String log_time() {
 	return(timeClient.getFormattedTime());
 }
 
+uint32_t log_unixTime() {
+	return(timeClient.getEpochTime());
+}
+
 char* log_getBuffer() {
   return(bootLog);
 }
