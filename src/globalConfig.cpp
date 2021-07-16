@@ -9,7 +9,7 @@
 const uint8_t m = 5;
 
 char cfgWbecVersion[]     = "v0.3.0+";          // wbec version
-char cfgBuildDate[]       = "2021-07-13";	      // wbec build date
+char cfgBuildDate[]       = "2021-07-16";	      // wbec build date
 
 char     cfgApSsid[32];	              // SSID of the initial Access Point
 char     cfgApPass[63];               // Password of the initial Access Point
@@ -64,19 +64,19 @@ bool createConfig() {
 boolean checkConfig(JsonDocument& doc) {
   File configFile = LittleFS.open(F("/cfg.json"), "r");
   if (!configFile) {
-    log(m, F("Failed to open config file... Creating default config..."));
+    LOG(m, "Failed to open config file... Creating default config...","")
     if (createConfig()) {
-      log(0, F("Successful!"));
+      LOG(0, "Successful!", "");
       configFile = LittleFS.open(F("/cfg.json"), "r");
     } else {
-      log(m, F("Failed to create default config... Please try to erase flash"));
+      LOG(m, "Failed to create default config... Please try to erase flash","");
       return(false);
     }
   }
 
   size_t size = configFile.size();
   if (size > 1024) {
-    log(m, F("Config file size is too large"));
+    LOG(m, "Config file size is too large","");
     return(false);
   }
 
@@ -90,7 +90,7 @@ boolean checkConfig(JsonDocument& doc) {
   
   auto error = deserializeJson(doc, buf.get());
   if (error) {
-    log(m, F("Failed to parse config file: ") + String(error.c_str()));
+    LOG(m, "Failed to parse config file: %s", error.c_str());
     return(false);
   }
   configFile.close();
@@ -104,7 +104,7 @@ boolean checkConfig(JsonDocument& doc) {
 void loadConfig() {
   StaticJsonDocument<1024> doc;
   if (!checkConfig(doc)) {
-    log(m, F("Using default config"));
+    LOG(m, "Using default config", "");
     deserializeJson(doc, F("{}"));
   }
 
@@ -123,9 +123,9 @@ void loadConfig() {
   strncpy(cfgFoxPass,         doc["cfgFoxPass"]           | "",                 sizeof(cfgFoxPass));
   strncpy(cfgFoxDevId,        doc["cfgFoxDevId"]          | "",                 sizeof(cfgFoxDevId));
 
-  log(m, F("cfgWbecVersion: ") + String(cfgWbecVersion));
-  log(m, F("cfgBuildDate: ")   + String(cfgBuildDate));
-  log(m, F("cfgCntWb: ")       + String(cfgCntWb));
+  LOG(m, "cfgWbecVersion: %s", cfgWbecVersion);
+  LOG(m, "cfgBuildDate: %s"  , cfgBuildDate);
+  LOG(m, "cfgCntWb: %d"      , cfgCntWb);
 
   for (uint8_t i = 0; i < WB_CNT; i++) {
     if (i < doc["cfgMqttLp"].size()) {
@@ -136,6 +136,5 @@ void loadConfig() {
     if (cfgMqttLp[i] > OPENWB_MAX_LP) {
       cfgMqttLp[i]            = 0;
     }
-    //log(m, "cfgMqttLp[" + String(i) + "]: " + cfgMqttLp[i]); 
   }
 }

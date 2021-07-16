@@ -41,7 +41,7 @@ void powerfox_loop() {
 
 	Serial.print(F("Heap before new: ")); Serial.println(ESP.getFreeHeap());
 	if (ESP.getFreeHeap() < MIN_HEAP_NEEDED) {
-		log(m, F("Not enough Heap"));
+		LOG(m, "Not enough Heap", "")
 		return;
 	}
 	http = new HTTPClient();
@@ -73,12 +73,13 @@ void powerfox_loop() {
 	// Parse JSON object
 	DeserializationError error = deserializeJson(doc, response);
 	if (error) {
-		log(m, F("deserializeJson() failed: ") + String(error.f_str()));
+		LOG(m, "deserializeJson() failed: %s", error.f_str())
 		return;
 	}
 	timestamp =  doc[F("Timestamp")]        | 0;
 	watt = (int) doc[F("Watt")].as<float>();
-	log(m, F("Timestamp=") + String(timestamp) + F(", Watt=") + watt);
+	LOG(m, "Timestamp=%d, Watt=%d", timestamp, watt)
+  
 }
 
 int32_t pf_getWatt() {

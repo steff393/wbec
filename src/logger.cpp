@@ -4,7 +4,11 @@
 #include <ESP8266mDNS.h>
 #include "globalConfig.h"
 #include <LittleFS.h>
+#include "logger.h"
 #include <NTPClient.h>
+
+#define TIME_LEN            10   // "23:12:01: "
+#define MOD_LEN              6   // "WEBS: "
 
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, cfgNtpServer, 3600, 60000); // GMT+1 and update every minute
@@ -97,6 +101,30 @@ void log(uint8_t module, String msg, boolean newLine /* =true */) {
   if (strlen(bootLog)+strlen(output.c_str()) < sizeof(bootLog)-10) {
     strcat(bootLog, output.c_str());
   } 
+}
+
+void log(uint8_t module, const char *msg, boolean newLine /* =true */) {
+	char output[TIME_LEN + MOD_LEN + 1];
+  if (module) {
+    strcpy(output, timeClient.getFormattedTime().c_str()); // 2 for ": "
+    strcat(output, ": ");
+    strncat(output, mod[module], MOD_LEN-2); // 2 for ": "
+    strcat(output, ": ");
+	}
+  // print to Serial
+  Serial.print(output);
+  Serial.print(msg);
+	if (newLine) {
+    Serial.print("\n");
+	}
+  // print to bootLog, if there is still enough space
+  if (strlen(bootLog)+strlen(output)+strlen(msg) < sizeof(bootLog)-10) {
+    strcat(bootLog, output);
+    strcat(bootLog, msg);
+    if (newLine) {
+      strcat(bootLog, "\n");
+	  }
+  }
 }
 
 String log_time() {
