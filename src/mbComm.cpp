@@ -49,17 +49,13 @@ boolean mb_available() {
 }
 
 
-String mb_getAscii(uint8_t id, uint8_t from, uint8_t len) {
-  char ch;
-  String ret = "";
+void mb_getAscii(uint8_t id, uint8_t from, uint8_t len, char *result) {
   // translate the uint16 values into a String
   for (int i = from; i < (from + len) ; i++) {
-    ch = (char) (content[id][i] & 0x00FF);
-    ret += ch;
-    ch = (char) (content[id][i] >> 8);
-    ret += ch;
+    result[(i-from)*2]   = (char) (content[id][i] & 0x00FF);
+    result[(i-from)*2+1] = (char) (content[id][i] >> 8);
   }
-  return(ret);
+	result[len*2]='\0';
 }
 
 
@@ -81,13 +77,13 @@ bool cbWrite(Modbus::ResultCode event, uint16_t transactionId, void* data) {
   int id = mb.slave()-1;
 	modbusResultCode[id] = event;
 	if (event) {
-		log(m, F("Comm-Failure BusID ") + String(mb.slave()));
+		LOG(m, "Comm-Failure BusID %d", mb.slave());
 		if (modbusFailureCnt[id] < 250) {
 			modbusFailureCnt[id]++;
 		}
 		if (modbusFailureCnt[id] == 10) {
 			// too many consecutive timeouts --> reset values
-			log(m, F("Timeout BusID ") + String(mb.slave()));
+			LOG(m, "Timeout BusID %d", mb.slave());
 			timeout(id);
 		}
 	} else
@@ -181,7 +177,7 @@ void mb_writeReg(uint8_t id, uint16_t reg, uint16_t val) {
 	if (rbIn == rbOut) {
 		// we have overwritten an not-sent value -> set rbOut to next element, otherwise complete ring would be skipped
 		rbOut = (rbOut+1) % RINGBUF_SIZE; 		// increment pointer, but take care of overflow
-		log(m, F("Overflow of ring buffer"));
+		LOG(m, "Overflow of ring buffer", "");
 	}
 
 	// direct read back, when current register was modified

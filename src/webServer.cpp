@@ -246,7 +246,8 @@ void webServer_begin() {
       data[F("box")][i][F("energyI")]   = (float)((uint32_t) content[i][13] << 16 | (uint32_t)content[i][14]) / 1000.0;
       data[F("box")][i][F("currMax")]  = content[i][15];
       data[F("box")][i][F("currMin")]  = content[i][16];
-      data[F("box")][i][F("logStr")]   = mb_getAscii(i, 17,32);
+      char txt[65]; mb_getAscii(i, 17, 32, txt);
+      data[F("box")][i][F("logStr")]   = txt;
       data[F("box")][i][F("wdTmOut")]  = content[i][49];
       data[F("box")][i][F("standby")]  = content[i][50];
       data[F("box")][i][F("remLock")]  = content[i][51];

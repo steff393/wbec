@@ -152,7 +152,8 @@ String goE_getStatus(uint8_t id, boolean fromApp) {
 	data[F("nrg")][14] = 0;
 	data[F("nrg")][15] = 0;
 	data[F("fwv")] = F("040");
-	data[F("sse")] = mb_getAscii(id, 27,3);
+	char txt[7]; mb_getAscii(id, 27, 3, txt);
+	data[F("sse")] = txt;
 	data[F("ama")] = String(content[id][15]);
 	data[F("ust")] = F("2");
 	data[F("ast")] = F("0");
