@@ -5,6 +5,8 @@
 
 // standard log
 #define LOG(MODULE, TEXT, ...)    {char s[100]; snprintf_P(s, sizeof(s), PSTR(TEXT), __VA_ARGS__); log(MODULE, s);}
+// standard log without newline
+#define LOGN(MODULE, TEXT, ...)   {char s[100]; snprintf_P(s, sizeof(s), PSTR(TEXT), __VA_ARGS__); log(MODULE, s, false);}
 // large log
 #define LOGEXT(MODULE, TEXT, ...) {char s[600]; snprintf_P(s, sizeof(s), PSTR(TEXT), __VA_ARGS__); log(MODULE, s)};
 

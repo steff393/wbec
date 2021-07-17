@@ -15,22 +15,20 @@ uint32_t 	lastMsg = 0;
 uint32_t 	lastReconnect = 0;
 
 
-void callback(char* _topic, byte* payload, uint8_t length)
+void callback(char* topic, byte* payload, uint8_t length)
 {
-	String topic = String(_topic);
-
 	// handle received message
-	log(m, F("Received: ") + topic + F(", Payload: "), false);
-	char buffer[length];
+	char buffer[length+1];	// +1 for string termination
 	for (uint8_t i = 0; i < length; i++) {
-		log(0, String((char)payload[i]), false);
-		buffer[i] = (char)payload[i];
+		buffer[i] = (char)payload[i];		
 	}
 	buffer[length] = '\0';			// add string termination
+	LOGN(m, "Received: %s, Payload: %s", topic, buffer)
 
-	if (topic.startsWith(F("openWB/lp/")) && topic.endsWith(F("/AConfigured"))) {
-		uint8_t val = String(buffer).toInt();				// Alternative: toFloat()
-		uint8_t lp  = topic.substring(10,11).toInt();		// loadpoint nr.
+	//if (topic.startsWith(F("openWB/lp/")) && topic.endsWith(F("/AConfigured"))) {
+	if (strstr_P(topic, PSTR("openWB/lp/")) && strstr_P(topic, PSTR("/AConfigured"))) {
+		uint16_t val = atoi(buffer);
+		uint8_t lp  = topic[10] - '0'; 	// loadpoint nr.
 		uint8_t i;
 		// search, which index fits to loadpoint, first element will be selected
 		for (i = 0; i < cfgCntWb; i++) {
@@ -41,11 +39,11 @@ void callback(char* _topic, byte* payload, uint8_t length)
 			val = val * 10;
 			// set current
 			if (val == 0 || (val >= CURR_ABS_MIN && val <= CURR_ABS_MAX)) {
-				log(0, F(", Write to box: ") + String(i) + F(" Value: ") + String(val));
+				LOG(0, ", Write to box: %d Value: %d", i, val)
 				mb_writeReg(i, REG_CURR_LIMIT, val);
 			}
 		} else {
-			log(0, F(", no box assigned"));
+			LOG(0, ", no box assigned", "");
 		}
 	}
 }
@@ -59,31 +57,31 @@ void mqtt_begin() {
 }
 
 void reconnect() {
-	log(m, F("Attempting MQTT connection..."), false);
+	LOGN(m, "Attempting MQTT connection...", "");
 	// Create a random client ID
-	String clientId = F("wbec-");
-	clientId += String(random(0xffff), HEX);
+	char clientId[10];
+	snprintf_P(clientId, sizeof(clientId), PSTR("wbec-%d"), (uint8_t)random(255));
 
 	// Attempt to connect
 	boolean con = false;
 	if (strcmp(cfgMqttUser, "") != 0 && strcmp(cfgMqttPass, "") != 0) {
-		con = client.connect(clientId.c_str(), cfgMqttUser, cfgMqttPass);
+		con = client.connect(clientId, cfgMqttUser, cfgMqttPass);
 	} else {
-		con = client.connect(clientId.c_str());
+		con = client.connect(clientId);
 	}
 	if (con)
 	{
-		log(0, F("connected"));
+		LOG(0, "connected", "");
 		//once connected to MQTT broker, subscribe command if any
 		for (uint8_t i = 0; i < cfgCntWb; i++) {
-			String topic = F("openWB/lp/+/AConfigured");
+			char topic[40];
 			if (cfgMqttLp[i] != 0) {
-				topic.setCharAt(10, char(cfgMqttLp[i] + '0'));
-				client.subscribe(topic.c_str());
+				snprintf_P(topic, sizeof(topic), PSTR("openWB/lp/%d/AConfigured"), cfgMqttLp[i]);
+				client.subscribe(topic);
 			}
 		}
 	} else {
-		log(m, String(F("failed, rc=")) + client.state() + F(" try again in 5 seconds"));
+		LOG(m, "failed, rc=%d try again in 5 seconds", client.state())
 	}
 }
 
@@ -107,9 +105,7 @@ void mqtt_publish(uint8_t i) {
 	if (strcmp(cfgMqttIp, "") == 0 || cfgMqttLp[i] == 0) {
 		return;	// do nothing, when Mqtt is not configured, or box has no loadpoint assigned
 	}
-	// publish the contents of box i
-	String header = String(F("openWB/set/lp/")) + String(cfgMqttLp[i]);
-	boolean retain = true;
+	
 	uint8_t ps = 0;
 	uint8_t cs = 0;
 
@@ -122,16 +118,40 @@ void mqtt_publish(uint8_t i) {
 		case 7:  ps = 1; cs = 1; break;
 		default: ps = 0; cs = 0; break; 
 	}
-	client.publish(String(header + F("/plugStat")).c_str(),   String(ps).c_str(), retain);
-	client.publish(String(header + F("/chargeStat")).c_str(), String(cs).c_str(), retain);
 
-	client.publish(String(header + F("/W")).c_str(),          String(content[i][10]).c_str(), retain);
-	client.publish(String(header + F("/kWhCounter")).c_str(), String((float)((uint32_t) content[i][13] << 16 | (uint32_t)content[i][14]) / 1000.0, 3).c_str(), retain);
-	client.publish(String(header + F("/VPhase1")).c_str(),    String(content[i][6]).c_str(), retain);
-	client.publish(String(header + F("/VPhase2")).c_str(),    String(content[i][7]).c_str(), retain);
-	client.publish(String(header + F("/VPhase3")).c_str(),    String(content[i][8]).c_str(), retain);
-	client.publish(String(header + F("/APhase1")).c_str(),    String((float)content[i][2] / 10.0, 1).c_str(), retain);
-	client.publish(String(header + F("/APhase2")).c_str(),    String((float)content[i][3] / 10.0, 1).c_str(), retain);
-	client.publish(String(header + F("/APhase3")).c_str(),    String((float)content[i][4] / 10.0, 1).c_str(), retain);
-	log(m, F("Publish to ") + header);
+	// publish the contents of box i
+	char header[20];
+	char topic[40];
+	char value[15];
+	snprintf_P(header, sizeof(header), PSTR("openWB/set/lp/%d"), cfgMqttLp[i]);
+	boolean retain = true;
+	
+	snprintf_P(topic, sizeof(topic), PSTR("%s/plugStat"), header);
+	snprintf_P(value, sizeof(value), PSTR("%d"), ps);
+	client.publish(topic, value, retain);
+
+	snprintf_P(topic, sizeof(topic), PSTR("%s/chargeStat"), header);
+	snprintf_P(value, sizeof(value), PSTR("%d"), cs);
+	client.publish(topic, value, retain);
+
+	snprintf_P(topic, sizeof(topic), PSTR("%s/W"), header);
+	snprintf_P(value, sizeof(value), PSTR("%d"), content[i][10]);
+	client.publish(topic, value, retain);
+
+	snprintf_P(topic, sizeof(topic), PSTR("%s/kWhCounter"), header);
+	snprintf_P(value, sizeof(value), PSTR("%.3f"), (float)((uint32_t) content[i][13] << 16 | (uint32_t)content[i][14]) / 1000.0);
+	client.publish(topic, value, retain);
+
+	for (uint8_t ph = 1; ph <= 3; ph++) {
+		snprintf_P(topic, sizeof(topic), PSTR("%s/VPhase%d"), header, ph);
+		snprintf_P(value, sizeof(value), PSTR("%d"), content[i][ph+5]);	// L1 = 6, L2 = 7, L3 = 8
+		client.publish(topic, value, retain);
+	}
+
+	for (uint8_t ph = 1; ph <= 3; ph++) {
+		snprintf_P(topic, sizeof(topic), PSTR("%s/APhase%d"), header, ph);
+		snprintf_P(value, sizeof(value), PSTR("%.1f"), (float)content[i][ph+1]/10.0);	// L1 = 2, L2 = 3, L3 = 4
+		client.publish(topic, value, retain);
+	}
+	LOG(m, "Publish to %s", header)
 }

@@ -105,12 +105,15 @@ void log(uint8_t module, String msg, boolean newLine /* =true */) {
 
 void log(uint8_t module, const char *msg, boolean newLine /* =true */) {
 	char output[TIME_LEN + MOD_LEN + 1];
+
   if (module) {
     strcpy(output, timeClient.getFormattedTime().c_str()); // 2 for ": "
     strcat(output, ": ");
     strncat(output, mod[module], MOD_LEN-2); // 2 for ": "
     strcat(output, ": ");
-	}
+	} else {
+    strcpy(output, "");
+  }
   // print to Serial
   Serial.print(output);
   Serial.print(msg);
