@@ -6,5 +6,7 @@
 extern void powerfox_setup();
 extern void powerfox_loop();
 extern int32_t pf_getWatt();
+extern boolean pf_getEnabled();
+extern void    pf_setEnabled(boolean act);
 
 #endif /* POWERFOX_H */
