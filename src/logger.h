@@ -10,6 +10,7 @@
 // large log
 #define LOGEXT(MODULE, TEXT, ...) {char s[600]; snprintf_P(s, sizeof(s), PSTR(TEXT), __VA_ARGS__); log(MODULE, s)};
 
+extern void logger_allocate();
 extern void logger_begin();
 extern void logger_handle();
 

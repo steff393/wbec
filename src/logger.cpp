@@ -14,7 +14,8 @@ WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, cfgNtpServer, 3600, 60000); // GMT+1 and update every minute
 
 static const char *mod[10] = {"", "MB  ", "MQTT", "WEBS", "GO-E", "CFG ", "1P3P", "LLOG", "RFID", "PFOX"};
-char bootLog[2000];
+char *   bootLog;
+uint16_t bootLogSize;
 boolean written = false;
 
 boolean getDstGermany(uint32_t unixtime) {
@@ -76,7 +77,24 @@ boolean getDstGermany(uint32_t unixtime) {
 
 }
 
+void logger_allocate() {
+  // allocate a small amount at the beginning, for logging during loadconfig()
+  bootLogSize = 200;
+  bootLog = (char *) malloc(bootLogSize);
+  bootLog[0] = '\0';
+}
+
 void logger_begin() {
+  // call this once the values from config are available
+  if (!strcmp(cfgFoxUser, "") || !strcmp(cfgFoxPass, "") || !strcmp(cfgFoxDevId, "")) {
+    // powerfox is NOT configured => extend bootlog
+    char * tmpPtr;
+    bootLogSize = 5000;
+    tmpPtr = (char *) malloc(bootLogSize);  // allocate a new area on heap
+    strncpy(tmpPtr, bootLog, bootLogSize);  // copy content from old bootlog
+    free(bootLog);
+    bootLog = tmpPtr;                       // set bootLog pointer to new larger area
+  } 
   // connect to NTP time server
   timeClient.begin();
 }
@@ -98,7 +116,7 @@ void log(uint8_t module, String msg, boolean newLine /* =true */) {
 	}
   Serial.print(output);
 
-  if (strlen(bootLog)+strlen(output.c_str()) < sizeof(bootLog)-10) {
+  if ((strlen(bootLog)+strlen(output.c_str()) + 5) < bootLogSize) {
     strcat(bootLog, output.c_str());
   } 
 }
@@ -121,7 +139,7 @@ void log(uint8_t module, const char *msg, boolean newLine /* =true */) {
     Serial.print("\n");
 	}
   // print to bootLog, if there is still enough space
-  if (strlen(bootLog)+strlen(output)+strlen(msg) < sizeof(bootLog)-10) {
+  if ((strlen(bootLog)+strlen(output)+strlen(msg) + 5) < bootLogSize) {
     strcat(bootLog, output);
     strcat(bootLog, msg);
     if (newLine) {

@@ -21,6 +21,7 @@ bool _handlingOTA = false;
 void setup() {
   Serial.begin(115200);
   Serial.println(F("\n\nStarting wbec ;-)"));
+  logger_allocate();
 
   // define a GPIO as output
   pinMode(PIN_RST, OUTPUT);
@@ -37,10 +38,10 @@ void setup() {
   char pass[63]; strcpy(pass, cfgApPass);
   wifiManager.autoConnect(ssid, pass);
 
+  logger_begin();
+
   // setup the Webserver
   webServer_begin();
-
-  logger_begin();
 
   // setup the OTA server
   ArduinoOTA.setHostname("wbec");
@@ -69,7 +70,7 @@ void loop() {
     mqtt_handle();
     webServer_handle();
     rfid_loop();
-    powerfox_loop();
+    powerfox_loop(); 
     //pc_handle();
   }
 }
