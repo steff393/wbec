@@ -23,6 +23,8 @@
 
 const uint8_t m = 3;
 
+#define PFOX_JSON_LEN 256
+
 static const char* otaPage PROGMEM = "%OTARESULT%<br><form method='POST' action='/update' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>";
 
 AsyncWebServer server(80);
@@ -261,6 +263,7 @@ void webServer_begin() {
     data[F("rfid")][F("enabled")] = rfid_getEnabled();
     data[F("rfid")][F("release")] = rfid_getReleased();
     data[F("rfid")][F("lastId")]  = rfid_getLastID();
+    data[F("pfox")][F("enabled")] = pf_getEnabled();
     data[F("pfox")][F("watt")]    = pf_getWatt();
     data[F("wifi")][F("mac")] = WiFi.macAddress();
     int qrssi = WiFi.RSSI();
@@ -311,6 +314,43 @@ void webServer_begin() {
       pc_requestPhase(request->getParam(F("ph"))->value().toInt());
     }
     request->send(200, F("text/plain"), String(pc_getState()));
+  });
+
+  server.on("/pfox", HTTP_GET, [](AsyncWebServerRequest *request) {
+    StaticJsonDocument<PFOX_JSON_LEN> data;
+    uint8_t id = 0;
+    // modify values
+
+    if (request->hasParam(F("enabled"))) {
+      uint16_t val = request->getParam(F("enabled"))->value().toInt();
+      if (val <= 1) {
+        pf_setEnabled((boolean)val);
+      }
+    }
+
+    data[F("box")][F("chgStat")]  = content[id][1];
+    data[F("box")][F("power")]    = content[id][10];
+    data[F("box")][F("currLim")]  = content[id][53];
+    data[F("box")][F("resCode")]  = String(modbusResultCode[id], HEX);
+    data[F("modbus")][F("millis")]  = millis();
+    data[F("pfox")][F("enabled")] = pf_getEnabled();
+    data[F("pfox")][F("watt")]    = pf_getWatt();
+    char response[PFOX_JSON_LEN];
+    serializeJson(data, response, PFOX_JSON_LEN);
+    request->send(200, F("application/json"), response);
+  });
+
+  server.on("/status", HTTP_GET, [](AsyncWebServerRequest *request) {
+    uint8_t id = 0;
+    boolean fromApp = false;
+    if (request->hasParam(F("box"))) {
+      fromApp = true;
+      id = request->getParam(F("box"))->value().toInt();
+      if (id >= WB_CNT) {
+        id = 0;
+      }
+    }
+    request->send(200, F("application/json"), goE_getStatus(id, fromApp));
   });
 
   // OTA via http, based on https://gist.github.com/JMishou/60cb762047b735685e8a09cd2eb42a60
