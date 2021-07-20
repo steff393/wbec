@@ -6,7 +6,7 @@ WLAN-Anbindung der Heidelberg **W**all**B**ox **E**nergy **C**ontrol über ESP82
 Die Heidelberg Wallbox Energy Control ist eine hochwertige Ladestation, bietet aber nur Modbus RTU als Schnittstelle.  
 Ziel des Projekts ist es, eine WLAN-Schnittstelle zu entwickeln, die gleichzeitig die Modbus-Leader-Funktion übernimmt.  
 
-## Funktionen (bisher)
+## Funktionen
 - Anbindung an openWB, EVCC, Solaranzeige (per tlw. Emulation der go-eCharger API)
 - MQTT-Kommunikation mit openWB
 - Steuerbar per Android App [Wallbox Steuerung](https://android.chk.digital/ecar-charger-control/) 
@@ -33,7 +33,7 @@ Wifi interface to Heidelberg **W**all**B**ox **E**nergy **C**ontrol using ESP826
 The Heidelberg Wallbox Energy Control is a high quality wallbox, but it offers only a Modbus RTU interface.
 Goal of this project is to establish an Wifi interface, which also acts as Modbus master.  
 
-## Features (as of now)
+## Features
 - Works with openWB, EVCC, Solaranzeige (by emulation of parts of the go-eCharger API)
 - Support of MQTT communication to openWB
 - Support of Android App [Wallbox Steuerung](https://android.chk.digital/ecar-charger-control/)  
@@ -159,6 +159,22 @@ http://x.x.x.x/mqtt?payload=...
 ```
 
 This offers a simple way to integrate wbec into Energy Management Systems, which support go-eCharger, but not the Heidelberg Energy Control, such as EVCC or Solaranzeige.  
+
+## Credits
+Third-party libraries included/adapted in wbec:
+- [modbus-esp8266](https://github.com/emelianov/modbus-esp8266)
+- [ESP Async WebServer](https://github.com/me-no-dev/ESPAsyncWebServer)
+- [ArduinoJson](https://github.com/bblanchon/ArduinoJson)
+- [PubSubClient](https://github.com/knolleary/PubSubClient)
+- [NTPClient](https://github.com/arduino-libraries/NTPClient)
+- [MFRC522](https://github.com/miguelbalboa/MFRC522)
+- [RTCVars](https://github.com/highno/RTCVars)
+- [OTA via http](https://gist.github.com/JMishou/60cb762047b735685e8a09cd2eb42a60)
+- [WiFiManager](https://github.com/tzapu/WiFiManager)
+- [Web Interface](https://RandomNerdTutorials.com)
+- [A Beginner's Guide to the ESP8266 - article](https://github.com/tttapa/ESP8266)
+
+Special thanks also to the early testers and supporters: mli987, profex1337, Clanchef and many more!
 
 ## Support the project
 You like wbec? Please [star this project on GitHub](https://github.com/steff393/wbec/stargazers)!
