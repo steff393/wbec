@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include "globalConfig.h"
+#include <LittleFS.h>
 #include "logger.h"
 #include "mbComm.h"
 #include <rtcvars.h>
@@ -76,6 +77,26 @@ void pfoxAlgo() {
 		targetCurr = 0;
 	}
 	Serial.print("Watt="); Serial.print(watt); Serial.print(", availPower="); Serial.print(availPower); Serial.print(", targetCurr="); Serial.println(targetCurr);
+
+
+	FSInfo fs_info;   
+	LittleFS.info(fs_info);
+	uint32_t time = log_unixTime();
+	if ((time < 2085000000UL) &&                                // 26.01.2036 --> sometimes there are large values (e.g. 2085985724) which are wrong -> ignore them
+			(fs_info.totalBytes - fs_info.usedBytes > 512000)) {    // 500kB should remain free
+		File logFile = LittleFS.open(F("/pfox.txt"), "a"); // Write the time and the temperature to the csv file
+		logFile.print(time);
+		logFile.print(";");
+		logFile.print(watt);
+		logFile.print(";");
+		logFile.print(content[BOXID][10]);
+		logFile.print(";");
+		logFile.print(actualCurr);
+		logFile.print(";");
+		logFile.println(targetCurr);
+		logFile.close();
+	}
+
 	if ((targetCurr != actualCurr) && (millis() - lastUpdate > UPDATE_TIME)) {	// update the value not too often 
 		mb_writeReg(BOXID, REG_CURR_LIMIT, targetCurr);
 		lastUpdate = millis();

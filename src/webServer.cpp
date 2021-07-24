@@ -32,7 +32,15 @@ boolean resetRequested = false;
 
 void onRequest(AsyncWebServerRequest *request){
   //Handle Unknown Request
-  request->send(404);
+  if (request->url().endsWith(F(".html")) || request->url().endsWith(F(".png")) || request->url().endsWith(F(".css")) || 
+      request->url().endsWith(F(".json")) || request->url().endsWith(F(".txt")) || request->url().endsWith(F(".js"))) {
+    int fnsstart = request->url().lastIndexOf('/');
+    String fn = request->url().substring(fnsstart);
+    boolean download = request->url().endsWith(F(".html")) ? false : true;
+    request->send(LittleFS, fn, String(), download);
+  } else {
+    request->send_P(404, PSTR("text/plain"), PSTR("Not found"));
+  }
 }
 
 void onBody(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total){

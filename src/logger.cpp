@@ -153,7 +153,13 @@ String log_time() {
 }
 
 uint32_t log_unixTime() {
-	return(timeClient.getEpochTime());
+  // The pfox chart needs the 'real' unixtime, not corrected for timezone or DST
+  uint32_t time = timeClient.getEpochTime() - 3600;
+
+  if (getDstGermany(time)) { 
+    time = time - 3600;
+  }
+	return(time);
 }
 
 char* log_getBuffer() {
