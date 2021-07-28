@@ -52,7 +52,6 @@ void pfoxAlgo() {
 		// Simple filter (average of this and previous value)
 		availPower = (availPowerPrev + availPower) / 2;
 		availPowerPrev = availPower;
-		rtc.saveToRTC();   // memorize over reset
 		
 		// Calculate the new target current
 		if (availPower > 0) {
@@ -76,6 +75,7 @@ void pfoxAlgo() {
 	} else {
 		// no car connected
 		targetCurr = 0;
+		availPowerPrev = 0;
 	}
 	Serial.print("Watt="); Serial.print(watt); Serial.print(", availPower="); Serial.print(availPower); Serial.print(", targetCurr="); Serial.println(targetCurr);
 
@@ -155,22 +155,25 @@ void powerfox_loop() {
 	DeserializationError error = deserializeJson(doc, response);
 	if (error) {
 		LOG(m, "deserializeJson() failed: %s", error.f_str())
-		return;
+	} else {
+		uint32_t timestamp = 0;
+		timestamp =  doc[F("Timestamp")]        | 0;
+		watt = (int) doc[F("Watt")].as<float>();
+		LOG(m, "Timestamp=%d, Watt=%d", timestamp, watt)
+		
+		if ((log_unixTime() - timestamp > OUTDATED) || (watt < WATT_MIN) || (watt > WATT_MAX)) {
+			Serial.print("unixtime:"); Serial.println(log_unixTime());
+			watt = 0;
+			availPowerPrev = 0;
+		}
 	}
-	uint32_t timestamp = 0;
-	timestamp =  doc[F("Timestamp")]        | 0;
-	watt = (int) doc[F("Watt")].as<float>();
-	LOG(m, "Timestamp=%d, Watt=%d", timestamp, watt)
-  
-	if ((log_unixTime() - timestamp > OUTDATED) || (watt < WATT_MIN) || (watt > WATT_MAX)) {
-		Serial.print("unixtime:"); Serial.println(log_unixTime());
-		watt = 0;
-	}
-
 	// Call algo
 	if (enabled) {  // PowerFox Control active 
 		pfoxAlgo();
+	} else {
+		availPowerPrev = 0;
 	}
+	rtc.saveToRTC();   // memorize over reset
 }
 
 int32_t pf_getWatt() {
