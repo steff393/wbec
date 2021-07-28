@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<!-- based on https://github.com/tttapa/ESP8266, GPL-3.0 License -->
+<head>
+    <title>wbec Chart</title>
+    <link href='https://fonts.googleapis.com/css?family=Roboto:300' rel='stylesheet' type='text/css'>
+    <meta name="theme-color" content="#00878f">
+    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport'>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+</head>
+
+<body>
+    <center>
+		<h1>wbec</h1>
+		<div id='main'>
+			<h3>LED CONTROL</h3>
+			<div id='content'>
+				<p id='LED_status'>LED is off</p>
+				<button id='BTN_LED'class="button">Turn on the LED</button>
+			</div>
+			<p>Received data = <span id='rd'>---</span> </p>
+			<br />
+			</div>
+    </center>
+
+    <script src="web.js"></script>
+
+    <style>
+	body {
+	    font-family: 'Roboto', sans-serif;
+	    font-size: 22pt;
+	    margin: 0;
+	    margin-top: 6px;
+	}
+
+	h1 {
+	    font-size: 1.5em;
+	    font-weight: normal;
+	    margin: 0px 0px 12px 0px;
+	}
+
+	button {
+	    font-size: 14pt;
+	    width: 2em;
+	}
+
+	center {
+	    padding: 1em;
+	    margin: auto;
+	    width: 90%;
+	    box-shadow: #777 2px 2px 5px;
+	    box-sizing: border-box;
+	}
+
+	#loading {
+		margin-bottom: 12px;
+	}
+
+	@media only screen and (max-device-width: 700px) {
+	    center {
+		width: 100%;
+		height: 100vh;
+		overflow: auto;
+	    }
+	}
+    </style>
+</body>
+
+</html>
