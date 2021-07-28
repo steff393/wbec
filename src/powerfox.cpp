@@ -52,6 +52,7 @@ void pfoxAlgo() {
 		// Simple filter (average of this and previous value)
 		availPower = (availPowerPrev + availPower) / 2;
 		availPowerPrev = availPower;
+		rtc.saveToRTC();   // memorize over reset
 		
 		// Calculate the new target current
 		if (availPower > 0) {
@@ -106,6 +107,7 @@ void pfoxAlgo() {
 
 void powerfox_setup() {
 	rtc.registerVar(&enabled);
+	rtc.registerVar(&availPowerPrev);
 	rtc.loadFromRTC();             // we load the values from rtc memory back into the registered variables
 }
 
