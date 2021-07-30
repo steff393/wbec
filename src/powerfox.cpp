@@ -22,8 +22,8 @@ const uint8_t m = 9;
 #define WATT_MIN        -100000		// 100kW Feed-in
 #define WATT_MAX         100000		// 100kW Consumption
 #define BOXID                 0		// only 1 box supported
-#define CURR_START_MIN       70   // 7A
-#define CURR_STOP_MIN        50   // 5A (not possible, but will be kept at 6A)
+#define CURR_START_MIN       61   // 6,1A
+#define CURR_STOP_MIN        50   // 5,0A (not possible, but will be kept at 6A)
 #define CURRENT_POWER_FACTOR 69		// 1A equals 690 W @ 3phases  => 0,1A equals 69W       (@ 1phase: 23)
 
 RTCVars rtc;                               // used to memorize a few global variables over reset (not for cold boot / power on reset)
@@ -98,9 +98,9 @@ void pfoxAlgo() {
 		logFile.close();
 	}
 
-	if ((targetCurr != actualCurr) && (millis() - lastUpdate > UPDATE_TIME)) {	// update the value not too often 
+	if ((targetCurr != actualCurr) /*&& (millis() - lastUpdate > UPDATE_TIME)*/) {	// update the value not too often 
 		mb_writeReg(BOXID, REG_CURR_LIMIT, targetCurr);
-		lastUpdate = millis();
+		//lastUpdate = millis();
 	}
 }
 
@@ -155,18 +155,20 @@ void powerfox_loop() {
 	DeserializationError error = deserializeJson(doc, response);
 	if (error) {
 		LOG(m, "deserializeJson() failed: %s", error.f_str())
-	} else {
-		uint32_t timestamp = 0;
-		timestamp =  doc[F("Timestamp")]        | 0;
-		watt = (int) doc[F("Watt")].as<float>();
-		LOG(m, "Timestamp=%d, Watt=%d", timestamp, watt)
-		
-		if ((log_unixTime() - timestamp > OUTDATED) || (watt < WATT_MIN) || (watt > WATT_MAX)) {
-			Serial.print("unixtime:"); Serial.println(log_unixTime());
-			watt = 0;
-			availPowerPrev = 0;
-		}
+		return;
+	} 
+
+	uint32_t timestamp = 0;
+	timestamp =  doc[F("Timestamp")]        | 0;
+	watt = (int) doc[F("Watt")].as<float>();
+	LOG(m, "Timestamp=%d, Watt=%d", timestamp, watt)
+	
+	if ((log_unixTime() - timestamp > OUTDATED) || (watt < WATT_MIN) || (watt > WATT_MAX)) {
+		Serial.print("unixtime:"); Serial.println(log_unixTime());
+		watt = 0;
+		availPowerPrev = 0;
 	}
+
 	// Call algo
 	if (enabled) {  // PowerFox Control active 
 		pfoxAlgo();
