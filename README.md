@@ -22,8 +22,14 @@ Ziel des Projekts ist es, eine WLAN-Schnittstelle zu entwickeln, die gleichzeiti
 - Weniger als 1W Strombedarf (trotz Ansteuerung von bis zu 16 Ladestationen)
 
 ## Kontakt
-Bei Fragen oder wenn ihr Unterstützung beim Zusammenbauen braucht gerne einfach eine Mail schicken (wbec393@gmail.com)    
+Bei Fragen oder wenn ihr Unterstützung braucht gerne einfach eine Mail schicken (wbec393@gmail.com)    
 Bitte schaut auch ins [Wiki](https://github.com/steff393/wbec/wiki).  
+
+## Bilder
+<p align="center">
+  <img src="/images/wbec.jpg"> <br> 
+  <img src="https://i.ibb.co/mJPF4PV/1a.jpg"> 
+</p>
   
   
   
@@ -50,11 +56,6 @@ Goal of this project is to establish an Wifi interface, which also acts as Modbu
 ## Contact
 In case of any questions or in case you need support, feel free to send a mail (wbec393@gmail.com)  ;-)  
 Please also take a look to the [Wiki](https://github.com/steff393/wbec/wiki).
-
-## Pictures
-<p align="center">
-  <img src="/images/wbec.jpg"> <br> <img src="https://user-images.githubusercontent.com/73853447/117866120-0e9e6700-b297-11eb-9cd1-4a33e714bceb.PNG">
-</p>
 
 ## Switch configuration of wallbox
 S1 > 5 (16A max)  
