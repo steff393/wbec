@@ -2,7 +2,7 @@
 <html>
 <!-- based on https://github.com/tttapa/ESP8266, GPL-3.0 License -->
 <head>
-    <title>wbec Chart</title>
+    <title>wbec</title>
     <link href='https://fonts.googleapis.com/css?family=Roboto:300' rel='stylesheet' type='text/css'>
     <meta name="theme-color" content="#00878f">
     <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport'>
@@ -12,15 +12,48 @@
 <body>
     <center>
 		<h1>wbec</h1>
+		<div class="slidecontainer">
+			<input type="range" min="0" max="16" value="6" class="slider" id="slideCurr">
+			<br><br>
+		</div>
 		<div id='main'>
-			<h3>LED CONTROL</h3>
-			<div id='content'>
-				<p id='LED_status'>LED is off</p>
-				<button id='BTN_LED'class="button">Turn on the LED</button>
-			</div>
-			<p>Received data = <span id='rd'>---</span> </p>
-			<br />
-			</div>
+			<table>
+				<tr>
+					<td>Stromlimit</td>
+					<td align="right"><span id='currLim'>-</span></td>
+					<td>A</td>
+				</tr>
+				<tr>
+					<td>Ladezustand</td>
+					<td align="right"><span id='chgStat'>-</span></td>
+				</tr>
+				<tr>
+					<td>Ladeleistung</td>
+					<td align="right"><span id='power'>-</span></td>
+					<td>W</td>
+				</tr>
+				<tr>
+					<td>Energiez&auml;hler</td>
+					<td align="right"><span id='energyI'>-</span></td>
+					<td>kWh</td>
+				</tr>
+				<tr>
+					<td>Bezug(+)/Einsp.(-)</td>
+					<td align="right"><span id='watt'>-</span></td>
+					<td>W</td>
+				</tr>
+				<tr>
+					<td>PV-Laden</td>
+					<td align="right"><span id='pvStat'>-</span></td>
+				</tr>
+			</table>
+		</div>
+		<h4>PV Laden</h4>
+		<div id='pvLaden'>
+			<button id='btnAus'   class="button">Aus</button>
+			<button id='btnMinPv' class="button">Min+PV</button>
+			<button id='btnPv'    class="button">PV</button>
+		</div>
     </center>
 
     <script src="web.js"></script>
@@ -41,7 +74,7 @@
 
 	button {
 	    font-size: 14pt;
-	    width: 2em;
+	    width: 6em;
 	}
 
 	center {
@@ -54,6 +87,48 @@
 
 	#loading {
 		margin-bottom: 12px;
+	}
+
+	.slidecontainer {
+		width: 50%; /* Width of the outside container */
+	}
+
+	/* The slider itself */
+	.slider {
+		-webkit-appearance: none;  /* Override default CSS styles */
+		appearance: none;
+		width: 100%; /* Full-width */
+		height: 15px;
+  	border-radius: 5px; 
+		background: #d3d3d3; /* Grey background */
+		outline: none; /* Remove outline */
+		opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+		-webkit-transition: .2s; /* 0.2 seconds transition on hover */
+		transition: opacity .2s;
+	}
+
+	/* Mouse-over effects */
+	.slider:hover {
+		opacity: 1; /* Fully shown on mouse-over */
+	}
+
+	/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+	.slider::-webkit-slider-thumb {
+		-webkit-appearance: none; /* Override default look */
+		appearance: none;
+		width: 25px; /* Set a specific slider handle width */
+		height: 25px;
+  	border-radius: 50%; 
+		background: #008CBA; /* Green background */
+		cursor: pointer; /* Cursor on hover */
+	}
+
+	.slider::-moz-range-thumb {
+		width: 25px; /* Set a specific slider handle width */
+		height: 25px;
+  	border-radius: 50%;
+		background: #008CBA; /* Green background */
+		cursor: pointer; /* Cursor on hover */
 	}
 
 	@media only screen and (max-device-width: 700px) {

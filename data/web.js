@@ -1,43 +1,61 @@
+// Copyright (c) 2021 steff393, MIT license
+
 var Socket;
+
+
 function init() 
 {
 	Socket = new WebSocket('ws://' + window.location.hostname + ':81/');
 	Socket.onmessage = function(event) { processReceivedCommand(event); };
+
+	//output.innerHTML = document.getElementById("slideCurr").value; // Display the default slider value
+}
+
+// Update the current slider value (each time you drag the slider handle)
+document.getElementById("slideCurr").oninput = function() {
+	var val = parseInt(this.value);
+	if (val == 0 || (val >= 6 && val <=16)) {
+		document.getElementById("currLim").innerHTML = val;
+		sendText('currLim=' + val * 10);
+	} else {
+		document.getElementById("currLim").innerHTML = 0;
+		document.getElementById("slideCurr").value = 0;
+		sendText('currLim=0');
+	}
 }
  
  
 function processReceivedCommand(evt) 
 {
-		document.getElementById('rd').innerHTML = evt.data;
-		if (evt.data ==='0') 
-		{  
-				document.getElementById('BTN_LED').innerHTML = 'Turn on the LED';  
-				document.getElementById('LED_status').innerHTML = 'LED is off';  
-		}
-		if (evt.data ==='1') 
-		{  
-				document.getElementById('BTN_LED').innerHTML = 'Turn off the LED'; 
-				document.getElementById('LED_status').innerHTML = 'LED is on';   
-		}
+		const obj = JSON.parse(evt.data);
+		document.getElementById('chgStat').innerHTML = obj.chgStat;
+		document.getElementById('power').innerHTML = obj.power;
+		document.getElementById('energyI').innerHTML = obj.energyI;
+		document.getElementById('currLim').innerHTML = obj.currLim;
+		document.getElementById('watt').innerHTML = obj.watt;
+		document.getElementById("slideCurr").value = obj.currLim;
 }
  
  
-document.getElementById('BTN_LED').addEventListener('click', buttonClicked);
-function buttonClicked()
-{   
-	var btn = document.getElementById('BTN_LED')
-	var btnText = btn.textContent || btn.innerText;
-	if (btnText ==='Turn on the LED') { btn.innerHTML = 'Turn off the LED'; document.getElementById('LED_status').innerHTML = 'LED is on';  sendText('1'); }  
-	else                              { btn.innerHTML = 'Turn on the LED';  document.getElementById('LED_status').innerHTML = 'LED is off'; sendText('0'); }
-}
+document.getElementById('btnAus').addEventListener('click', function() {
+	sendText('pfoxDisable');
+	document.getElementById("pvStat").innerHTML = 'Aus';
+});
+document.getElementById('btnMinPv').addEventListener('click', function() {
+	sendText('pfoxEnable');
+	document.getElementById("pvStat").innerHTML = 'Min+PV';
+});
+document.getElementById('btnPv').addEventListener('click', function() {
+	sendText('pfoxEnable');
+	document.getElementById("pvStat").innerHTML = 'PV';
+});
 
-function sendText(data)
-{
+
+function sendText(data){
 	Socket.send(data);
 }
 
 
-window.onload = function(e)
-{ 
+window.onload = function(e){ 
 	init();
 }
