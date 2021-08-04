@@ -14,6 +14,7 @@
 #define WIFI_MANAGER_USE_ASYNC_WEB_SERVER
 #include <WiFiManager.h>
 #include "webServer.h"
+#include "webSocket.h"
 
 bool _handlingOTA = false;
 
@@ -42,6 +43,7 @@ void setup() {
 
   // setup the Webserver
   webServer_begin();
+  webSocket_begin();
 
   // setup the OTA server
   ArduinoOTA.setHostname("wbec");
@@ -69,6 +71,7 @@ void loop() {
     goE_handle();
     mqtt_handle();
     webServer_handle();
+    webSocket_handle();
     rfid_loop();
     powerfox_loop(); 
     //pc_handle();

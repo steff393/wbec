@@ -170,6 +170,7 @@ Third-party libraries included/adapted in wbec:
 - [NTPClient](https://github.com/arduino-libraries/NTPClient)
 - [MFRC522](https://github.com/miguelbalboa/MFRC522)
 - [RTCVars](https://github.com/highno/RTCVars)
+- [arduinoWebSockets](https://github.com/Links2004/arduinoWebSockets)
 - [OTA via http](https://gist.github.com/JMishou/60cb762047b735685e8a09cd2eb42a60)
 - [WiFiManager](https://github.com/tzapu/WiFiManager)
 - [Web Interface](https://RandomNerdTutorials.com)

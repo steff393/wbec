@@ -32,15 +32,7 @@ boolean resetRequested = false;
 
 void onRequest(AsyncWebServerRequest *request){
   //Handle Unknown Request
-  if (request->url().endsWith(F(".html")) || request->url().endsWith(F(".png")) || request->url().endsWith(F(".css")) || 
-      request->url().endsWith(F(".json")) || request->url().endsWith(F(".txt")) || request->url().endsWith(F(".js"))) {
-    int fnsstart = request->url().lastIndexOf('/');
-    String fn = request->url().substring(fnsstart);
-    boolean download = request->url().endsWith(F(".html")) ? false : true;
-    request->send(LittleFS, fn, String(), download);
-  } else {
-    request->send_P(404, PSTR("text/plain"), PSTR("Not found"));
-  }
+  request->send_P(404, PSTR("text/plain"), PSTR("Not found"));
 }
 
 void onBody(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total){
@@ -411,6 +403,8 @@ void webServer_begin() {
 
   // add the SPIFFSEditor, which can be opened via "/edit"
   server.addHandler(new SPIFFSEditor("" ,"" ,LittleFS));//http_username,http_password));
+
+  server.serveStatic("/", LittleFS, "/");
 
   // Catch-All Handlers
   // Any request that can not find a Handler that canHandle it
