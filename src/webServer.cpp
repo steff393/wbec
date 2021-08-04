@@ -263,7 +263,7 @@ void webServer_begin() {
     data[F("rfid")][F("enabled")] = rfid_getEnabled();
     data[F("rfid")][F("release")] = rfid_getReleased();
     data[F("rfid")][F("lastId")]  = rfid_getLastID();
-    data[F("pfox")][F("enabled")] = pf_getEnabled();
+    data[F("pfox")][F("mode")]    = pf_getMode();
     data[F("pfox")][F("watt")]    = pf_getWatt();
     data[F("wifi")][F("mac")] = WiFi.macAddress();
     int qrssi = WiFi.RSSI();
@@ -321,10 +321,10 @@ void webServer_begin() {
     uint8_t id = 0;
     // modify values
 
-    if (request->hasParam(F("enabled"))) {
-      uint16_t val = request->getParam(F("enabled"))->value().toInt();
+    if (request->hasParam(F("mode"))) {
+      uint16_t val = request->getParam(F("mode"))->value().toInt();
       if (val <= 1) {
-        pf_setEnabled((boolean)val);
+        pf_setMode(val);
       }
     }
 
@@ -333,7 +333,7 @@ void webServer_begin() {
     data[F("box")][F("currLim")]  = content[id][53];
     data[F("box")][F("resCode")]  = String(modbusResultCode[id], HEX);
     data[F("modbus")][F("millis")]  = millis();
-    data[F("pfox")][F("enabled")] = pf_getEnabled();
+    data[F("pfox")][F("mode")]    = pf_getMode();
     data[F("pfox")][F("watt")]    = pf_getWatt();
     char response[PFOX_JSON_LEN];
     serializeJson(data, response, PFOX_JSON_LEN);

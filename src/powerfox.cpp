@@ -6,6 +6,7 @@
 #include <LittleFS.h>
 #include "logger.h"
 #include "mbComm.h"
+#include "powerfox.h"
 #include <rtcvars.h>
 
 #include <ESP8266HTTPClient.h>
@@ -26,7 +27,7 @@ static uint32_t lastHandleCall       = 0;
 static int32_t  watt                 = 0;  // power from powerfox API (neg. = 'Einspeisung', pos. = 'Bezug')
 static int32_t  availPowerPrev       = 0;  // availPower from previous cycle
 static uint32_t lastUpdate           = 0;  // last update via Modbus to box
-static uint8_t  enabled              = 0;
+static uint8_t  pvMode               = 0;
 
 HTTPClient                *http;
 BearSSL::WiFiClientSecure *httpsClient;
@@ -38,7 +39,7 @@ void pfoxAlgo() {
 	uint8_t targetCurr = 0;
 	uint8_t actualCurr = content[BOXID][53];
 
-	if (true /*content[BOXID][1] >= 4 && content[BOXID][1] <= 7*/) {   // Car is connected
+	if (content[BOXID][1] >= 4 && content[BOXID][1] <= 7) {   // Car is connected
 
 		// available power for charging is 'Einspeisung + akt. Ladeleistung' = -watt + content[0][10]
 		// negative 'watt' means 'Einspeisung'
@@ -57,6 +58,10 @@ void pfoxAlgo() {
 		if ((actualCurr == 0 && targetCurr < cfgPvLimStart) ||
 				(actualCurr != 0 && targetCurr < cfgPvLimStop)) {
 			targetCurr = 0;
+		}
+
+		if (pvMode == PV_MIN_PV) {
+			targetCurr = content[BOXID][16]; // set minimal current configured in box
 		}
 
 		// Saturation to 0 or 6..16A
@@ -101,7 +106,7 @@ void pfoxAlgo() {
 
 
 void powerfox_setup() {
-	rtc.registerVar(&enabled);
+	rtc.registerVar(&pvMode);
 	rtc.registerVar(&availPowerPrev);
 	rtc.loadFromRTC();             // we load the values from rtc memory back into the registered variables
 }
@@ -165,7 +170,7 @@ void powerfox_loop() {
 	}
 
 	// Call algo
-	if (enabled) {  // PowerFox Control active 
+	if (pvMode != PV_OFF) {  // PowerFox Control active 
 		pfoxAlgo();
 	} else {
 		availPowerPrev = 0;
@@ -177,11 +182,11 @@ int32_t pf_getWatt() {
 	return(watt);
 }
 
-boolean pf_getEnabled() {
-	return(enabled);
+uint8_t pf_getMode() {
+	return(pvMode);
 }
 
-void pf_setEnabled(boolean act) {
-	enabled = act;
+void pf_setMode(uint8_t val) {
+	pvMode = val;
 	rtc.saveToRTC();   // memorize over reset
 }

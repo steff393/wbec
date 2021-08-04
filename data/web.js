@@ -34,20 +34,26 @@ function processReceivedCommand(evt)
 		document.getElementById('currLim').innerHTML = obj.currLim;
 		document.getElementById('watt').innerHTML = obj.watt;
 		document.getElementById("slideCurr").value = obj.currLim;
+		switch (obj.pvMode) {
+			case 0:  document.getElementById('pvMode').innerHTML = 'Aus'; break;
+			case 1:  document.getElementById('pvMode').innerHTML = 'PV'; break;
+			case 2:  document.getElementById('pvMode').innerHTML = 'Min+PV'; break;
+			default: document.getElementById('pvMode').innerHTML = '-';
+		}
 }
  
  
 document.getElementById('btnAus').addEventListener('click', function() {
-	sendText('pfoxDisable');
+	sendText('PV_OFF');
 	document.getElementById("pvStat").innerHTML = 'Aus';
 });
-document.getElementById('btnMinPv').addEventListener('click', function() {
-	sendText('pfoxEnable');
-	document.getElementById("pvStat").innerHTML = 'Min+PV';
-});
 document.getElementById('btnPv').addEventListener('click', function() {
-	sendText('pfoxEnable');
+	sendText('PV_ACTIVE');
 	document.getElementById("pvStat").innerHTML = 'PV';
+});
+document.getElementById('btnMinPv').addEventListener('click', function() {
+	sendText('PV_MIN_PV');
+	document.getElementById("pvStat").innerHTML = 'Min+PV';
 });
 
 
