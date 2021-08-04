@@ -38,6 +38,11 @@ extern char     cfgNtpServer[30];            // NTP server
 extern char     cfgFoxUser[32];              // powerfox: Username
 extern char     cfgFoxPass[16];              // powerfox: Password
 extern char     cfgFoxDevId[16];             // powerfox: DeviceId
+extern uint8_t  cfgPvCycleTime;	             // PV charging: cycle time (in seconds)
+extern uint8_t  cfgPvLimStart;		           // PV charging: Target current needed for starting (in 0.1A), e.g. 61=6.1A
+extern uint8_t  cfgPvLimStop;		             // PV charging: Target current to stop charging when below (in 0.1A)
+extern uint8_t  cfgPvPhFactor;		           // PV charging: Power/Current factor, e.g. 69: 1A equals 690W at 3phases, 23: 1A equals 230W at 1phase
+extern uint16_t cfgPvOffset;                 // PV charging: Offset for the available power calculation (in W); can be used to assure that no/less current is consumed from net
 
 extern void loadConfig();
 

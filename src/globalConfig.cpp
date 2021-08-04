@@ -9,7 +9,7 @@
 const uint8_t m = 5;
 
 char cfgWbecVersion[]     = "v0.3.0+";          // wbec version
-char cfgBuildDate[]       = "2021-07-30";	      // wbec build date
+char cfgBuildDate[]       = "2021-08-04";	      // wbec build date
 
 char     cfgApSsid[32];	              // SSID of the initial Access Point
 char     cfgApPass[63];               // Password of the initial Access Point
@@ -26,6 +26,11 @@ char     cfgNtpServer[30];            // NTP server
 char     cfgFoxUser[32];              // powerfox: Username
 char     cfgFoxPass[16];              // powerfox: Password
 char     cfgFoxDevId[16];             // powerfox: DeviceId
+uint8_t  cfgPvCycleTime;	            // PV charging: cycle time (in seconds)
+uint8_t  cfgPvLimStart;		            // PV charging: Target current needed for starting (in 0.1A), e.g. 61=6.1A
+uint8_t  cfgPvLimStop;		            // PV charging: Target current to stop charging when below (in 0.1A)
+uint8_t  cfgPvPhFactor;		            // PV charging: Power/Current factor, e.g. 69: 1A equals 690W at 3phases, 23: 1A equals 230W at 1phase
+uint16_t cfgPvOffset;                 // PV charging: Offset for the available power calculation (in W); can be used to assure that no/less current is consumed from net
 
 
 bool createConfig() {
@@ -48,6 +53,7 @@ bool createConfig() {
   doc["cfgFoxUser"]             = F("");
   doc["cfgFoxPass"]             = F("");
   doc["cfgFoxDevId"]            = F("");
+  // ... Pv parameters not yet in; to be created manually if needed
   // -------------------------------------
   
   File configFile = LittleFS.open(F("/cfg.json"), "w");
@@ -122,7 +128,12 @@ void loadConfig() {
   strncpy(cfgFoxUser,         doc["cfgFoxUser"]           | "",                 sizeof(cfgFoxUser));
   strncpy(cfgFoxPass,         doc["cfgFoxPass"]           | "",                 sizeof(cfgFoxPass));
   strncpy(cfgFoxDevId,        doc["cfgFoxDevId"]          | "",                 sizeof(cfgFoxDevId));
-
+  cfgPvCycleTime             = doc["cfgPvCycleTime"]      | 30; 
+  cfgPvLimStart              = doc["cfgPvLimStart"]       | 61; 
+  cfgPvLimStop               = doc["cfgPvLimStop"]        | 50; 
+  cfgPvPhFactor              = doc["cfgPvPhFactor"]         | 69; 
+  cfgPvOffset                = doc["cfgPvOffset"]         | 0UL;
+	
   LOG(m, "cfgWbecVersion: %s", cfgWbecVersion);
   LOG(m, "cfgBuildDate: %s"  , cfgBuildDate);
   LOG(m, "cfgCntWb: %d"      , cfgCntWb);

@@ -14,17 +14,12 @@
 
 const uint8_t m = 9;
 
-#define CYCLE_TIME		    30000		// 30 s	=> 2880 calls per day (fair-use limit: 8000 per day)
-#define UPDATE_TIME       60000   // 60s
 #define MAX_API_LEN		 	    150		// Max accepted length of API response
 #define MIN_HEAP_NEEDED   15000		// This heap is minimum necessary, otherwise ESP might crash during HTTPS / TLS connection
 #define OUTDATED         600000		// 10 min, after this time the value is considered outdated
 #define WATT_MIN        -100000		// 100kW Feed-in
 #define WATT_MAX         100000		// 100kW Consumption
 #define BOXID                 0		// only 1 box supported
-#define CURR_START_MIN       61   // 6,1A
-#define CURR_STOP_MIN        50   // 5,0A (not possible, but will be kept at 6A)
-#define CURRENT_POWER_FACTOR 69		// 1A equals 690 W @ 3phases  => 0,1A equals 69W       (@ 1phase: 23)
 
 RTCVars rtc;                               // used to memorize a few global variables over reset (not for cold boot / power on reset)
 static uint32_t lastHandleCall       = 0;
@@ -47,20 +42,20 @@ void pfoxAlgo() {
 
 		// available power for charging is 'Einspeisung + akt. Ladeleistung' = -watt + content[0][10]
 		// negative 'watt' means 'Einspeisung'
-		availPower = (int16_t)(content[BOXID][10] - watt);
+		availPower = (int16_t)(content[BOXID][10] - watt - cfgPvOffset);
 		
 		// Simple filter (average of this and previous value)
 		availPower = (availPowerPrev + availPower) / 2;
 		availPowerPrev = availPower;
 		
 		// Calculate the new target current
-		if (availPower > 0) {
-			targetCurr = availPower / CURRENT_POWER_FACTOR;
+		if (availPower > 0 && cfgPvPhFactor != 0) {
+			targetCurr = availPower / cfgPvPhFactor;
 		}
 		LOG(m, "Target current: %.1fA", (float)targetCurr/10.0)
 		// Hysteresis
-		if ((actualCurr == 0 && targetCurr < CURR_START_MIN) ||
-				(actualCurr != 0 && targetCurr < CURR_STOP_MIN)) {
+		if ((actualCurr == 0 && targetCurr < cfgPvLimStart) ||
+				(actualCurr != 0 && targetCurr < cfgPvLimStop)) {
 			targetCurr = 0;
 		}
 
@@ -113,7 +108,7 @@ void powerfox_setup() {
 
 
 void powerfox_loop() {
-	if ((millis() - lastHandleCall < CYCLE_TIME)  || 								                        // avoid unnecessary frequent calls
+	if ((millis() - lastHandleCall < (uint16_t)cfgPvCycleTime * 1000)  || 								                        // avoid unnecessary frequent calls
 			!strcmp(cfgFoxUser, "") || !strcmp(cfgFoxPass, "") || !strcmp(cfgFoxDevId, "") ||		// look for credentials (all need a value)
 			(cfgCntWb > 1)) {		// more wallboxes need too much heap, e.g. for web server
 		return;
