@@ -24,8 +24,12 @@
 					<td>A</td>
 				</tr>
 				<tr>
-					<td>Ladezustand</td>
-					<td align="right"><span id='chgStat'>-</span></td>
+					<td>Fzg. verbunden</td>
+					<td align="center" colspan="2"><span id='carStat'>-</span></td>
+				</tr>
+				<tr>
+					<td>WB erlaubt Laden</td>
+					<td align="center" colspan="2"><span id='wbStat'>-</span></td>
 				</tr>
 				<tr>
 					<td>Ladeleistung</td>
@@ -44,7 +48,7 @@
 				</tr>
 				<tr>
 					<td>PV-Laden</td>
-					<td align="right"><span id='pvMode'>-</span></td>
+					<td align="center" colspan="2"><span id='pvMode'>-</span></td>
 				</tr>
 			</table>
 		</div>
@@ -54,6 +58,7 @@
 			<button id='btnPv'    class="button">PV</button>
 			<button id='btnMinPv' class="button">Min+PV</button>
 		</div>
+		<span style="font-size:8pt" id='timeNow'>-</span>
     </center>
 
     <script src="web.js"></script>

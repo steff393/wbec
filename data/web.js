@@ -7,8 +7,6 @@ function init()
 {
 	Socket = new WebSocket('ws://' + window.location.hostname + ':81/');
 	Socket.onmessage = function(event) { processReceivedCommand(event); };
-
-	//output.innerHTML = document.getElementById("slideCurr").value; // Display the default slider value
 }
 
 // Update the current slider value (each time you drag the slider handle)
@@ -28,11 +26,24 @@ document.getElementById("slideCurr").oninput = function() {
 function processReceivedCommand(evt) 
 {
 		const obj = JSON.parse(evt.data);
-		document.getElementById('chgStat').innerHTML = obj.chgStat;
+		var carStat;
+		var wbStat;
+		switch (obj.chgStat) {
+			case  2: /*A1*/ carStat = 'nein'; wbStat = 'nein'; break;
+			case  3: /*A2*/ carStat = 'nein'; wbStat = 'ja'; break;
+			case  4: /*B1*/ carStat = 'ja, ohne Ladeanf.'; wbStat = 'nein'; break;
+			case  5: /*B2*/ carStat = 'ja, ohne Ladeanf.'; wbStat = 'ja'; break;
+			case  6: /*C1*/ carStat = 'ja,  mit Ladeanf.'; wbStat = 'nein'; break;
+			case  7: /*C2*/ carStat = 'ja,  mit Ladeanf.'; wbStat = 'ja'; break;
+			default: carStat = obj.chgStat; wbStat = '-';
+		}
+		document.getElementById('carStat').innerHTML = carStat;
+		document.getElementById('wbStat').innerHTML = wbStat;
 		document.getElementById('power').innerHTML = obj.power;
 		document.getElementById('energyI').innerHTML = obj.energyI;
 		document.getElementById('currLim').innerHTML = obj.currLim;
 		document.getElementById('watt').innerHTML = obj.watt;
+		document.getElementById('timeNow').innerHTML = obj.timeNow;
 		document.getElementById("slideCurr").value = obj.currLim;
 		switch (obj.pvMode) {
 			case 0:  document.getElementById('pvMode').innerHTML = 'Aus'; break;
