@@ -8,6 +8,7 @@
 #include "mbComm.h"
 #include "powerfox.h"
 #include <rtcvars.h>
+#include <umm_malloc/umm_heap_select.h>
 
 #include <ESP8266HTTPClient.h>
 #include <WiFiClientSecureBearSSL.h>
@@ -16,7 +17,6 @@
 const uint8_t m = 9;
 
 #define MAX_API_LEN		 	    150		// Max accepted length of API response
-#define MIN_HEAP_NEEDED   15000		// This heap is minimum necessary, otherwise ESP might crash during HTTPS / TLS connection
 #define OUTDATED         600000		// 10 min, after this time the value is considered outdated
 #define WATT_MIN        -100000		// 100kW Feed-in
 #define WATT_MAX         100000		// 100kW Consumption
@@ -26,7 +26,6 @@ RTCVars rtc;                               // used to memorize a few global vari
 static uint32_t lastHandleCall       = 0;
 static int32_t  watt                 = 0;  // power from powerfox API (neg. = 'Einspeisung', pos. = 'Bezug')
 static int32_t  availPowerPrev       = 0;  // availPower from previous cycle
-static uint32_t lastUpdate           = 0;  // last update via Modbus to box
 static uint8_t  pvMode               = 0;
 
 HTTPClient                *http;
@@ -98,9 +97,8 @@ void pfoxAlgo() {
 		logFile.close();
 	}
 
-	if ((targetCurr != actualCurr) /*&& (millis() - lastUpdate > UPDATE_TIME)*/) {	// update the value not too often 
+	if ((targetCurr != actualCurr)) {														// update the value not too often 
 		mb_writeReg(BOXID, REG_CURR_LIMIT, targetCurr);
-		//lastUpdate = millis();
 	}
 }
 
@@ -121,53 +119,57 @@ void powerfox_loop() {
 	lastHandleCall = millis();
 
 	Serial.print(F("Heap before new: ")); Serial.println(ESP.getFreeHeap());
-	if (ESP.getFreeHeap() < MIN_HEAP_NEEDED) {
-		LOG(m, "Heap is low!", "")
-	}
-	http = new HTTPClient();
-	httpsClient = new BearSSL::WiFiClientSecure();
-	
-	Serial.print(F("Heap after new : ")); Serial.println(ESP.getFreeHeap());
+	{
+		HeapSelectIram ephemeral;
+		Serial.printf("IRAM free: %6d bytes\r\n", ESP.getFreeHeap());
+		http = new HTTPClient();
+		httpsClient = new BearSSL::WiFiClientSecure();
+		
+		Serial.print(F("Heap after new : ")); Serial.println(ESP.getFreeHeap());
 
-	httpsClient->setInsecure();
-	httpsClient->setBufferSizes(512,512);    // must be between 512 and 16384
-	http->begin(*httpsClient, F("https://backend.powerfox.energy/api/2.0/my/") + String(cfgFoxDevId) + F("/current"));
+		httpsClient->setInsecure();
+		httpsClient->setBufferSizes(512,512);    // must be between 512 and 16384
+		http->begin(*httpsClient, F("https://backend.powerfox.energy/api/2.0/my/") + String(cfgFoxDevId) + F("/current"));
 
-	http->setAuthorization(cfgFoxUser, cfgFoxPass);
-	http->setReuse(false);
-	uint32_t tm = millis();
-	http->GET();
-	Serial.print(F("Duration of GET: ")); Serial.println(millis() - tm);
-	
-	char response[MAX_API_LEN];
-	while (httpsClient->connected() || httpsClient->available()) {
-		if (httpsClient->available()) {
-			httpsClient->read((uint8_t*)response, MAX_API_LEN-1);
+		http->setAuthorization(cfgFoxUser, cfgFoxPass);
+		http->setReuse(false);
+		uint32_t tm = millis();
+		http->GET();
+		Serial.print(F("Duration of GET: ")); Serial.println(millis() - tm);
+		
+		char response[MAX_API_LEN];
+		while (httpsClient->connected() || httpsClient->available()) {
+			if (httpsClient->available()) {
+				httpsClient->read((uint8_t*)response, MAX_API_LEN-1);
+			}
+		}
+		Serial.println(response);
+		Serial.print(F("Heap befor del : ")); Serial.println(ESP.getFreeHeap());
+		delete http;
+		delete httpsClient;
+		Serial.print(F("Heap after del : ")); Serial.println(ESP.getFreeHeap());
+
+		StaticJsonDocument<256> doc;
+		// Parse JSON object
+		DeserializationError error = deserializeJson(doc, response);
+		if (error) {
+			LOG(m, "deserializeJson() failed: %s", error.f_str())
+			return;
+		} 
+
+		uint32_t timestamp = 0;
+		timestamp =  doc[F("Timestamp")]        | 0;
+		watt = (int) doc[F("Watt")].as<float>();
+		LOG(m, "Timestamp=%d, Watt=%d", timestamp, watt)
+		
+		if ((log_unixTime() - timestamp > OUTDATED) || (watt < WATT_MIN) || (watt > WATT_MAX)) {
+			Serial.print("unixtime:"); Serial.println(log_unixTime());
+			watt = 0;
+			availPowerPrev = 0;
 		}
 	}
-	Serial.println(response);
-	delete http;
-  delete httpsClient;
-	Serial.print(F("Heap after del : ")); Serial.println(ESP.getFreeHeap());
-
-	StaticJsonDocument<256> doc;
-	// Parse JSON object
-	DeserializationError error = deserializeJson(doc, response);
-	if (error) {
-		LOG(m, "deserializeJson() failed: %s", error.f_str())
-		return;
-	} 
-
-	uint32_t timestamp = 0;
-	timestamp =  doc[F("Timestamp")]        | 0;
-	watt = (int) doc[F("Watt")].as<float>();
-	LOG(m, "Timestamp=%d, Watt=%d", timestamp, watt)
-	
-	if ((log_unixTime() - timestamp > OUTDATED) || (watt < WATT_MIN) || (watt > WATT_MAX)) {
-		Serial.print("unixtime:"); Serial.println(log_unixTime());
-		watt = 0;
-		availPowerPrev = 0;
-	}
+	HeapSelectDram ephemeral;
+  Serial.printf("DRAM free: %6d bytes\r\n", ESP.getFreeHeap());
 
 	// Call algo
 	if (pvMode != PV_OFF) {  // PowerFox Control active 
