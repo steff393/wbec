@@ -28,7 +28,7 @@ Bitte schaut auch ins [Wiki](https://github.com/steff393/wbec/wiki).
 ## Bilder
 <p align="center">
   <img src="/images/wbec.jpg"> <br> 
-  <img src="https://i.ibb.co/mJPF4PV/1a.jpg"> 
+  <img src="/images/wbec_pcb.jpg"> 
 </p>
   
   
