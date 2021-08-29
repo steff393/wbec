@@ -155,3 +155,17 @@ void mqtt_publish(uint8_t i) {
 	}
 	LOG(m, "Publish to %s", header)
 }
+
+void mqtt_log(const char *output, const char *msg) {
+	if (strcmp(cfgMqttIp, "") == 0) {
+		return;	// do nothing, when Mqtt is not configured
+	}
+
+	boolean retain = true;
+	char topic[10];
+	char value[150];
+
+	snprintf_P(topic, sizeof(topic), PSTR("wbec/log"), "");
+	snprintf_P(value, sizeof(value), PSTR("%s%s"), output, msg);
+	client.publish(topic, value, retain);
+}

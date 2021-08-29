@@ -6,5 +6,6 @@
 extern void mqtt_begin();
 extern void mqtt_handle();
 extern void mqtt_publish(uint8_t i);
+extern void mqtt_log(const char *output, const char *msg);
 
 #endif /* MQTT_H */

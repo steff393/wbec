@@ -5,6 +5,7 @@
 #include "globalConfig.h"
 #include <LittleFS.h>
 #include "logger.h"
+#include "mqtt.h"
 #include <NTPClient.h>
 
 #define TIME_LEN            10   // "23:12:01: "
@@ -119,6 +120,7 @@ void log(uint8_t module, String msg, boolean newLine /* =true */) {
   if ((strlen(bootLog)+strlen(output.c_str()) + 5) < bootLogSize) {
     strcat(bootLog, output.c_str());
   } 
+  mqtt_log(output.c_str(), msg.c_str());
 }
 
 void log(uint8_t module, const char *msg, boolean newLine /* =true */) {
@@ -146,6 +148,7 @@ void log(uint8_t module, const char *msg, boolean newLine /* =true */) {
       strcat(bootLog, "\n");
 	  }
   }
+  mqtt_log(output, msg);
 }
 
 String log_time() {
