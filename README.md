@@ -26,8 +26,7 @@ Bei Fragen oder wenn ihr Unterstützung braucht gerne einfach eine Mail schicken
 Bitte schaut auch ins [Wiki](https://github.com/steff393/wbec/wiki).  
 
 ## Bilder
-<p align="center">
-  <img src="/images/wbec.jpg"> <br> 
+<p align="center"> 
   <img src="/images/wbec_pcb.jpg"> 
 </p>
   
@@ -66,9 +65,10 @@ S5 = 0000
 S6 = 0100 (terminator 120 Ohm, only on last box)  
 
 ## Examples
-First simple web interface (might be removed again in future, as there are better alternatives with openWB, EVCC, ...):
-<p align="center">
-  <img src="https://i.ibb.co/kKSkL1X/wbec-Web-Interface.png">
+Simple web interface (example with powerfox setup):  
+`http://x.x.x.x/web.html` 
+<p align="center"> 
+  <img src="https://i.ibb.co/DtZC9tp/wbec-Web-Interface2.png"> 
 </p>
 
 Get current status (here for 2 configured wallboxes, but only 1 connected):
