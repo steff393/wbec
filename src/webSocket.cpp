@@ -1,24 +1,24 @@
 // Copyright (c) 2021 steff393, MIT license
 
 #include <Arduino.h>
-#include "ArduinoJson.h"
-#include "globalConfig.h"
-#include "logger.h"
-#include "mbComm.h"
-#include "powerfox.h"
-#include "webSocket.h"
+#include <ArduinoJson.h>
+#include <globalConfig.h>
+#include <logger.h>
+#include <mbComm.h>
+#include <powerfox.h>
+#include <webSocket.h>
 #include <WebSocketsServer.h>
-
-const uint8_t m = 10;
 
 #define CYCLE_TIME	 1000	
 #define JSON_LEN      256
 
-WebSocketsServer webSocket = WebSocketsServer(81);
-static uint32_t lastHandleCall       = 0;
+static const uint8_t m = 10;
+
+static WebSocketsServer webSocket = WebSocketsServer(81);
+static uint32_t lastCall   = 0;
 
 
-void webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t length) {
+static void webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t length) {
 	if(type == WStype_TEXT) {
 		LOG(m, "Payload %s", (char *)payload)
 		if (!strncmp((char *)payload, "currLim", 7)) {
@@ -37,19 +37,19 @@ void webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t length) {
 }
 
 
-void webSocket_begin() {
+void webSocket_setup() {
 	// start the WebSocket connection
 	webSocket.begin();
 	webSocket.onEvent(webSocketEvent);
 }
 
 
-void webSocket_handle() {
+void webSocket_loop() {
 	webSocket.loop();
-	if ((millis() - lastHandleCall < CYCLE_TIME)) {
+	if ((millis() - lastCall < CYCLE_TIME)) {
 		return;
 	}
-	lastHandleCall = millis();
+	lastCall = millis();
 
 	StaticJsonDocument<JSON_LEN> data;
 	uint8_t id = 0;
@@ -59,7 +59,7 @@ void webSocket_handle() {
 	data[F("currLim")]  = (float)content[id][53]/10.0;
 	data[F("watt")]     = pf_getWatt();
 	data[F("pvMode")]   = pf_getMode();
-	data[F("timeNow")]   = log_time();
+	data[F("timeNow")]  = log_time();
 	char response[JSON_LEN];
 	serializeJson(data, response, JSON_LEN);
 	webSocket.broadcastTXT(response);

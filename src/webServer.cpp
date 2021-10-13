@@ -1,49 +1,53 @@
 // Copyright (c) 2021 steff393, MIT license
 
 #include <Arduino.h>
-#include "AsyncJson.h"
-#include "ArduinoJson.h"
+#include <AsyncJson.h>
+#include <ArduinoJson.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
-#include "ESPAsyncTCP.h"
-#include "ESPAsyncWebServer.h"
-#include "globalConfig.h"
-#include "goEmulator.h"
-#include "LittleFS.h"
-#include "loadManager.h"
-#include "logger.h"
-#include "mbComm.h"
-#include "phaseCtrl.h"
-#include "powerfox.h"
-#include "rfid.h"
-#include "SPIFFSEditor.h"
-#include "webServer.h"
+#include <ESPAsyncTCP.h>
+#include <ESPAsyncWebServer.h>
+#include <globalConfig.h>
+#include <goEmulator.h>
+#include <LittleFS.h>
+#include <loadManager.h>
+#include <logger.h>
+#include <mbComm.h>
+#include <phaseCtrl.h>
+#include <powerfox.h>
+#include <rfid.h>
+#include <SPIFFSEditor.h>
+#include <webServer.h>
 #define WIFI_MANAGER_USE_ASYNC_WEB_SERVER
 #include <WiFiManager.h>
 
-const uint8_t m = 3;
-
 #define PFOX_JSON_LEN 256
 
+static const uint8_t m = 3;
 static const char* otaPage PROGMEM = "%OTARESULT%<br><form method='POST' action='/update' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>";
 
-AsyncWebServer server(80);
-boolean resetRequested = false;
+static AsyncWebServer server(80);
+static boolean resetRequested = false;
+static boolean resetwifiRequested = false;
 
-void onRequest(AsyncWebServerRequest *request){
+
+static void onRequest(AsyncWebServerRequest *request){
   //Handle Unknown Request
   request->send_P(404, PSTR("text/plain"), PSTR("Not found"));
 }
 
-void onBody(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total){
+
+static void onBody(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total){
   //Handle body
 }
 
-void onUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final){
+
+static void onUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final){
   //Handle upload
 }
 
-String processor(const String& var){
+
+static String processor(const String& var){
   String commState;
   if(var == F("STATE")){
     if(modbusResultCode[0]==0x00){
@@ -68,7 +72,8 @@ String processor(const String& var){
   } else return(String(F("notFound")));
 }
 
-String otaProcessor(const String& var){
+
+static String otaProcessor(const String& var){
   if(Update.hasError()){
     return(F("Failed"));
   } else {
@@ -76,12 +81,14 @@ String otaProcessor(const String& var){
   }
 }
 
-String otaProcessorEmpty(const String& var){
+
+static String otaProcessorEmpty(const String& var){
   // just replace the template string with nothing, neither ok, nor fail
   return String();
 }
 
-uint8_t getSignalQuality(int rssi)
+
+static uint8_t getSignalQuality(int rssi)
 {
     int quality = 0;
     if (rssi <= -100) {
@@ -94,17 +101,14 @@ uint8_t getSignalQuality(int rssi)
     return quality;
 }
 
-void webServer_begin() {
+
+void webServer_setup() {
   server.on("/heap", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(200, F("text/plain"), String(ESP.getFreeHeap()));
   });
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(LittleFS, F("/index.html"), String(), false, processor);
-  });
-
-  server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, F("/style.css"), F("text/css"));
   });
 
   server.on("/cfg", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -119,24 +123,6 @@ void webServer_begin() {
     log_freeBuffer();
     request->send(200, F("text/plain"), F("Cleared"));
   });
-
-  server.on("/delete_cfg", HTTP_GET, [](AsyncWebServerRequest *request){
-    if (LittleFS.remove(F("/cfg.json"))) {
-      request->send(200, F("text/plain"), F("cfg.json successfully deleted, resetting defaults at next startup"));
-    } else {
-      request->send(200, F("text/plain"), F("cfg.json could not be deleted"));
-    }
-  });
-
-  server.on("/delete", HTTP_GET, [](AsyncWebServerRequest *request){
-    if (request->hasParam(F("file"))) {
-      if (LittleFS.remove(request->getParam(F("file"))->value())) {
-        request->send(200, F("text/plain"), F("OK"));
-      } else {
-        request->send(200, F("text/plain"), F("FAIL"));
-      }
-    }
-  }); 
 
   server.on("/web", HTTP_GET, [](AsyncWebServerRequest *request){
     uint8_t id = 0;
@@ -191,11 +177,10 @@ void webServer_begin() {
     resetRequested = true;
   });
 
-  server.on("/resetwifi", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(200, F("text/plain"), F("Resetting the WiFi credentials..."));
-    WiFiManager wm;
-    wm.resetSettings();
-  });
+	server.on("/resetwifi", HTTP_GET, [](AsyncWebServerRequest *request){
+		request->send(200, F("text/plain"), F("Resetting the WiFi credentials... Please power off/on"));
+		resetwifiRequested = true;
+	});
 
   server.on("/json", HTTP_GET, [](AsyncWebServerRequest *request) {
     DynamicJsonDocument data((cfgCntWb+2)/3  * 2048);  // always 2048 byte for 3 wallboxes
@@ -416,8 +401,13 @@ void webServer_begin() {
   server.begin();
 }
 
-void webServer_handle() {
+void webServer_loop() {
   if (resetRequested){
     ESP.restart();
   }
+	if (resetwifiRequested) {
+		WiFi.disconnect(true);
+		ESP.eraseConfig();
+		resetwifiRequested = false;
+	}
 }

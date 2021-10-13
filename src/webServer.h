@@ -3,7 +3,7 @@
 #ifndef WEBSERVER_H
 #define WEBSERVER_H
 
-extern void webServer_begin();
-extern void webServer_handle();
+extern void webServer_setup();
+extern void webServer_loop();
 
 #endif /* WEBSERVER_H */

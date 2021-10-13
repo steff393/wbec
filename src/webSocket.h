@@ -3,7 +3,7 @@
 #ifndef WEBSOCKET_H
 #define WEBSOCKET_H
 
-extern void webSocket_begin();
-extern void webSocket_handle();
+extern void webSocket_setup();
+extern void webSocket_loop();
 
 #endif /* WEBSOCKET_H */

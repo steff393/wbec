@@ -2,21 +2,22 @@
 
 #include <Arduino.h>
 #include <ArduinoOTA.h>
-#include "globalConfig.h"
-#include "goEmulator.h"
+#include <globalConfig.h>
+#include <goEmulator.h>
 #include <LittleFS.h>
-#include "logger.h"
-#include "mbComm.h"
-#include "mqtt.h"
-#include "phaseCtrl.h"
-#include "powerfox.h"
-#include "rfid.h"
+#include <logger.h>
+#include <mbComm.h>
+#include <mqtt.h>
+#include <phaseCtrl.h>
+#include <powerfox.h>
+#include <rfid.h>
 #define WIFI_MANAGER_USE_ASYNC_WEB_SERVER
 #include <WiFiManager.h>
-#include "webServer.h"
-#include "webSocket.h"
+#include <webServer.h>
+#include <webSocket.h>
 
-bool _handlingOTA = false;
+
+static bool _handlingOTA = false;
 
 
 void setup() {
@@ -39,11 +40,11 @@ void setup() {
   char pass[63]; strcpy(pass, cfgApPass);
   wifiManager.autoConnect(ssid, pass);
 
-  logger_begin();
+  logger_setup();
 
   // setup the Webserver
-  webServer_begin();
-  webSocket_begin();
+  webServer_setup();
+  webSocket_setup();
 
   // setup the OTA server
   ArduinoOTA.setHostname("wbec");
@@ -66,12 +67,12 @@ void setup() {
 void loop() {
   ArduinoOTA.handle();
   if(!_handlingOTA) {
-    logger_handle();
-    mb_handle();
+    logger_loop();
+    mb_loop();
     goE_handle();
     mqtt_handle();
-    webServer_handle();
-    webSocket_handle();
+    webServer_loop();
+    webSocket_loop();
     rfid_loop();
     powerfox_loop(); 
     //pc_handle();

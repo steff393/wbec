@@ -2,24 +2,24 @@
 
 #include <Arduino.h>
 #include <ESP8266mDNS.h>
-#include "globalConfig.h"
+#include <globalConfig.h>
 #include <LittleFS.h>
-#include "logger.h"
-#include "mqtt.h"
+#include <logger.h>
+#include <mqtt.h>
 #include <NTPClient.h>
 
 #define TIME_LEN            10   // "23:12:01: "
 #define MOD_LEN              6   // "WEBS: "
 
-WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, cfgNtpServer, 3600, 60000); // GMT+1 and update every minute
+static WiFiUDP ntpUDP;
+static NTPClient timeClient(ntpUDP, cfgNtpServer, 3600, 60000); // GMT+1 and update every minute
 
 static const char *mod[11] = {"", "MB  ", "MQTT", "WEBS", "GO-E", "CFG ", "1P3P", "LLOG", "RFID", "PFOX", "SOCK"};
-char *   bootLog;
-uint16_t bootLogSize;
-boolean written = false;
+static char *   bootLog;
+static uint16_t bootLogSize;
 
-boolean getDstGermany(uint32_t unixtime) {
+
+static boolean getDstGermany(uint32_t unixtime) {
   
   const uint32_t SEKUNDEN_PRO_TAG   =  86400ul; /*  24* 60 * 60 */
   const uint32_t TAGE_IM_GEMEINJAHR =    365ul; /* kein Schaltjahr */
@@ -78,32 +78,6 @@ boolean getDstGermany(uint32_t unixtime) {
 
 }
 
-void logger_allocate() {
-  // allocate a small amount at the beginning, for logging during loadconfig()
-  bootLogSize = 200;
-  bootLog = (char *) malloc(bootLogSize);
-  bootLog[0] = '\0';
-}
-
-void logger_begin() {
-  // call this once the values from config are available
-  if (!strcmp(cfgFoxUser, "") || !strcmp(cfgFoxPass, "") || !strcmp(cfgFoxDevId, "")) {
-    // powerfox is NOT configured => extend bootlog
-    char * tmpPtr;
-    bootLogSize = 5000;
-    tmpPtr = (char *) malloc(bootLogSize);  // allocate a new area on heap
-    strncpy(tmpPtr, bootLog, bootLogSize);  // copy content from old bootlog
-    free(bootLog);
-    bootLog = tmpPtr;                       // set bootLog pointer to new larger area
-  } 
-  // connect to NTP time server
-  timeClient.begin();
-}
-
-void logger_handle() {
-	timeClient.update();
-	if (getDstGermany(timeClient.getEpochTime())) timeClient.setTimeOffset(7200);
-}
 
 void log(uint8_t module, String msg, boolean newLine /* =true */) {
 	String output;
@@ -122,6 +96,7 @@ void log(uint8_t module, String msg, boolean newLine /* =true */) {
   } 
   mqtt_log(output.c_str(), msg.c_str());
 }
+
 
 void log(uint8_t module, const char *msg, boolean newLine /* =true */) {
 	char output[TIME_LEN + MOD_LEN + 1];
@@ -151,9 +126,11 @@ void log(uint8_t module, const char *msg, boolean newLine /* =true */) {
   mqtt_log(output, msg);
 }
 
+
 String log_time() {
 	return(timeClient.getFormattedTime());
 }
+
 
 uint32_t log_unixTime() {
   // The pfox chart needs the 'real' unixtime, not corrected for timezone or DST
@@ -165,11 +142,43 @@ uint32_t log_unixTime() {
 	return(time);
 }
 
+
 char* log_getBuffer() {
   return(bootLog);
 }
 
+
 void log_freeBuffer() {
   // set string-end character to first position to indicate an empty string
   bootLog[0] = '\0';
+}
+
+
+void logger_allocate() {
+  // allocate a small amount at the beginning, for logging during loadconfig()
+  bootLogSize = 200;
+  bootLog = (char *) malloc(bootLogSize);
+  bootLog[0] = '\0';
+}
+
+
+void logger_setup() {
+  // call this once the values from config are available
+  if (!strcmp(cfgFoxUser, "") || !strcmp(cfgFoxPass, "") || !strcmp(cfgFoxDevId, "")) {
+    // powerfox is NOT configured => extend bootlog
+    char * tmpPtr;
+    bootLogSize = 5000;
+    tmpPtr = (char *) malloc(bootLogSize);  // allocate a new area on heap
+    strncpy(tmpPtr, bootLog, bootLogSize);  // copy content from old bootlog
+    free(bootLog);
+    bootLog = tmpPtr;                       // set bootLog pointer to new larger area
+  } 
+  // connect to NTP time server
+  timeClient.begin();
+}
+
+
+void logger_loop() {
+	timeClient.update();
+	if (getDstGermany(timeClient.getEpochTime())) timeClient.setTimeOffset(7200);
 }

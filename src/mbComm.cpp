@@ -10,36 +10,36 @@
 #include "phaseCtrl.h"
 #include <SoftwareSerial.h>
 
+#define RINGBUF_SIZE 20
+
 const uint8_t m = 1;
 
-// receivePin, transmitPin, inverse_logic, bufSize, isrBufSize
-SoftwareSerial S(PIN_RO, PIN_DI);
-
-ModbusRTU mb;
-
-uint16_t  content[WB_CNT][55];
-
-uint32_t  modbusLastTime = 0;
-uint32_t  modbusLastMsgSentTime = 0;
-uint8_t   modbusResultCode[WB_CNT];
-uint8_t   modbusFailureCnt[WB_CNT];
-uint8_t   msgCnt = 0;
-uint8_t   id = 0;
-uint8_t   msgCnt0_lastId = 255;
 
 typedef struct rb_struct {
-	uint8_t   id;				// box id (0..WB_CNT)
-	uint16_t reg;				// register
-	uint16_t val;				// value
-	uint16_t * buf;			// write: null  read: buffer where to write the response
+	uint8_t   id;       // box id (0..WB_CNT)
+	uint16_t reg;       // register
+	uint16_t val;       // value
+	uint16_t * buf;     // write: null  read: buffer where to write the response
 } rb_t;
 
-#define RINGBUF_SIZE 20
-rb_t 		rb[RINGBUF_SIZE];			// ring buffer
-uint8_t rbIn  = 0;				  	// last element, which was written to ring buffer
-uint8_t rbOut = 0;						// last element, which was read from ring buffer
 
-boolean mb_available() {
+uint16_t         content[WB_CNT][55];
+uint32_t         modbusLastTime = 0;
+uint8_t          modbusResultCode[WB_CNT];
+
+static SoftwareSerial S;
+static ModbusRTU mb;
+static uint32_t  modbusLastMsgSentTime = 0;
+static uint8_t   modbusFailureCnt[WB_CNT];
+static uint8_t   msgCnt = 0;
+static uint8_t   id = 0;
+static uint8_t   msgCnt0_lastId = 255;
+static rb_t      rb[RINGBUF_SIZE];    // ring buffer
+static uint8_t   rbIn  = 0;           // last element, which was written to ring buffer
+static uint8_t   rbOut = 0;           // last element, which was read from ring buffer
+
+
+static boolean mb_available() {
 	// don't allow new msg, when communication is still active (ca.30ms) or minimum delay time not exceeded
 	if (mb.slave() || millis() - modbusLastMsgSentTime < cfgMbDelay) {
 		return(false);
@@ -50,16 +50,16 @@ boolean mb_available() {
 
 
 void mb_getAscii(uint8_t id, uint8_t from, uint8_t len, char *result) {
-  // translate the uint16 values into a String
-  for (int i = from; i < (from + len) ; i++) {
-    result[(i-from)*2]   = (char) (content[id][i] & 0x00FF);
-    result[(i-from)*2+1] = (char) (content[id][i] >> 8);
-  }
+	// translate the uint16 values into a String
+	for (int i = from; i < (from + len) ; i++) {
+		result[(i-from)*2]   = (char) (content[id][i] & 0x00FF);
+		result[(i-from)*2+1] = (char) (content[id][i] >> 8);
+	}
 	result[len*2]='\0';
 }
 
 
-void timeout(uint8_t id) {
+static void timeout(uint8_t id) {
 	if (cfgStandby == 4) {
 		// standby disabled => timeout indicates a failure => reset all
 		for (int i =  1; i <= 16; i++) { content[id][i] = 0;	}
@@ -73,8 +73,8 @@ void timeout(uint8_t id) {
 }
 
 
-bool cbWrite(Modbus::ResultCode event, uint16_t transactionId, void* data) {
-  int id = mb.slave()-1;
+static bool cbWrite(Modbus::ResultCode event, uint16_t transactionId, void* data) {
+	int id = mb.slave()-1;
 	modbusResultCode[id] = event;
 	if (event) {
 		LOG(m, "Comm-Failure BusID %d", mb.slave());
@@ -92,20 +92,25 @@ bool cbWrite(Modbus::ResultCode event, uint16_t transactionId, void* data) {
 		modbusFailureCnt[id] = 0;
 	}
 	
-  //log(m, "ResultCode: 0x" + String(event, HEX) + ", BusID: "+ mb.slave());
+	//log(m, "ResultCode: 0x" + String(event, HEX) + ", BusID: "+ mb.slave());
 	return(true);
 }
 
 
 void mb_setup() {
 	// setup SoftwareSerial and Modbus Master
-  S.begin(19200, SWSERIAL_8E1);       // Wallbox Energy Control uses 19.200 bit/sec, 8 data bit, 1 parity bit (even), 1 stop bit
-  mb.begin(&S, PIN_DE_RE);
-  mb.master();
+	LOG(m, "HwVersion: %d", cfgHwVersion);
+	if (cfgHwVersion == 10) {
+		S.begin(19200, SWSERIAL_8E1, PIN_DI, PIN_RO); // inverted
+	} else {
+		S.begin(19200, SWSERIAL_8E1, PIN_RO, PIN_DI); // Wallbox Energy Control uses 19.200 bit/sec, 8 data bit, 1 parity bit (even), 1 stop bit
+	}
+	mb.begin(&S, PIN_DE_RE);
+	mb.master();
 }
 
 
-void mb_handle() {
+void mb_loop() {
 	// When pointers of the ring buffer are not equal, then there is something to send
 	if (rbOut != rbIn) {
 		if (mb_available()) {			// check, if bus available
@@ -120,7 +125,7 @@ void mb_handle() {
 	}
 
 	if (modbusLastTime == 0 || millis() - modbusLastTime > (cfgMbCycleTime*1000)) {
-      if (mb_available()) {
+			if (mb_available()) {
 				//Serial.print(millis());Serial.print(": Sending to BusID: ");Serial.print(id+1);Serial.print(" with msgCnt = ");Serial.println(msgCnt);
 				if (msgCnt0_lastId != 255) {
 					// msgCnt=0 was recently sent => content is updated => publish to MQTT
@@ -149,17 +154,17 @@ void mb_handle() {
 					msgCnt++;
 				}
 				if (msgCnt > 8 || 
-				   (msgCnt > 7 && modbusLastTime != 0)) {						// write the REG_WD_TIME_OUT and REG_STANDBY_CTRL only on the very first loop
+					 (msgCnt > 7 && modbusLastTime != 0)) {						// write the REG_WD_TIME_OUT and REG_STANDBY_CTRL only on the very first loop
 					msgCnt = 0;
 					//Serial.print("Time:");Serial.println(millis()-modbusLastTime);
 					modbusLastTime = millis();
 					// 1st trial implementation of a simple loadManager
 					lm_updateWbLimits();
 				}
-      }
-    }
-    mb.task();
-    yield();
+			}
+		}
+		mb.task();
+		yield();
 }
 
 
