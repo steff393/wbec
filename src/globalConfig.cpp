@@ -8,8 +8,8 @@
 
 const uint8_t m = 5;
 
-char cfgWbecVersion[]     = "v0.4.1";           // wbec version
-char cfgBuildDate[]       = "2021-10-13";       // wbec build date
+char cfgWbecVersion[]     = "v0.4.2";           // wbec version
+char cfgBuildDate[]       = "2021-11-01";       // wbec build date
 
 char     cfgApSsid[32];               // SSID of the initial Access Point
 char     cfgApPass[63];               // Password of the initial Access Point
@@ -32,6 +32,7 @@ uint8_t  cfgPvLimStop;                // PV charging: Target current to stop cha
 uint8_t  cfgPvPhFactor;               // PV charging: Power/Current factor, e.g. 69: 1A equals 690W at 3phases, 23: 1A equals 230W at 1phase
 uint16_t cfgPvOffset;                 // PV charging: Offset for the available power calculation (in W); can be used to assure that no/less current is consumed from net
 uint8_t  cfgHwVersion;                // Selection of the used HW
+uint8_t  cfgWifiSleepMode;            // Set sleep type for power saving, recomendation is 255 (=no influence) or 0 (=WIFI_NONE_SLEEP)
 
 static bool createConfig() {
 	StaticJsonDocument<1024> doc;
@@ -122,6 +123,7 @@ void loadConfig() {
 	cfgPvPhFactor             = doc["cfgPvPhFactor"]        | 69; 
 	cfgPvOffset               = doc["cfgPvOffset"]          | 0UL;
 	cfgHwVersion              = doc["cfgHwVersion"]         | 15;
+	cfgWifiSleepMode          = doc["cfgWifiSleepMode"]     | 255;
 	
 	LOG(m, "cfgWbecVersion: %s", cfgWbecVersion);
 	LOG(m, "cfgBuildDate: %s"  , cfgBuildDate);

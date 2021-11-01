@@ -44,6 +44,7 @@ extern uint8_t  cfgPvLimStop;                // PV charging: Target current to s
 extern uint8_t  cfgPvPhFactor;               // PV charging: Power/Current factor, e.g. 69: 1A equals 690W at 3phases, 23: 1A equals 230W at 1phase
 extern uint16_t cfgPvOffset;                 // PV charging: Offset for the available power calculation (in W); can be used to assure that no/less current is consumed from net
 extern uint8_t  cfgHwVersion;                // Selection of the used HW
+extern uint8_t  cfgWifiSleepMode;            // Set sleep type for power saving, recomendation is 255 (=no influence) or 0 (=WIFI_NONE_SLEEP)
 
 extern void loadConfig();
 

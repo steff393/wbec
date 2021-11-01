@@ -40,6 +40,11 @@ void setup() {
   char pass[63]; strcpy(pass, cfgApPass);
   wifiManager.autoConnect(ssid, pass);
 
+  // still experimental (see #12):
+  if (cfgWifiSleepMode >= WIFI_NONE_SLEEP && cfgWifiSleepMode <= WIFI_MODEM_SLEEP) {
+    WiFi.setSleepMode((WiFiSleepType_t)cfgWifiSleepMode);
+  }
+
   logger_setup();
 
   // setup the Webserver
