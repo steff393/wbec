@@ -13,10 +13,13 @@ WiFiClient espClient;
 PubSubClient client(espClient);
 uint32_t 	lastMsg = 0;
 uint32_t 	lastReconnect = 0;
+uint8_t   maxcurrent[WB_CNT];
+boolean   callbackActive = false;
 
 
 void callback(char* topic, byte* payload, uint8_t length)
 {
+	callbackActive = true;
 	// handle received message
 	char buffer[length+1];	// +1 for string termination
 	for (uint8_t i = 0; i < length; i++) {
@@ -25,7 +28,6 @@ void callback(char* topic, byte* payload, uint8_t length)
 	buffer[length] = '\0';			// add string termination
 	LOGN(m, "Received: %s, Payload: %s", topic, buffer)
 
-	//if (topic.startsWith(F("openWB/lp/")) && topic.endsWith(F("/AConfigured"))) {
 	if (strstr_P(topic, PSTR("openWB/lp/")) && strstr_P(topic, PSTR("/AConfigured"))) {
 		uint16_t val = atoi(buffer);
 		uint8_t lp  = topic[10] - '0'; 	// loadpoint nr.
@@ -35,7 +37,7 @@ void callback(char* topic, byte* payload, uint8_t length)
 			if (cfgMqttLp[i] == lp) {break;}
 		}
 		if (cfgMqttLp[i] == lp) {
-			// openWB has 1A resolution, wbec has 0.1A resulotion
+			// openWB has 1A resolution, wbec has 0.1A resolution
 			val = val * 10;
 			// set current
 			if (val == 0 || (val >= CURR_ABS_MIN && val <= CURR_ABS_MAX)) {
@@ -46,6 +48,48 @@ void callback(char* topic, byte* payload, uint8_t length)
 			LOG(0, ", no box assigned", "");
 		}
 	}
+	
+	if (strstr_P(topic, PSTR("wbec/lp/"))   && strstr_P(topic, PSTR("/maxcurrent"))) {
+		float val = atof(buffer);
+		uint8_t lp  = topic[8] - '0'; 	// loadpoint nr.
+		uint8_t i;
+		// search, which index fits to loadpoint, first element will be selected
+		for (i = 0; i < cfgCntWb; i++) {
+			if (cfgMqttLp[i] == lp) {break;}
+		}
+		if (cfgMqttLp[i] == lp) {
+			// EVCC has 1A resolution, wbec has 0.1A resolution
+			val = val * 10;
+			// set current
+			if (val == 0 || (val >= CURR_ABS_MIN && val <= CURR_ABS_MAX)) {
+				LOG(0, ", Write to box: %d Value: %d", i, (uint16) val)
+				mb_writeReg(i, REG_CURR_LIMIT, val);
+			}
+		} else {
+			LOG(0, ", no box assigned", "");
+		}
+	}
+
+	if (strstr_P(topic, PSTR("wbec/lp/"))   && strstr_P(topic, PSTR("/enable"))) {
+		uint8_t lp  = topic[8] - '0'; 	// loadpoint nr.
+		uint8_t i;
+		// search, which index fits to loadpoint, first element will be selected
+		for (i = 0; i < cfgCntWb; i++) {
+			if (cfgMqttLp[i] == lp) {break;}
+		}
+		if (cfgMqttLp[i] == lp) {
+			if (strstr_P(buffer, PSTR("true"))) {
+				LOG(0, ", Enable box: %d", i)
+				mb_writeReg(i, REG_CURR_LIMIT, maxcurrent[i]);
+			} else {
+				LOG(0, ", Disable box: %d", i)
+				mb_writeReg(i, REG_CURR_LIMIT, 0);
+			}
+		} else {
+			LOG(0, ", no box assigned", "");
+		}
+	}
+	callbackActive = false;
 }
 
 
@@ -53,6 +97,9 @@ void mqtt_begin() {
 	if (strcmp(cfgMqttIp, "") != 0) {
   	client.setServer(cfgMqttIp, 1883);
 		client.setCallback(callback);
+	}
+	for (uint8_t i = 0; i < cfgCntWb; i++) {
+		maxcurrent[i] = CURR_ABS_MIN;
 	}
 }
 
@@ -77,6 +124,10 @@ void reconnect() {
 			char topic[40];
 			if (cfgMqttLp[i] != 0) {
 				snprintf_P(topic, sizeof(topic), PSTR("openWB/lp/%d/AConfigured"), cfgMqttLp[i]);
+				client.subscribe(topic);
+				snprintf_P(topic, sizeof(topic), PSTR("wbec/lp/%d/enable"), cfgMqttLp[i]);
+				client.subscribe(topic);
+				snprintf_P(topic, sizeof(topic), PSTR("wbec/lp/%d/maxcurrent"), cfgMqttLp[i]);
 				client.subscribe(topic);
 			}
 		}
@@ -108,21 +159,24 @@ void mqtt_publish(uint8_t i) {
 	
 	uint8_t ps = 0;
 	uint8_t cs = 0;
+	char status;
 
 	switch(content[i][1]) {
-		case 2:  ps = 0; cs = 0; break;
-		case 3:  ps = 0; cs = 0; break;
-		case 4:  ps = 1; cs = 0; break;
-		case 5:  ps = 1; cs = 0; break;
-		case 6:  ps = 1; cs = 0; break;
-		case 7:  ps = 1; cs = 1; break;
-		default: ps = 0; cs = 0; break; 
+		case 2:  ps = 0; cs = 0; status = 'A'; break;
+		case 3:  ps = 0; cs = 0; status = 'A'; break;
+		case 4:  ps = 1; cs = 0; status = 'B'; break;
+		case 5:  ps = 1; cs = 0; status = 'B'; break;
+		case 6:  ps = 1; cs = 0; status = 'C'; break;
+		case 7:  ps = 1; cs = 1; status = 'C'; break;
+		default: ps = 0; cs = 0; status = 'F'; break; 
 	}
 
 	// publish the contents of box i
 	char header[20];
 	char topic[40];
 	char value[15];
+	
+	// topics for openWB
 	snprintf_P(header, sizeof(header), PSTR("openWB/set/lp/%d"), cfgMqttLp[i]);
 	boolean retain = true;
 	
@@ -153,12 +207,42 @@ void mqtt_publish(uint8_t i) {
 		snprintf_P(value, sizeof(value), PSTR("%.1f"), (float)content[i][ph+1]/10.0);	// L1 = 2, L2 = 3, L3 = 4
 		client.publish(topic, value, retain);
 	}
+
 	LOG(m, "Publish to %s", header)
+
+	// topics for EVCC
+	snprintf_P(header, sizeof(header), PSTR("wbec/lp/%d"), cfgMqttLp[i]);
+
+	snprintf_P(topic, sizeof(topic), PSTR("%s/status"), header);
+	snprintf_P(value, sizeof(value), PSTR("%c"), status);
+	client.publish(topic, value, retain);
+
+	snprintf_P(topic, sizeof(topic), PSTR("%s/enabled"), header);
+	if (content[i][53] > 0) {
+		client.publish(topic, "true", retain);
+		maxcurrent[i] = content[i][53];       // memorize the current limit if not 0
+	} else {
+		client.publish(topic, "false", retain);
+	}
+
+	snprintf_P(topic, sizeof(topic), PSTR("%s/power"), header);
+	snprintf_P(value, sizeof(value), PSTR("%d"), content[i][10]);
+	client.publish(topic, value, retain);
+
+	snprintf_P(topic, sizeof(topic), PSTR("%s/energy"), header);
+	snprintf_P(value, sizeof(value), PSTR("%.3f"), (float)((uint32_t) content[i][13] << 16 | (uint32_t)content[i][14]) / 1000.0);
+	client.publish(topic, value, retain);
+	
+	for (uint8_t ph = 1; ph <= 3; ph++) {
+		snprintf_P(topic, sizeof(topic), PSTR("%s/currL%d"), header, ph);
+		snprintf_P(value, sizeof(value), PSTR("%.1f"), (float)content[i][ph+1]/10.0);	// L1 = 2, L2 = 3, L3 = 4
+		client.publish(topic, value, retain);
+	}
 }
 
 void mqtt_log(const char *output, const char *msg) {
-	if (strcmp(cfgMqttIp, "") == 0) {
-		return;	// do nothing, when Mqtt is not configured
+	if (strcmp(cfgMqttIp, "") == 0 || callbackActive) {
+		return;	// do nothing, when Mqtt is not configured OR when request comes from mqtt callback (#13)
 	}
 
 	boolean retain = true;
