@@ -11,7 +11,7 @@ Ziel des Projekts ist es, eine WLAN-Schnittstelle zu entwickeln, die gleichzeiti
 
 ## Funktionen
 - Anbindung an openWB, EVCC, Solaranzeige (per tlw. Emulation der go-eCharger API)
-- MQTT-Kommunikation mit openWB
+- MQTT-Kommunikation mit openWB und EVCC (ideal für mehrere Ladestationen)
 - Steuerbar per Android App [Wallbox Steuerung](https://android.chk.digital/ecar-charger-control/) 
 - PV-Überschussladen, Zielladen, etc. mit den o.g. Steuerungen
 - RFID-Kartenleser zur Freischaltung der Wallbox mit gültiger Karte/Chip (spezielle HW nötig, s. Wiki)  
@@ -43,7 +43,7 @@ Goal of this project is to establish an Wifi interface, which also acts as Modbu
 
 ## Features
 - Works with openWB, EVCC, Solaranzeige (by emulation of parts of the go-eCharger API)
-- Support of MQTT communication to openWB
+- Support of MQTT communication to openWB and EVCC (ideal for multiple wallboxes)
 - Support of Android App [Wallbox Steuerung](https://android.chk.digital/ecar-charger-control/)  
 - RFID card reader for unlocking the wallbox only with valid card/chip (needs special HW, s. Wiki)  
 - Prepared for supporting up to all 16 connected boxes (up to 8 openWB load points)
@@ -60,7 +60,7 @@ In case of any questions or in case you need support, feel free to send a mail (
 Please also take a look to the [Wiki](https://github.com/steff393/wbec/wiki).
 
 ## Switch configuration of wallbox
-S1 > 5 (16A max)  
+S1 >= 5 (16A max)  
 S2 = 0000  
 S3 = 0 (6A min)  
 S4 = 0001 (slave address, Bus-ID)  
