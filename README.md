@@ -43,7 +43,7 @@ Goal of this project is to establish an Wifi interface, which also acts as Modbu
 
 ## Features
 - Works with openWB, EVCC, Solaranzeige (by emulation of parts of the go-eCharger API)
-- Support of MQTT communication to openWB and EVCC (ideal for multiple wallboxes)
+- Support of MQTT communication to openWB and EVCC (perfect for multiple wallboxes)
 - Support of Android App [Wallbox Steuerung](https://android.chk.digital/ecar-charger-control/)  
 - RFID card reader for unlocking the wallbox only with valid card/chip (needs special HW, s. Wiki)  
 - Prepared for supporting up to all 16 connected boxes (up to 8 openWB load points)
@@ -183,5 +183,3 @@ Special thanks also to the early testers and supporters: mli987, profex1337, Cla
 
 ## Support the project
 You like wbec? Please [star this project on GitHub](https://github.com/steff393/wbec/stargazers)!
-
-What? You don't like it but you *love* it?  When wbec helps you in using your wallbox more efficiently, you can also [![](https://img.shields.io/badge/send%20me%20a%20small%20gift-paypal-blue.svg?style=flat-square)](https://paypal.me/steff393)
