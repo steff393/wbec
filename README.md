@@ -19,14 +19,14 @@ Ziel des Projekts ist es, eine WLAN-Schnittstelle zu entwickeln, die gleichzeiti
 - Lesen/Schreiben der Modbus-Register über ein JSON-Web-Interface 
 - Standby-Funktion der Ladestation einstellbar
 - Einfacher Prototyp einer Webseite zur Steuerung
-- Einfacher Prototyp eines lokalen Lastmanagements
+- Einfacher Prototyp eines lokalen Lastmanagements (in Entwicklung)
 - Softwareupdate per WLAN (Over The Air), z.B. mit PlatformIO oder einfach per Browser (s. Wiki)
 - Access-Point-Modus zur initialen Einstellung des WLANs (SSID/Passwort, s. Wiki)
 - Weniger als 1W Strombedarf (trotz Ansteuerung von bis zu 16 Ladestationen)
 
 ## Kontakt
 Bei Fragen oder wenn ihr Unterstützung braucht gerne einfach eine Mail schicken (wbec393@gmail.com)    
-Bitte schaut auch ins [Wiki](https://github.com/steff393/wbec/wiki).  
+Bitte schaut auch ins [Wiki](https://github.com/steff393/wbec/wiki) und in meine anderen [Projekte](https://github.com/steff393/hgdo).  
 
 ## Bilder
 <p align="center"> 
