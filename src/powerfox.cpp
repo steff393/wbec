@@ -27,7 +27,7 @@ RTCVars rtc;                               // used to memorize a few global vari
 static uint32_t lastHandleCall       = 0;
 static int32_t  watt                 = 0;  // power from powerfox API (neg. = 'Einspeisung', pos. = 'Bezug')
 static int32_t  availPowerPrev       = 0;  // availPower from previous cycle
-static uint8_t  pvMode               = 0;
+static uint8_t  pvMode               = PV_OFF;
 
 HTTPClient                *http;
 BearSSL::WiFiClientSecure *httpsClient;
@@ -105,16 +105,21 @@ void pfoxAlgo() {
 
 
 void powerfox_setup() {
-	rtc.registerVar(&pvMode);
-	rtc.registerVar(&availPowerPrev);
-	rtc.loadFromRTC();             // we load the values from rtc memory back into the registered variables
+	// check config values
+	if (!strcmp(cfgFoxUser, "") || !strcmp(cfgFoxPass, "") || !strcmp(cfgFoxDevId, "") ||		// look for credentials (all need a value)
+			(cfgCntWb > 1)) {		// more wallboxes need too much heap, e.g. for web server
+		pvMode = PV_DISABLED;
+	} else {
+		rtc.registerVar(&pvMode);
+		rtc.registerVar(&availPowerPrev);
+		rtc.loadFromRTC();             // we load the values from rtc memory back into the registered variables
+	}
 }
 
 
 void powerfox_loop() {
-	if ((millis() - lastHandleCall < (uint16_t)cfgPvCycleTime * 1000)  || 								                        // avoid unnecessary frequent calls
-			!strcmp(cfgFoxUser, "") || !strcmp(cfgFoxPass, "") || !strcmp(cfgFoxDevId, "") ||		// look for credentials (all need a value)
-			(cfgCntWb > 1)) {		// more wallboxes need too much heap, e.g. for web server
+	if ((millis() - lastHandleCall < (uint16_t)cfgPvCycleTime * 1000)  ||      // avoid unnecessary frequent calls
+			(pvMode == PV_DISABLED)) {
 		return;
 	}
 	lastHandleCall = millis();
@@ -173,7 +178,7 @@ void powerfox_loop() {
   Serial.printf("DRAM free: %6d bytes\r\n", ESP.getFreeHeap());
 
 	// Call algo
-	if (pvMode != PV_OFF) {  // PowerFox Control active 
+	if (pvMode > PV_OFF) {  // PowerFox Control active 
 		pfoxAlgo();
 	} else {
 		availPowerPrev = 0;

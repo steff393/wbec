@@ -12,6 +12,14 @@
 <body>
     <center>
 		<h1>wbec</h1>
+		<!--
+		<div id='boxSelection'>
+			<button id='btn1' class="button">1</button>
+			<button id='btn2' class="button">2</button>
+			<button id='btn3' class="button">3</button>
+		</div>
+		<br>
+		-->
 		<div class="slidecontainer">
 			<input type="range" min="0" max="16" value="6" class="slider" id="slideCurr">
 			<br><br>
@@ -41,19 +49,19 @@
 					<td align="right"><span id='energyI'>-</span></td>
 					<td>kWh</td>
 				</tr>
-				<tr>
+				<tr id='trPFox1'>
 					<td>Bezug(+)/Einsp.(-)</td>
 					<td align="right"><span id='watt'>-</span></td>
 					<td>W</td>
 				</tr>
-				<tr>
+				<tr id='trPFox2'>
 					<td>PV-Laden</td>
 					<td align="center" colspan="2"><span id='pvMode'>-</span></td>
 				</tr>
 			</table>
 		</div>
-		<h4>PV Laden</h4>
 		<div id='pvLaden'>
+		<h4>PV Laden mit powerfox</h4>
 			<button id='btnAus'   class="button">Aus</button>
 			<button id='btnPv'    class="button">PV</button>
 			<button id='btnMinPv' class="button">Min+PV</button>

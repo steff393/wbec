@@ -17,16 +17,22 @@ static const uint8_t m = 10;
 
 static WebSocketsServer webSocket = WebSocketsServer(81);
 static uint32_t lastCall   = 0;
+static uint8_t  id         = 0;
 
 
 static void webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t length) {
 	if(type == WStype_TEXT) {
 		LOG(m, "Payload %s", (char *)payload)
-		if (!strncmp((char *)payload, "currLim", 7)) {
+		if (length >= 9 && !strncmp((char *)payload, "currLim=", 8)) {
 			char * pch;
 			pch = strtok((char *)payload, "=");
 			pch = strtok(NULL, "=");
-			lm_storeRequest(0, atoi(pch));
+			lm_storeRequest(id, atoi(pch));
+		} else if (length >= 4 && !strncmp((char *)payload, "id=", 3)) {
+			char * pch;
+			pch = strtok((char *)payload, "=");
+			pch = strtok(NULL, "=");
+			id = atoi(pch);
 		} else if (strstr_P((char *)payload, PSTR("PV_OFF"))) {
 			pf_setMode(PV_OFF);
 		} else if (strstr_P((char *)payload, PSTR("PV_ACTIVE"))) {
@@ -53,7 +59,7 @@ void webSocket_loop() {
 	lastCall = millis();
 
 	StaticJsonDocument<JSON_LEN> data;
-	uint8_t id = 0;
+	data[F("id")]       = id;
 	data[F("chgStat")]  = content[id][1];
 	data[F("power")]    = content[id][10];
 	data[F("energyI")]  = (float)((uint32_t) content[id][13] << 16 | (uint32_t)content[id][14]) / 1000.0;

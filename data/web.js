@@ -7,6 +7,7 @@ function init()
 {
 	Socket = new WebSocket('ws://' + window.location.hostname + ':81/');
 	Socket.onmessage = function(event) { processReceivedCommand(event); };
+	showPFoxElements("hidden");
 }
 
 // Update the current slider value (each time you drag the slider handle)
@@ -46,11 +47,20 @@ function processReceivedCommand(evt)
 		document.getElementById('timeNow').innerHTML = obj.timeNow;
 		document.getElementById("slideCurr").value = obj.currLim;
 		switch (obj.pvMode) {
-			case 0:  document.getElementById('pvMode').innerHTML = 'Aus'; break;
-			case 1:  document.getElementById('pvMode').innerHTML = 'PV'; break;
-			case 2:  document.getElementById('pvMode').innerHTML = 'Min+PV'; break;
-			default: document.getElementById('pvMode').innerHTML = '-';
+			case 1:  document.getElementById('pvMode').innerHTML = 'Aus';    showPFoxElements("visible"); break;
+			case 2:  document.getElementById('pvMode').innerHTML = 'PV';     showPFoxElements("visible"); break;
+			case 3:  document.getElementById('pvMode').innerHTML = 'Min+PV'; showPFoxElements("visible");break;
+			default: {
+				document.getElementById('pvMode').innerHTML = '-'; showPFoxElements("hidden");
+			}
 		}
+}
+
+
+function showPFoxElements(state) {
+	document.getElementById('trPFox1').style.visibility = state;
+	document.getElementById('trPFox2').style.visibility = state;
+	document.getElementById('pvLaden').style.visibility = state;
 }
  
  
@@ -66,6 +76,19 @@ document.getElementById('btnMinPv').addEventListener('click', function() {
 	sendText('PV_MIN_PV');
 	document.getElementById("pvStat").innerHTML = 'Min+PV';
 });
+
+
+/*
+document.getElementById('btn1').addEventListener('click', function() {
+	sendText('id=0');
+});
+document.getElementById('btn2').addEventListener('click', function() {
+	sendText('id=1');
+});
+document.getElementById('btn3').addEventListener('click', function() {
+	sendText('id=2');
+});
+*/
 
 
 function sendText(data){

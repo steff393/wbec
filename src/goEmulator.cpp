@@ -107,7 +107,7 @@ String goE_getStatus(uint8_t id, boolean fromApp) {
 	if (fromApp) {
 		data[F("oem")]=F("wbec");
 		data[F("typ")]=F("Heidelberg Energy Control");
-		data[F("box")]=F("0");
+		data[F("box")]=String(id);
 	}
 	data["version"] = F("B");
 	switch(content[id][1]) {

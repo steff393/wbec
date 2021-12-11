@@ -9,6 +9,6 @@ extern int32_t pf_getWatt();
 extern uint8_t pf_getMode();
 extern void    pf_setMode(uint8_t val);
 
-enum pvMode_enum {PV_OFF, PV_ACTIVE, PV_MIN_PV};
+enum pvMode_enum {PV_DISABLED, PV_OFF, PV_ACTIVE, PV_MIN_PV};
 
 #endif /* POWERFOX_H */
