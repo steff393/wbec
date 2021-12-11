@@ -4,6 +4,7 @@
 #include <ArduinoJson.h>
 #include <globalConfig.h>
 #include <logger.h>
+#include <loadManager.h>
 #include <mbComm.h>
 #include <powerfox.h>
 #include <webSocket.h>
@@ -25,7 +26,7 @@ static void webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t le
 			char * pch;
 			pch = strtok((char *)payload, "=");
 			pch = strtok(NULL, "=");
-			mb_writeReg(0, REG_CURR_LIMIT, atoi(pch));
+			lm_storeRequest(0, atoi(pch));
 		} else if (strstr_P((char *)payload, PSTR("PV_OFF"))) {
 			pf_setMode(PV_OFF);
 		} else if (strstr_P((char *)payload, PSTR("PV_ACTIVE"))) {

@@ -5,6 +5,7 @@
 #include <globalConfig.h>
 #include <goEmulator.h>
 #include <LittleFS.h>
+#include <loadManager.h>
 #include <logger.h>
 #include <mbComm.h>
 #include <mqtt.h>
@@ -64,6 +65,7 @@ void setup() {
   mqtt_begin();
   rfid_setup();
   powerfox_setup();
+  lm_setup();
   Serial.print(F("Boot time: ")); Serial.println(millis());
   Serial.print(F("Free heap: ")); Serial.println(ESP.getFreeHeap());
 }
@@ -81,5 +83,6 @@ void loop() {
     rfid_loop();
     powerfox_loop(); 
     //pc_handle();
+    lm_loop();
   }
 }

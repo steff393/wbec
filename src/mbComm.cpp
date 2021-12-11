@@ -38,7 +38,6 @@ static rb_t      rb[RINGBUF_SIZE];    // ring buffer
 static uint8_t   rbIn  = 0;           // last element, which was written to ring buffer
 static uint8_t   rbOut = 0;           // last element, which was read from ring buffer
 
-
 static boolean mb_available() {
 	// don't allow new msg, when communication is still active (ca.30ms) or minimum delay time not exceeded
 	if (mb.slave() || millis() - modbusLastMsgSentTime < cfgMbDelay) {
@@ -90,6 +89,10 @@ static bool cbWrite(Modbus::ResultCode event, uint16_t transactionId, void* data
 	{
 		// no failure
 		modbusFailureCnt[id] = 0;
+		// tell load manager that the current register was successfully read
+		if (msgCnt == 6+1) {
+			lm_currentReadSuccess(id);
+		}
 	}
 	
 	//log(m, "ResultCode: 0x" + String(event, HEX) + ", BusID: "+ mb.slave());
@@ -158,8 +161,6 @@ void mb_loop() {
 					msgCnt = 0;
 					//Serial.print("Time:");Serial.println(millis()-modbusLastTime);
 					modbusLastTime = millis();
-					// 1st trial implementation of a simple loadManager
-					lm_updateWbLimits();
 				}
 			}
 		}

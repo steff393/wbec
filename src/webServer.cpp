@@ -129,7 +129,7 @@ void webServer_setup() {
     if (request->hasParam(F("currLim"))) {
       uint16_t val = request->getParam(F("currLim"))->value().toInt();
       if (val == 0 || (val >= CURR_ABS_MIN && val <= CURR_ABS_MAX)) {
-        mb_writeReg(id, REG_CURR_LIMIT, val);
+        lm_storeRequest(id, val);
       }
     }
     request->send(LittleFS, F("/index.html"), String(), false, processor);
@@ -202,7 +202,7 @@ void webServer_setup() {
     if (request->hasParam(F("currLim"))) {
       uint16_t val = request->getParam(F("currLim"))->value().toInt();
       if (val == 0 || (val >= CURR_ABS_MIN && val <= CURR_ABS_MAX)) {
-        mb_writeReg(id, REG_CURR_LIMIT, val);
+        lm_storeRequest(id, val);
       }
     }
     if (request->hasParam(F("currFs"))) {
@@ -240,7 +240,8 @@ void webServer_setup() {
       data[F("box")][i][F("remLock")]  = content[i][51];
       data[F("box")][i][F("currLim")]  = content[i][53];
       data[F("box")][i][F("currFs")]   = content[i][54];
-      data[F("box")][i][F("load")]     = lm_getWbLimit(i);
+      data[F("box")][i][F("lmReq")]    = lm_getLastRequest(i);
+      data[F("box")][i][F("lmLim")]    = lm_getWbLimit(i);
       data[F("box")][i][F("resCode")]  = String(modbusResultCode[i], HEX);
     }
     data[F("modbus")][F("state")][F("lastTm")]  = modbusLastTime;

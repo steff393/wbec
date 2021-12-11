@@ -2,11 +2,12 @@
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
-#include "globalConfig.h"
+#include <globalConfig.h>
 #include <LittleFS.h>
-#include "logger.h"
-#include "mbComm.h"
-#include "powerfox.h"
+#include <logger.h>
+#include <loadManager.h>
+#include <mbComm.h>
+#include <powerfox.h>
 #include <rtcvars.h>
 #include <umm_malloc/umm_heap_select.h>
 
@@ -98,7 +99,7 @@ void pfoxAlgo() {
 	}
 
 	if ((targetCurr != actualCurr)) {														// update the value not too often 
-		mb_writeReg(BOXID, REG_CURR_LIMIT, targetCurr);
+		lm_storeRequest(BOXID, targetCurr);
 	}
 }
 

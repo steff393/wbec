@@ -2,9 +2,10 @@
 
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
-#include "globalConfig.h"
-#include "logger.h"
-#include "mbComm.h"
+#include <globalConfig.h>
+#include <logger.h>
+#include <loadManager.h>
+#include <mbComm.h>
 #include <PubSubClient.h>
 
 const uint8_t m = 2;
@@ -42,7 +43,7 @@ void callback(char* topic, byte* payload, uint8_t length)
 			// set current
 			if (val == 0 || (val >= CURR_ABS_MIN && val <= CURR_ABS_MAX)) {
 				LOG(0, ", Write to box: %d Value: %d", i, val)
-				mb_writeReg(i, REG_CURR_LIMIT, val);
+				lm_storeRequest(i, val);
 			}
 		} else {
 			LOG(0, ", no box assigned", "");
@@ -63,7 +64,7 @@ void callback(char* topic, byte* payload, uint8_t length)
 			// set current
 			if (val == 0 || (val >= CURR_ABS_MIN && val <= CURR_ABS_MAX)) {
 				LOG(0, ", Write to box: %d Value: %d", i, (uint16) val)
-				mb_writeReg(i, REG_CURR_LIMIT, val);
+				lm_storeRequest(i, val);
 			}
 		} else {
 			LOG(0, ", no box assigned", "");
@@ -80,10 +81,10 @@ void callback(char* topic, byte* payload, uint8_t length)
 		if (cfgMqttLp[i] == lp) {
 			if (strstr_P(buffer, PSTR("true"))) {
 				LOG(0, ", Enable box: %d", i)
-				mb_writeReg(i, REG_CURR_LIMIT, maxcurrent[i]);
+				lm_storeRequest(i, maxcurrent[i]);
 			} else {
 				LOG(0, ", Disable box: %d", i)
-				mb_writeReg(i, REG_CURR_LIMIT, 0);
+				lm_storeRequest(i, 0);
 			}
 		} else {
 			LOG(0, ", no box assigned", "");

@@ -1,10 +1,11 @@
 // Copyright (c) 2021 steff393, MIT license
 
 #include <Arduino.h>
-#include "globalConfig.h"
+#include <globalConfig.h>
 #include <LittleFS.h>
-#include "logger.h"
-#include "mbComm.h"
+#include <logger.h>
+#include <loadManager.h>
+#include <mbComm.h>
 #include <MFRC522.h>
 #include <SPI.h>
 
@@ -91,7 +92,7 @@ void rfid_loop() {
     // vehicle unplugged or not plugged within RELEASE_TIME --> RFID chip no longer allowed
     rfid_released = false;
     rfid_lastReleased = 0;
-    mb_writeReg(id, REG_CURR_LIMIT, 0);
+    lm_storeRequest(id, 0);
   }
   rfid_chgStat_old = content[id][1];
 
@@ -117,7 +118,7 @@ void rfid_loop() {
       rfid_released = true;
       rfid_lastReleased = millis();
       // set current to max value
-      mb_writeReg(id, REG_CURR_LIMIT, content[id][15]);
+      lm_storeRequest(id, content[id][15]);
     } else {
       log(0, F("unknown"));
     }

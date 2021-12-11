@@ -3,8 +3,9 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
-#include "logger.h"
-#include "mbComm.h"
+#include <logger.h>
+#include <loadManager.h>
+#include <mbComm.h>
 
 const uint8_t m  = 6;
 const uint8_t id = 0;
@@ -115,7 +116,7 @@ void trans_NORMAL_1P() {
 	log(m, F("--> NORMAL_1P"));
 	pcState = NORMAL_1P;
 	if (currentBackup > 0) {
-		mb_writeReg(id, REG_CURR_LIMIT, currentBackup);
+		lm_storeRequest(id, currentBackup);
 	}
 }
 
@@ -124,7 +125,7 @@ void trans_NORMAL_3P() {
 	log(m, F("--> NORMAL_3P"));
 	pcState = NORMAL_3P;
 	if (currentBackup > 0) {
-		mb_writeReg(id, REG_CURR_LIMIT, currentBackup);
+		lm_storeRequest(id, currentBackup);
 	}
 }
 
@@ -158,13 +159,13 @@ void pc_handle() {
 			break;
 		case NORMAL_1P:
 		  if (getRequestedPhases() == 3) {
-				mb_writeReg(0, REG_CURR_LIMIT, 0);
+				lm_storeRequest(0, 0);
 				trans_WAIT_0AMP();
 			}
 			break;
 		case NORMAL_3P:
 			if (getRequestedPhases() == 1) {
-				mb_writeReg(0, REG_CURR_LIMIT, 0);
+				lm_storeRequest(0, 0);
 				trans_WAIT_0AMP();
 			}
 			break;

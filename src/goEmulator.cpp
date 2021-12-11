@@ -1,10 +1,11 @@
 // Copyright (c) 2021 steff393, MIT license
 
 #include <Arduino.h>
-#include "AsyncJson.h"
-#include "ArduinoJson.h"
-#include "logger.h"
-#include "mbComm.h"
+#include <AsyncJson.h>
+#include <ArduinoJson.h>
+#include <logger.h>
+#include <loadManager.h>
+#include <mbComm.h>
 
 #define CYCLE_TIME		   1000		// 1s
 
@@ -60,7 +61,7 @@ void goE_handle() {
 				// Defined energy for this load cycle was reached => stop loading
 				box[id].alw = 0;
 				box[id].dwo = 0;
-				mb_writeReg(id, REG_CURR_LIMIT, 0);
+				lm_storeRequest(id, 0);
 			}
 		}
 	}
@@ -76,12 +77,12 @@ void goE_setPayload(String payload, uint8_t id) {
 		if (val == 1) {
 			// charging allowed
 			box[id].alw = 1;
-			mb_writeReg(id, REG_CURR_LIMIT, box[id].amp);
+			lm_storeRequest(id, box[id].amp);
 		} 
 		if (val == 0) {
 			// charging  not allowed
 			box[id].alw = 0;
-			mb_writeReg(id, REG_CURR_LIMIT, 0);
+			lm_storeRequest(id, 0);
 		}
 	}
 	if (cmd == F("amp") || cmd == F("amx")) {
@@ -90,7 +91,7 @@ void goE_setPayload(String payload, uint8_t id) {
 		// set current
 		if (val >= CURR_ABS_MIN && val <= CURR_ABS_MAX) {	// values are between 6..32A according to API, 0 is not allowed
 			box[id].amp = val;
-			mb_writeReg(id, REG_CURR_LIMIT, box[id].amp);
+			lm_storeRequest(id, box[id].amp);
 		}
 	}
 	if (cmd == F("dwo")) {
