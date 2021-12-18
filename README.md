@@ -174,10 +174,10 @@ Third-party libraries included/adapted in wbec:
 - [MFRC522](https://github.com/miguelbalboa/MFRC522)
 - [RTCVars](https://github.com/highno/RTCVars)
 - [arduinoWebSockets](https://github.com/Links2004/arduinoWebSockets)
-- [OTA via http](https://gist.github.com/JMishou/60cb762047b735685e8a09cd2eb42a60)
 - [WiFiManager](https://github.com/tzapu/WiFiManager)
 - [Web Interface](https://RandomNerdTutorials.com)
 - [A Beginner's Guide to the ESP8266 - article](https://github.com/tttapa/ESP8266)
+- [AsyncElegantOTA](https://github.com/ayushsharma82/AsyncElegantOTA)
 
 Special thanks also to the early testers and supporters: mli987, profex1337, Clanchef and many more!
 
