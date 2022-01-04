@@ -16,6 +16,7 @@
 #include <mbComm.h>
 #include <phaseCtrl.h>
 #include <powerfox.h>
+#include <pvAlgo.h>
 #include <rfid.h>
 #include <SPIFFSEditor.h>
 #include <webServer.h>
@@ -169,11 +170,16 @@ void webServer_setup() {
 	});
 
   server.on("/json", HTTP_GET, [](AsyncWebServerRequest *request) {
-    DynamicJsonDocument data((cfgCntWb+2)/3  * 2048);  // always 2048 byte for 3 wallboxes
-    uint8_t id = 0;
+    uint8_t  id       = 0;
+    uint8_t  from     = 0;        // used in 'for loop'
+    uint8_t  to       = cfgCntWb; // used in 'for loop'
+    uint16_t jsonSize = (cfgCntWb+2)/3 * 2048;  // always 2048 byte for 3 wallboxes
     // modify values
     if (request->hasParam(F("id"))) {
-      id = request->getParam(F("id"))->value().toInt();
+      id       = request->getParam(F("id"))->value().toInt();
+      from     = id;      // if id is provided, then only
+      to       = id+1;    // those values are returned (-> save RAM)
+      jsonSize = 2048;    // for one wallbox 2048 are sufficient         
     }
 
     if (request->hasParam(F("wdTmOut"))) {
@@ -197,12 +203,22 @@ void webServer_setup() {
         mb_writeReg(id, REG_CURR_LIMIT_FS, val);
       }
     }
+    if (request->hasParam(F("pvMode"))) {
+      pvMode_t val = (pvMode_t) request->getParam(F("pvMode"))->value().toInt();
+      if (val <= PV_MIN_PV) {
+        pv_setMode(val);
+      }
+    }
+    if (request->hasParam(F("pvWatt"))) {
+      pv_setWatt(request->getParam(F("pvWatt"))->value().toInt());
+    }
 
+    DynamicJsonDocument data(jsonSize);    
     // provide the complete content
     data[F("wbec")][F("version")] = cfgWbecVersion;
     data[F("wbec")][F("bldDate")] = cfgBuildDate;
     data[F("wbec")][F("timeNow")] = log_time();
-    for (int i = 0; i < cfgCntWb; i++) {
+    for (int i = from; i < to; i++) {
       data[F("box")][i][F("busId")]    = i+1;
       data[F("box")][i][F("version")]  = String(content[i][0], HEX);
       data[F("box")][i][F("chgStat")]  = content[i][1];
@@ -232,16 +248,16 @@ void webServer_setup() {
     }
     data[F("modbus")][F("state")][F("lastTm")]  = modbusLastTime;
     data[F("modbus")][F("state")][F("millis")]  = millis();
-    data[F("rfid")][F("enabled")] = rfid_getEnabled();
-    data[F("rfid")][F("release")] = rfid_getReleased();
-    data[F("rfid")][F("lastId")]  = rfid_getLastID();
-    data[F("pfox")][F("mode")]    = pf_getMode();
-    data[F("pfox")][F("watt")]    = pf_getWatt();
-    data[F("wifi")][F("mac")] = WiFi.macAddress();
-    int qrssi = WiFi.RSSI();
-    data[F("wifi")][F("rssi")] = qrssi;
-    data[F("wifi")][F("signal")] = getSignalQuality(qrssi);
-    data[F("wifi")][F("channel")] = WiFi.channel();
+    data[F("rfid")][F("enabled")]      = rfid_getEnabled();
+    data[F("rfid")][F("release")]      = rfid_getReleased();
+    data[F("rfid")][F("lastId")]       = rfid_getLastID();
+    data[F("pv")][F("mode")]           = pv_getMode();
+    data[F("pv")][F("watt")]           = pv_getWatt();
+    data[F("wifi")][F("mac")]          = WiFi.macAddress();
+    int qrssi = WiFi.RSSI();     
+    data[F("wifi")][F("rssi")]         = qrssi;
+    data[F("wifi")][F("signal")]       = getSignalQuality(qrssi);
+    data[F("wifi")][F("channel")]      = WiFi.channel();
     String response;
     serializeJson(data, response);
     log(m, response);
@@ -292,12 +308,14 @@ void webServer_setup() {
     StaticJsonDocument<PFOX_JSON_LEN> data;
     uint8_t id = 0;
     // modify values
-
-    if (request->hasParam(F("mode"))) {
-      uint16_t val = request->getParam(F("mode"))->value().toInt();
-      if (val <= 1) {
-        pf_setMode(val);
+    if (request->hasParam(F("pvMode"))) {
+      pvMode_t val = (pvMode_t) request->getParam(F("pvMode"))->value().toInt();
+      if (val <= PV_MIN_PV) {
+        pv_setMode(val);
       }
+    }
+    if (request->hasParam(F("pvWatt"))) {
+      pv_setWatt(request->getParam(F("pvWatt"))->value().toInt());
     }
 
     data[F("box")][F("chgStat")]  = content[id][1];
@@ -305,8 +323,8 @@ void webServer_setup() {
     data[F("box")][F("currLim")]  = content[id][53];
     data[F("box")][F("resCode")]  = String(modbusResultCode[id], HEX);
     data[F("modbus")][F("millis")]  = millis();
-    data[F("pfox")][F("mode")]    = pf_getMode();
-    data[F("pfox")][F("watt")]    = pf_getWatt();
+    data[F("pv")][F("mode")]    = pv_getMode();
+    data[F("pv")][F("watt")]    = pv_getWatt();
     char response[PFOX_JSON_LEN];
     serializeJson(data, response, PFOX_JSON_LEN);
     request->send(200, F("application/json"), response);

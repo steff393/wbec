@@ -11,6 +11,7 @@
 #include <mqtt.h>
 #include <phaseCtrl.h>
 #include <powerfox.h>
+#include <pvAlgo.h>
 #include <rfid.h>
 #define WIFI_MANAGER_USE_ASYNC_WEB_SERVER
 #include <WiFiManager.h>
@@ -65,6 +66,7 @@ void setup() {
   mqtt_begin();
   rfid_setup();
   powerfox_setup();
+  pv_setup();
   lm_setup();
   Serial.print(F("Boot time: ")); Serial.println(millis());
   Serial.print(F("Free heap: ")); Serial.println(ESP.getFreeHeap());
@@ -82,6 +84,7 @@ void loop() {
     webSocket_loop();
     rfid_loop();
     powerfox_loop(); 
+    pv_loop();
     //pc_handle();
     lm_loop();
   }
