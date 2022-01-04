@@ -31,6 +31,7 @@ extern uint16_t cfgMbDelay;                  // delay time of the modbus before 
 extern uint16_t cfgMbTimeout;                // Reg. 257: Modbus timeout (in milliseconds)
 extern uint16_t cfgStandby;                  // Reg. 258: Standby Function Control: 0 = enable standby, 4 = disable standby
 extern char     cfgMqttIp[16];               // IP address of MQTT broker, "" to disable MQTT
+extern uint16_t cfgMqttPort;                 // Port of MQTT broker (optional)
 extern char     cfgMqttUser[32];             // MQTT: Username
 extern char     cfgMqttPass[32];             // MQTT: Password
 extern uint8_t  cfgMqttLp[WB_CNT];           // Array with assignments to openWB loadpoints, e.g. [4,2,0,1]: Box0 = LP4, Box1 = LP2, Box2 = no MQTT, Box3 = LP1
@@ -38,6 +39,7 @@ extern char     cfgNtpServer[30];            // NTP server
 extern char     cfgFoxUser[32];              // powerfox: Username
 extern char     cfgFoxPass[16];              // powerfox: Password
 extern char     cfgFoxDevId[16];             // powerfox: DeviceId
+extern uint8_t  cfgPvActive;                 // PV charging: Active (1) or inactive (0)
 extern uint8_t  cfgPvCycleTime;              // PV charging: cycle time (in seconds)
 extern uint8_t  cfgPvLimStart;               // PV charging: Target current needed for starting (in 0.1A), e.g. 61=6.1A
 extern uint8_t  cfgPvLimStop;                // PV charging: Target current to stop charging when below (in 0.1A)

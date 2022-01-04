@@ -8,8 +8,8 @@
 
 const uint8_t m = 5;
 
-char cfgWbecVersion[]     = "v0.4.3";           // wbec version
-char cfgBuildDate[]       = "2021-12-18";       // wbec build date
+char cfgWbecVersion[]     = "v0.4.3+";           // wbec version
+char cfgBuildDate[]       = "2022-01-04";       // wbec build date
 
 char     cfgApSsid[32];               // SSID of the initial Access Point
 char     cfgApPass[63];               // Password of the initial Access Point
@@ -19,6 +19,7 @@ uint16_t cfgMbDelay;                  // delay time of the modbus before sending
 uint16_t cfgMbTimeout;                // Reg. 257: Modbus timeout (in milliseconds)
 uint16_t cfgStandby;                  // Reg. 258: Standby Function Control: 0 = enable standby, 4 = disable standby
 char     cfgMqttIp[16];               // IP address of MQTT broker, "" to disable MQTT
+uint16_t cfgMqttPort;                 // Port of MQTT broker (optional)
 char     cfgMqttUser[32];             // MQTT: Username
 char     cfgMqttPass[32];             // MQTT: Password
 uint8_t  cfgMqttLp[WB_CNT];           // Array with assignments to openWB loadpoints, e.g. [4,2,0,1]: Box0 = LP4, Box1 = LP2, Box2 = no MQTT, Box3 = LP1
@@ -26,6 +27,7 @@ char     cfgNtpServer[30];            // NTP server
 char     cfgFoxUser[32];              // powerfox: Username
 char     cfgFoxPass[16];              // powerfox: Password
 char     cfgFoxDevId[16];             // powerfox: DeviceId
+uint8_t  cfgPvActive;                 // PV charging: Active (1) or inactive (0)
 uint8_t  cfgPvCycleTime;              // PV charging: cycle time (in seconds)
 uint8_t  cfgPvLimStart;               // PV charging: Target current needed for starting (in 0.1A), e.g. 61=6.1A
 uint8_t  cfgPvLimStop;                // PV charging: Target current to stop charging when below (in 0.1A)
@@ -112,12 +114,14 @@ void loadConfig() {
 	cfgMbTimeout              = doc["cfgMbTimeout"]         | 60000UL;
 	cfgStandby                = doc["cfgStandby"]           | 4UL; 
 	strncpy(cfgMqttIp,          doc["cfgMqttIp"]            | "",                 sizeof(cfgMqttIp));
+	cfgMqttPort               = doc["cfgMqttPort"]          | 1883UL;
 	strncpy(cfgMqttUser,        doc["cfgMqttUser"]          | "",                 sizeof(cfgMqttUser));
 	strncpy(cfgMqttPass,        doc["cfgMqttPass"]          | "",                 sizeof(cfgMqttPass));
 	strncpy(cfgNtpServer,       doc["cfgNtpServer"]         | "europe.pool.ntp.org", sizeof(cfgNtpServer));
 	strncpy(cfgFoxUser,         doc["cfgFoxUser"]           | "",                 sizeof(cfgFoxUser));
 	strncpy(cfgFoxPass,         doc["cfgFoxPass"]           | "",                 sizeof(cfgFoxPass));
 	strncpy(cfgFoxDevId,        doc["cfgFoxDevId"]          | "",                 sizeof(cfgFoxDevId));
+	cfgPvActive               = doc["cfgPvActive"]          | 0; 
 	cfgPvCycleTime            = doc["cfgPvCycleTime"]       | 30; 
 	cfgPvLimStart             = doc["cfgPvLimStart"]        | 61; 
 	cfgPvLimStop              = doc["cfgPvLimStop"]         | 50; 

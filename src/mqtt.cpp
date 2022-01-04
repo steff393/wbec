@@ -96,7 +96,7 @@ void callback(char* topic, byte* payload, uint8_t length)
 
 void mqtt_begin() {
 	if (strcmp(cfgMqttIp, "") != 0) {
-  	client.setServer(cfgMqttIp, 1883);
+  	client.setServer(cfgMqttIp, cfgMqttPort);
 		client.setCallback(callback);
 	}
 	for (uint8_t i = 0; i < cfgCntWb; i++) {
