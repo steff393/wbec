@@ -76,6 +76,16 @@ document.getElementById('btnMinPv').addEventListener('click', function() {
 	sendText('PV_MIN_PV');
 	document.getElementById("pvStat").innerHTML = 'Min+PV';
 });
+document.getElementById('btnExit').addEventListener('click', function() {
+	document.getElementById('carStat').innerHTML = '-';
+	document.getElementById('wbStat').innerHTML = '-';
+	document.getElementById('power').innerHTML = '-';
+	document.getElementById('energyI').innerHTML = '-';
+	document.getElementById('currLim').innerHTML = '-';
+	document.getElementById('watt').innerHTML = '-';
+	document.getElementById('timeNow').innerHTML = '-';
+	Socket.close();
+});
 
 
 /*
