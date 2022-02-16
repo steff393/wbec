@@ -95,7 +95,7 @@ void webServer_setup() {
   });
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(LittleFS, F("/index.html"), String(), false, processor);
+    request->send(LittleFS, F("/web.html"), String(), false, processor);
   });
 
   server.on("/cfg", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -119,7 +119,7 @@ void webServer_setup() {
         lm_storeRequest(id, val);
       }
     }
-    request->send(LittleFS, F("/index.html"), String(), false, processor);
+    request->send(LittleFS, F("/web.html"), String(), false, processor);
   });
 
   server.on("/state", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -161,6 +161,7 @@ void webServer_setup() {
 
   server.on("/reset", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(200, F("text/plain"), F("Resetting the ESP8266..."));
+    delay(50);
     resetRequested = true;
   });
 
