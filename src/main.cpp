@@ -87,5 +87,6 @@ void loop() {
     pv_loop();
     //pc_handle();
     lm_loop();
+    delay(5);
   }
 }
