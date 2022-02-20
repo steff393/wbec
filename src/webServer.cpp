@@ -95,7 +95,7 @@ void webServer_setup() {
   });
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(LittleFS, F("/index.html"), String(), false, processor);
+    request->send(LittleFS, F("/web.html"), String(), false, processor);
   });
 
   server.on("/cfg", HTTP_GET, [](AsyncWebServerRequest *request){
