@@ -18,6 +18,7 @@
 #include <powerfox.h>
 #include <pvAlgo.h>
 #include <rfid.h>
+#include <solarEdge.h>
 #include <SPIFFSEditor.h>
 #include <webServer.h>
 #define WIFI_MANAGER_USE_ASYNC_WEB_SERVER
@@ -341,6 +342,11 @@ void webServer_setup() {
       }
     }
     request->send(200, F("application/json"), goE_getStatus(id, fromApp));
+  });
+
+
+  server.on("/solaredge", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(200, F("application/json"), solarEdge_getStatus());
   });
 
 

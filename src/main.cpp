@@ -13,6 +13,7 @@
 #include <powerfox.h>
 #include <pvAlgo.h>
 #include <rfid.h>
+#include <solarEdge.h>
 #define WIFI_MANAGER_USE_ASYNC_WEB_SERVER
 #include <WiFiManager.h>
 #include <webServer.h>
@@ -66,6 +67,7 @@ void setup() {
   mqtt_begin();
   rfid_setup();
   powerfox_setup();
+  solarEdge_setup();
   pv_setup();
   lm_setup();
   Serial.print(F("Boot time: ")); Serial.println(millis());
@@ -84,6 +86,7 @@ void loop() {
     webSocket_loop();
     rfid_loop();
     powerfox_loop(); 
+    solarEdge_loop();
     pv_loop();
     //pc_handle();
     lm_loop();
