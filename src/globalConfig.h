@@ -48,6 +48,7 @@ extern uint16_t cfgPvOffset;                 // PV charging: Offset for the avai
 extern uint16_t cfgTotalCurrMax;             // <don't use - still beta> Total current limit for load management (in 0.1A)
 extern uint8_t  cfgHwVersion;                // Selection of the used HW
 extern uint8_t  cfgWifiSleepMode;            // Set sleep type for power saving, recomendation is 255 (=no influence) or 0 (=WIFI_NONE_SLEEP)
+extern uint8_t  cfgLoopDelay;                // Delay [ms] at end of main loop, might have an impact on web server reactivitiy, default: 255 = inactive
 
 extern void loadConfig();
 

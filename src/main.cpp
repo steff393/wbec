@@ -87,5 +87,9 @@ void loop() {
     pv_loop();
     //pc_handle();
     lm_loop();
+
+    if (cfgLoopDelay <= 10) {          // see #18, might have an effect to reactivity of webserver in some environments 
+      delay(cfgLoopDelay);
+    }
   }
 }

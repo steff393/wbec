@@ -8,8 +8,8 @@
 
 const uint8_t m = 5;
 
-char cfgWbecVersion[]     = "v0.4.3+pv";           // wbec version
-char cfgBuildDate[]       = "2022-01-04";       // wbec build date
+char cfgWbecVersion[]     = "v0.4.4";                 // wbec version
+char cfgBuildDate[]       = __DATE__ " " __TIME__;    // wbec build date
 
 char     cfgApSsid[32];               // SSID of the initial Access Point
 char     cfgApPass[63];               // Password of the initial Access Point
@@ -36,6 +36,8 @@ uint16_t cfgPvOffset;                 // PV charging: Offset for the available p
 uint16_t cfgTotalCurrMax;             // <don't use - still beta> Total current limit for load management (in 0.1A)
 uint8_t  cfgHwVersion;                // Selection of the used HW
 uint8_t  cfgWifiSleepMode;            // Set sleep type for power saving, recomendation is 255 (=no influence) or 0 (=WIFI_NONE_SLEEP)
+uint8_t  cfgLoopDelay;                // Delay [ms] at end of main loop, might have an impact on web server reactivitiy, default: 255 = inactive
+
 
 static bool createConfig() {
 	StaticJsonDocument<1024> doc;
@@ -130,6 +132,7 @@ void loadConfig() {
 	cfgTotalCurrMax           = doc["cfgTotalCurrMax"]      | 0UL;
 	cfgHwVersion              = doc["cfgHwVersion"]         | 15;
 	cfgWifiSleepMode          = doc["cfgWifiSleepMode"]     | 255;
+	cfgLoopDelay              = doc["cfgLoopDelay"]         | 255;
 	
 	LOG(m, "cfgWbecVersion: %s", cfgWbecVersion);
 	LOG(m, "cfgBuildDate: %s"  , cfgBuildDate);
