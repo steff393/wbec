@@ -167,7 +167,7 @@ void logger_setup() {
   if (!strcmp(cfgFoxUser, "") || !strcmp(cfgFoxPass, "") || !strcmp(cfgFoxDevId, "")) {
     // powerfox is NOT configured => extend bootlog
     char * tmpPtr;
-    bootLogSize = 5000;
+    bootLogSize = cfgBootlogSize;
     tmpPtr = (char *) malloc(bootLogSize);  // allocate a new area on heap
     strncpy(tmpPtr, bootLog, bootLogSize);  // copy content from old bootlog
     free(bootLog);

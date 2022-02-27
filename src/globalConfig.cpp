@@ -38,6 +38,7 @@ uint8_t  cfgHwVersion;                // Selection of the used HW
 uint8_t  cfgWifiSleepMode;            // Set sleep type for power saving, recomendation is 255 (=no influence) or 0 (=WIFI_NONE_SLEEP)
 uint8_t  cfgLoopDelay;                // Delay [ms] at end of main loop, might have an impact on web server reactivitiy, default: 255 = inactive
 char     cfgSolarEdgeIp[16];          // IP address of SolarEdge inverter, "" to disable 
+uint16_t cfgBootlogSize;              // Size of the bootlog buffer for debugging, max. 5000 [bytes]
 
 
 static bool createConfig() {
@@ -135,6 +136,8 @@ void loadConfig() {
 	cfgWifiSleepMode          = doc["cfgWifiSleepMode"]     | 255;
 	cfgLoopDelay              = doc["cfgLoopDelay"]         | 255;
 	strncpy(cfgSolarEdgeIp,     doc["cfgSolarEdgeIp"]       | "",                 sizeof(cfgSolarEdgeIp));
+	cfgBootlogSize            = doc["cfgBootlogSize"]       | 2000;
+	
 	
 	LOG(m, "cfgWbecVersion: %s", cfgWbecVersion);
 	LOG(m, "cfgBuildDate: %s"  , cfgBuildDate);

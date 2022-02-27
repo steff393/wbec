@@ -57,6 +57,7 @@ extern uint8_t  cfgHwVersion;                // Selection of the used HW
 extern uint8_t  cfgWifiSleepMode;            // Set sleep type for power saving, recomendation is 255 (=no influence) or 0 (=WIFI_NONE_SLEEP)
 extern uint8_t  cfgLoopDelay;                // Delay [ms] at end of main loop, might have an impact on web server reactivitiy, default: 255 = inactive
 extern char     cfgSolarEdgeIp[16];          // IP address of SolarEdge inverter, "" to disable 
+extern uint16_t cfgBootlogSize;              // Size of the bootlog buffer for debugging, e.g. 5000 bytes
 
 extern void loadConfig();
 
