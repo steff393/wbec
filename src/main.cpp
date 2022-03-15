@@ -18,6 +18,7 @@
 #include <WiFiManager.h>
 #include <webServer.h>
 #include <webSocket.h>
+#include <button.h>
 
 
 static bool _handlingOTA = false;
@@ -70,6 +71,7 @@ void setup() {
   solarEdge_setup();
   pv_setup();
   lm_setup();
+  btn_setup();
   Serial.print(F("Boot time: ")); Serial.println(millis());
   Serial.print(F("Free heap: ")); Serial.println(ESP.getFreeHeap());
 }
@@ -90,6 +92,7 @@ void loop() {
     pv_loop();
     //pc_handle();
     lm_loop();
+    btn_loop();
 
     if (cfgLoopDelay <= 10) {          // see #18, might have an effect to reactivity of webserver in some environments 
       delay(cfgLoopDelay);
