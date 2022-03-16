@@ -17,9 +17,8 @@
 #define PIN_DI              5   // GPIO5, NodeMCU pin D1
 #define PIN_RO              2   // GPIO2, NodeMCU pin D4
 #define PIN_DE_RE           4   // GPIO4, NodeMCU pin D2
-#define PIN_RST             0   // GPIO0, NodeMCU pin D3 
+#define PIN_RST_PV_SWITCH   0   // GPIO0, NodeMCU pin D3 
 #define PIN_SS             15   // GPIO15,NodeMCU pin D8
-#define PIN_PV_SWITCH      13   // GPIO13,NodeMCU pin D7
 
 // SolarEdge (sunspec) registers for modbusTCP
 #define REG_I_AC_Current  40071 // 40072 1 I_AC_Current uint16 Amps AC Total Current value
