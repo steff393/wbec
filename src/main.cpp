@@ -30,7 +30,7 @@ void setup() {
   logger_allocate();
 
   // define a GPIO as output
-  pinMode(PIN_RST, OUTPUT);
+  pinMode(PIN_RST_PV_SWITCH, OUTPUT);
   
   if(!LittleFS.begin()){ 
     Serial.println(F("An Error has occurred while mounting LittleFS"));
