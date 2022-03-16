@@ -28,9 +28,6 @@ void setup() {
   Serial.begin(115200);
   Serial.println(F("\n\nStarting wbec ;-)"));
   logger_allocate();
-
-  // define a GPIO as output
-  pinMode(PIN_RST_PV_SWITCH, OUTPUT);
   
   if(!LittleFS.begin()){ 
     Serial.println(F("An Error has occurred while mounting LittleFS"));
@@ -71,7 +68,12 @@ void setup() {
   solarEdge_setup();
   pv_setup();
   lm_setup();
-  btn_setup();
+  if(cfgBtnDebounce > 0) {
+    btn_setup();
+  }
+  else {
+    pinMode(PIN_RST_PV_SWITCH, OUTPUT);
+  }
   Serial.print(F("Boot time: ")); Serial.println(millis());
   Serial.print(F("Free heap: ")); Serial.println(ESP.getFreeHeap());
 }
@@ -92,8 +94,9 @@ void loop() {
     pv_loop();
     //pc_handle();
     lm_loop();
-    btn_loop();
-
+    if(cfgBtnDebounce > 0) {
+      btn_loop();
+    }
     if (cfgLoopDelay <= 10) {          // see #18, might have an effect to reactivity of webserver in some environments 
       delay(cfgLoopDelay);
     }
