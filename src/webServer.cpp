@@ -148,11 +148,11 @@ void webServer_setup() {
   server.on("/gpio", HTTP_GET, [](AsyncWebServerRequest *request){
     if (!rfid_getEnabled()) {
       if (request->hasParam(F("on"))) {
-        digitalWrite(PIN_RST, HIGH);
+        digitalWrite(PIN_RST_PV_SWITCH, HIGH);
         request->send(200, F("text/plain"), F("GPIO On"));
       }
       if (request->hasParam(F("off"))) {
-        digitalWrite(PIN_RST, LOW);
+        digitalWrite(PIN_RST_PV_SWITCH, LOW);
         request->send(200, F("text/plain"), F("GPIO Off"));
       }    
     } else {
