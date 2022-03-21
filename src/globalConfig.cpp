@@ -137,7 +137,7 @@ void loadConfig() {
 	cfgLoopDelay              = doc["cfgLoopDelay"]         | 255;
 	strncpy(cfgSolarEdgeIp,     doc["cfgSolarEdgeIp"]       | "",                 sizeof(cfgSolarEdgeIp));
 	cfgBootlogSize            = doc["cfgBootlogSize"]       | 2000;
-	cfgBtnDebounce            = doc["cfgBtnDebounce"]       | 300UL;
+	cfgBtnDebounce            = doc["cfgBtnDebounce"]       | 0;
 	
 	LOG(m, "cfgWbecVersion: %s", cfgWbecVersion);
 	LOG(m, "cfgBuildDate: %s"  , cfgBuildDate);
