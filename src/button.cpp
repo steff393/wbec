@@ -14,7 +14,7 @@
 static Bounce2::Button btn_PV_SWITCH = Bounce2::Button();
 
 void btn_setup() {
-	btn_PV_SWITCH.attach(PIN_PV_SWITCH, INPUT_PULLUP); // USE INTERNAL PULL-UP
+	btn_PV_SWITCH.attach(PIN_RST_PV_SWITCH, INPUT_PULLUP); // USE INTERNAL PULL-UP
 	btn_PV_SWITCH.interval(cfgBtnDebounce);
 	//btn_PV_SWITCH.setPressedState(LOW);
 }
