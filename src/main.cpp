@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include <ArduinoOTA.h>
+#include <button.h>
 #include <globalConfig.h>
 #include <goEmulator.h>
 #include <LittleFS.h>
@@ -18,7 +19,6 @@
 #include <WiFiManager.h>
 #include <webServer.h>
 #include <webSocket.h>
-#include <button.h>
 
 
 static bool _handlingOTA = false;
@@ -66,14 +66,9 @@ void setup() {
   rfid_setup();
   powerfox_setup();
   solarEdge_setup();
+  btn_setup();
   pv_setup();
   lm_setup();
-  if(cfgBtnDebounce > 0) {
-    btn_setup();
-  }
-  else {
-    pinMode(PIN_RST_PV_SWITCH, OUTPUT);
-  }
   Serial.print(F("Boot time: ")); Serial.println(millis());
   Serial.print(F("Free heap: ")); Serial.println(ESP.getFreeHeap());
 }
@@ -91,12 +86,10 @@ void loop() {
     rfid_loop();
     powerfox_loop(); 
     solarEdge_loop();
+    btn_loop();
     pv_loop();
     //pc_handle();
     lm_loop();
-    if(cfgBtnDebounce > 0) {
-      btn_loop();
-    }
     if (cfgLoopDelay <= 10) {          // see #18, might have an effect to reactivity of webserver in some environments 
       delay(cfgLoopDelay);
     }

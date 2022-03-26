@@ -20,6 +20,5 @@ extern int32_t  pv_getWatt();
 extern void     pv_setWatt(int32_t val);
 extern pvMode_t pv_getMode();
 extern void     pv_setMode(pvMode_t val);
-extern void     pvAlgo();
 
 #endif /* PVALGO_H */
