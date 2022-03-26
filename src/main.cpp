@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include <ArduinoOTA.h>
+#include <button.h>
 #include <globalConfig.h>
 #include <goEmulator.h>
 #include <LittleFS.h>
@@ -27,9 +28,6 @@ void setup() {
   Serial.begin(115200);
   Serial.println(F("\n\nStarting wbec ;-)"));
   logger_allocate();
-
-  // define a GPIO as output
-  pinMode(PIN_RST, OUTPUT);
   
   if(!LittleFS.begin()){ 
     Serial.println(F("An Error has occurred while mounting LittleFS"));
@@ -68,6 +66,7 @@ void setup() {
   rfid_setup();
   powerfox_setup();
   solarEdge_setup();
+  btn_setup();
   pv_setup();
   lm_setup();
   Serial.print(F("Boot time: ")); Serial.println(millis());
@@ -87,10 +86,10 @@ void loop() {
     rfid_loop();
     powerfox_loop(); 
     solarEdge_loop();
+    btn_loop();
     pv_loop();
     //pc_handle();
     lm_loop();
-
     if (cfgLoopDelay <= 10) {          // see #18, might have an effect to reactivity of webserver in some environments 
       delay(cfgLoopDelay);
     }

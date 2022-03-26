@@ -8,7 +8,7 @@
 
 const uint8_t m = 5;
 
-char cfgWbecVersion[]     = "v0.4.4";                 // wbec version
+char cfgWbecVersion[]     = "v0.4.5pre";              // wbec version
 char cfgBuildDate[]       = __DATE__ " " __TIME__;    // wbec build date
 
 char     cfgApSsid[32];               // SSID of the initial Access Point
@@ -37,9 +37,9 @@ uint16_t cfgTotalCurrMax;             // <don't use - still beta> Total current 
 uint8_t  cfgHwVersion;                // Selection of the used HW
 uint8_t  cfgWifiSleepMode;            // Set sleep type for power saving, recomendation is 255 (=no influence) or 0 (=WIFI_NONE_SLEEP)
 uint8_t  cfgLoopDelay;                // Delay [ms] at end of main loop, might have an impact on web server reactivitiy, default: 255 = inactive
-char     cfgSolarEdgeIp[16];          // IP address of SolarEdge inverter, "" to disable 
+char     cfgSolarEdgeIp[16];           // IP address of SolarEdge, "" to disable 
 uint16_t cfgBootlogSize;              // Size of the bootlog buffer for debugging, max. 5000 [bytes]
-
+uint16_t cfgBtnDebounce;              // Debounce time for button [ms]
 
 static bool createConfig() {
 	StaticJsonDocument<1024> doc;
@@ -137,7 +137,7 @@ void loadConfig() {
 	cfgLoopDelay              = doc["cfgLoopDelay"]         | 255;
 	strncpy(cfgSolarEdgeIp,     doc["cfgSolarEdgeIp"]       | "",                 sizeof(cfgSolarEdgeIp));
 	cfgBootlogSize            = doc["cfgBootlogSize"]       | 2000;
-	
+	cfgBtnDebounce            = doc["cfgBtnDebounce"]       | 0;
 	
 	LOG(m, "cfgWbecVersion: %s", cfgWbecVersion);
 	LOG(m, "cfgBuildDate: %s"  , cfgBuildDate);

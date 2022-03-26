@@ -143,5 +143,6 @@ pvMode_t pv_getMode() {
 
 void pv_setMode(pvMode_t val) {
 	pvMode = val;
-	rtc.saveToRTC();   // memorize over reset
+	rtc.saveToRTC();     // memorize over reset
+	lastHandleCall = 0;  // make sure to call pv_Algo() in the next pv_loop() call
 }

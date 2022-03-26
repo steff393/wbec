@@ -17,7 +17,7 @@
 #define PIN_DI              5   // GPIO5, NodeMCU pin D1
 #define PIN_RO              2   // GPIO2, NodeMCU pin D4
 #define PIN_DE_RE           4   // GPIO4, NodeMCU pin D2
-#define PIN_RST             0   // GPIO0, NodeMCU pin D3 
+#define PIN_RST_PV_SWITCH   0   // GPIO0, NodeMCU pin D3 
 #define PIN_SS             15   // GPIO15,NodeMCU pin D8
 
 // SolarEdge (sunspec) registers for modbusTCP
@@ -58,6 +58,7 @@ extern uint8_t  cfgWifiSleepMode;            // Set sleep type for power saving,
 extern uint8_t  cfgLoopDelay;                // Delay [ms] at end of main loop, might have an impact on web server reactivitiy, default: 255 = inactive
 extern char     cfgSolarEdgeIp[16];          // IP address of SolarEdge inverter, "" to disable 
 extern uint16_t cfgBootlogSize;              // Size of the bootlog buffer for debugging, e.g. 5000 bytes
+extern uint16_t cfgBtnDebounce;              // Debounce time for button [ms]
 
 extern void loadConfig();
 
