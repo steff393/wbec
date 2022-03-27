@@ -5,6 +5,7 @@
 
 extern void         btn_setup();
 extern void         btn_loop();
+extern boolean      btn_getState();
 
 
 #endif /* BUTTON_H */

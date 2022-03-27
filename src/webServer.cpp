@@ -4,6 +4,7 @@
 #include <AsyncElegantOTA.h>
 #include <AsyncJson.h>
 #include <ArduinoJson.h>
+#include <button.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 #include <ESPAsyncTCP.h>
@@ -25,6 +26,7 @@
 #include <WiFiManager.h>
 
 #define PFOX_JSON_LEN 256
+#define GPIO_JSON_LEN  32
 
 static const uint8_t m = 3;
 
@@ -146,18 +148,24 @@ void webServer_setup() {
   });
 
   server.on("/gpio", HTTP_GET, [](AsyncWebServerRequest *request){
+    StaticJsonDocument<GPIO_JSON_LEN> data;
+
     if ((!rfid_getEnabled()) && (cfgBtnDebounce==0)) {
+      // Set GPIO as an OUTPUT
       if (request->hasParam(F("on"))) {
         digitalWrite(PIN_RST_PV_SWITCH, HIGH);
-        request->send(200, F("text/plain"), F("GPIO On"));
       }
       if (request->hasParam(F("off"))) {
         digitalWrite(PIN_RST_PV_SWITCH, LOW);
-        request->send(200, F("text/plain"), F("GPIO Off"));
-      }    
-    } else {
-      request->send(200, F("text/plain"), F("RFID or PV button active, GPIO not possible"));
+      }
+			data[F("D3")] = digitalRead(PIN_RST_PV_SWITCH);
+    } else {    
+			// Read GPIO as an INPUT
+			data[F("D3")] = btn_getState() ? 1 : 0;
     }
+		char response[GPIO_JSON_LEN];
+    serializeJson(data, response, GPIO_JSON_LEN);
+    request->send(200, F("application/json"), response);
   });
 
   server.on("/reset", HTTP_GET, [](AsyncWebServerRequest *request){

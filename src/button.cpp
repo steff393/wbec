@@ -36,3 +36,8 @@ void btn_loop() {
 		}
 	}
 }
+
+
+boolean btn_getState() {
+	return(btn_PV_SWITCH.pressed());
+}
