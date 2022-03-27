@@ -52,32 +52,6 @@ static void onUpload(AsyncWebServerRequest *request, String filename, size_t ind
 }
 
 
-static String processor(const String& var){
-	String commState;
-	if(var == F("STATE")){
-		if(modbusResultCode[0]==0x00){
-			commState = F("ON");
-		}
-		else{
-			commState = F("OFF");
-		}
-		return(commState);
-	}
-	else if (var == F("TEMPERATURE")){
-		float tmp = content[0][5] / 10.0;
-		return(String(tmp));
-	}
-	else if (var == F("VOLTAGE")){
-		float tmp = content[0][6] / 10.0;
-		return(String(tmp));
-	}
-	else if (var == F("CURRENT")){
-		float tmp = content[0][53] / 10.0;
-		return(String(tmp));
-	} else return(String(F("notFound")));
-}
-
-
 static uint8_t getSignalQuality(int rssi)
 {
 		int quality = 0;
@@ -112,39 +86,6 @@ void webServer_setup() {
 	server.on("/bootlog_reset", HTTP_GET, [](AsyncWebServerRequest *request){
 		log_freeBuffer();
 		request->send(200, F("text/plain"), F("Cleared"));
-	});
-
-	server.on("/web", HTTP_GET, [](AsyncWebServerRequest *request){
-		uint8_t id = 0;
-		if (request->hasParam(F("currLim"))) {
-			uint16_t val = request->getParam(F("currLim"))->value().toInt();
-			if (val == 0 || (val >= CURR_ABS_MIN && val <= CURR_ABS_MAX)) {
-				lm_storeRequest(id, val);
-			}
-		}
-		request->send(LittleFS, F("/index.html"), String(), false, processor);
-	});
-
-	server.on("/state", HTTP_GET, [](AsyncWebServerRequest *request){
-		if(modbusResultCode[0]==0x00) {
-			request->send(200, F("text/plain"), F("ON"));
-		} else {
-			request->send(200, F("text/plain"), F("OFF"));
-		}
-	});
-
-	server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
-		float tmp = content[0][5] / 10.0;
-		request->send(200, F("text/plain"), String(tmp));
-	});
-	
-	server.on("/voltage", HTTP_GET, [](AsyncWebServerRequest *request){
-		request->send(200, F("text/plain"), String(content[0][6]));
-	});
-	
-	server.on("/current", HTTP_GET, [](AsyncWebServerRequest *request){
-		float tmp = content[0][53] / 10.0;
-		request->send(200, F("text/plain"), String(tmp));
 	});
 
 	server.on("/gpio", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -297,7 +238,6 @@ void webServer_setup() {
 				id = 0;
 			}
 		}
-		
 		if (request->hasParam(F("payload"))) {
 			log(m, F("/mqtt payload: ") + request->getParam(F("payload"))->value());
 			goE_setPayload(request->getParam(F("payload"))->value(), id);
@@ -338,20 +278,6 @@ void webServer_setup() {
 		serializeJson(data, response, PFOX_JSON_LEN);
 		request->send(200, F("application/json"), response);
 	});
-
-	server.on("/status", HTTP_GET, [](AsyncWebServerRequest *request) {
-		uint8_t id = 0;
-		boolean fromApp = false;
-		if (request->hasParam(F("box"))) {
-			fromApp = true;
-			id = request->getParam(F("box"))->value().toInt();
-			if (id >= WB_CNT) {
-				id = 0;
-			}
-		}
-		request->send(200, F("application/json"), goE_getStatus(id, fromApp));
-	});
-
 
 	server.on("/solaredge", HTTP_GET, [](AsyncWebServerRequest *request){
 		request->send(200, F("application/json"), solarEdge_getStatus());
