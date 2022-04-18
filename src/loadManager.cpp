@@ -5,7 +5,7 @@
 #include <loadManager.h>
 #include <mbComm.h>
 
-#define CYCLE_TIME		             100	// ms
+#define CYCLE_TIME		             500	// ms
 
 
 static uint32_t lastCall           = 0;
@@ -13,14 +13,19 @@ static uint32_t lastCall           = 0;
 static uint8_t  currLim[WB_CNT];
 static uint8_t  lastReq[WB_CNT];
 
-static uint16_t sumRead            = 0;
-/*static uint16_t sumReq             = 0;*/
-static boolean  allBoxesReceived   = false;
-
 /*
-static bool chargingRequested(uint8_t id) {
-	// check charging state
-	return (content[id][1] == 6 || content[id][1] == 7);		// C1 or C2
+static uint16_t sumRead            = 0;
+static uint16_t sumReq             = 0;
+static boolean  allBoxesReceived   = false;
+*/
+
+static uint16_t chargingRequested(uint8_t id) {
+	// check charging state, as a binary number
+	if (content[id][1] == 6 || content[id][1] == 7) {       // C1 or C2
+		return(1 << id);
+	} else {
+		return(0);
+	}
 }
 
 
@@ -42,7 +47,7 @@ static uint8_t saturate2(uint8_t val, uint16_t limit1, uint16_t limit2) {
 	}
 	return(saturate1(val, limit));
 }
-*/
+
 
 
 static void lm_updateWbLimits() {
@@ -52,11 +57,42 @@ static void lm_updateWbLimits() {
 	// Input:
 	// - chargingRequested(id)    Car connected with charging request
 	// - lastReq[id]              Last requested current limit from any of the 'applications' on higher level
+	// - content[id][15]          Maximum current configured in box (switch S1)
 	// - content[id][53]          Current limit which is wallbox
 	// Output:
 	// - currLim[id]              Current limit which shall be in the wallbox
 
+
+	// Simple stupid method, only for 2 wallboxes with 50%/50%
+	uint16_t requestMap = chargingRequested(0) + chargingRequested(1);
+
+	switch(requestMap) {
+		case 0: {   // no charging request
+			currLim[0] = 0;
+			currLim[1] = 0;
+			break;
+		}
+		case 1: {   // charging request only on box 0
+			currLim[0] = saturate2(lastReq[0], content[0][15], cfgTotalCurrMax);
+			currLim[1] = 0;
+			break;
+		}
+		case 2: {   // charging request only on box 1
+			currLim[0] = 0;
+			currLim[1] = saturate2(lastReq[1], content[1][15], cfgTotalCurrMax);
+			break;
+		}
+		case 3: {   // charging request on both boxes 
+			currLim[0] = saturate2(lastReq[0], content[0][15], cfgTotalCurrMax / 2);
+			currLim[1] = saturate2(lastReq[1], content[1][15], cfgTotalCurrMax / 2);
+			break;
+		}
+		default: { ; }  // shouldn't happen
+	}
+
 	/*
+	// Complex, flexible methods
+
 	uint16_t cnt = 0;
 	uint16_t limit = 0;
 	uint16_t remaining = cfgTotalCurrMax;
@@ -147,16 +183,20 @@ void lm_setup() {
 		currLim[id] = 255;     // 255 is the marker, that no valid value received yet
 		lastReq[id] = 0;
 	}
+	if (cfgTotalCurrMax != 0) {
+		cfgStandby = 4;        // disable standby when using load management
+	}
 }
 
 
 void lm_loop() {
-	if ((millis() - lastCall < CYCLE_TIME) || (cfgTotalCurrMax == 0) || (cfgStandby != 4)) {
+	if ((millis() - lastCall < CYCLE_TIME) || (cfgTotalCurrMax == 0) || (cfgCntWb != 2)) {
 		// avoid unnecessary frequent calls
 		return;
 	}
 	lastCall = millis();
 
+	/*
 	// load management only starts when all boxes have been received once
 	if (allBoxesReceived == false) {
 		for (uint8_t id = 0; id < cfgCntWb ; id++) {
@@ -164,6 +204,7 @@ void lm_loop() {
 		}
 		allBoxesReceived = true;
 	}
+	*/
 
 	lm_updateWbLimits();
 	
@@ -189,7 +230,7 @@ uint8_t lm_getLastRequest(uint8_t id) {
 void lm_storeRequest(uint8_t id, uint8_t val) {
 	lastReq[id] = val;
 	// when there is still buffer OR request is lowered OR load management inactive
-	if ((sumRead + val < cfgTotalCurrMax) || (val < content[id][53]) || (cfgTotalCurrMax == 0) || (cfgStandby != 4)) {
+	if (/*(sumRead + val < cfgTotalCurrMax) ||*/ (val < content[id][53]) || (cfgTotalCurrMax == 0)) {
 		// direct write is possible
 		mb_writeReg(id, REG_CURR_LIMIT, val);
 	}
@@ -198,7 +239,7 @@ void lm_storeRequest(uint8_t id, uint8_t val) {
 
 void lm_currentReadSuccess(uint8_t id) {
 	// takeover the value from wallbox as long as not all boxes are received
-	if (allBoxesReceived == false) {
-		currLim[id] = content[id][53];
-	} // else do nothing
+	//if (allBoxesReceived == false) {
+	//	currLim[id] = content[id][53];
+	//} // else do nothing
 }
