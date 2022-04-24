@@ -27,7 +27,7 @@ static pvMode_t  pvMode               = PV_OFF;
 void pvAlgo() {
 	int32_t availPower = 0;
 
-	uint8_t targetCurr = 0;
+	uint16_t targetCurr = 0;
 	uint8_t actualCurr = content[BOXID][53];
 
 	if (content[BOXID][1] >= 4 && content[BOXID][1] <= 7) {   // Car is connected
@@ -42,7 +42,7 @@ void pvAlgo() {
 		
 		// Calculate the new target current
 		if (availPower > 0 && cfgPvPhFactor != 0) {
-			targetCurr = availPower / cfgPvPhFactor;
+			targetCurr = (uint16_t) (availPower / (int32_t) cfgPvPhFactor); 
 		}
 		LOG(m, "Target current: %.1fA", (float)targetCurr/10.0)
 		// Hysteresis
