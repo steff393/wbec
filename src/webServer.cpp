@@ -279,8 +279,8 @@ void webServer_setup() {
 		request->send(200, F("application/json"), response);
 	});
 
-	server.on("/solaredge", HTTP_GET, [](AsyncWebServerRequest *request){
-		request->send(200, F("application/json"), solarEdge_getStatus());
+	server.on("/inverter", HTTP_GET, [](AsyncWebServerRequest *request){
+		request->send(200, F("application/json"), inverter_getStatus());
 	});
 
 

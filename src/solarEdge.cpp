@@ -1,9 +1,10 @@
-// Copyright (c) 2022 andreas.miketta, steff393, MIT license
-// based on https://github.com/AMiketta/wbec
+// Copyright (c) 2022 andreas.miketta, steff393, andy5macht, MIT license
+// based on https://github.com/AMiketta/wbec and https://github.com/andy5macht/wbec
 #include <Arduino.h>
 #include <AsyncJson.h>
 #include <ArduinoJson.h>
 #include <globalConfig.h>
+#include <solarEdge.h>
 #include <IPAddress.h>
 #include <ModbusIP_ESP8266.h>
 #include <pvAlgo.h>
@@ -14,7 +15,7 @@
 static IPAddress remote;   // Address of Modbus Slave device
 static ModbusIP  mb;       // Declare ModbusTCP instance
 
-static bool      solarEgdeActive            = false;
+static bool      inverterActive             = false;
 static bool      isConnected                = false;
 static int16_t   power_inverter             = 0;
 static int16_t   power_inverter_scale       = 0;
@@ -29,7 +30,7 @@ static bool cb(Modbus::ResultCode event, uint16_t transactionId, void *data) {
 	if (event != Modbus::EX_SUCCESS) {
 		Serial.printf("Modbus result: %02X\n", event);
 	}
-#ifdef DEBUG_SOLAREDGE
+#ifdef DEBUG_INVERTER
 	if (event == Modbus::EX_TIMEOUT) {
 		Serial.println("Timeout");
 	}
@@ -47,32 +48,49 @@ static int16_t pow_int16(int16_t base, uint16_t exp) {
 }
 
 
-void solarEdge_setup() {
-	if (strcmp(cfgSolarEdgeIp, "") != 0) {
-		if (remote.fromString(cfgSolarEdgeIp)) {
+void inverter_setup() {
+	if (strcmp(cfgInverterIp, "") != 0) {
+		if (remote.fromString(cfgInverterIp)) {
 			mb.client(); // Act as Modbus TCP server
-			solarEgdeActive = true;
+			inverterActive = true;
 		}
 	}
 }
 
 
-void solarEdge_loop() {
+void inverter_loop() {
 	if ((millis() - lastHandleCall < (uint16_t)cfgPvCycleTime * 1000) ||     // avoid unnecessary frequent calls
-			(solarEgdeActive == false)) {
+			(inverterActive == false)) {
 		return;
 	}
 	lastHandleCall = millis();
 
 	isConnected = mb.isConnected(remote);
-	if (!isConnected) {            // Check if connection to Modbus Slave is established
-		mb.connect(remote, SOLAR_EDGE_PORT);    // Try to connect if no connection
-	} else {  
-		mb.readHreg(remote, REG_I_AC_Current,  (uint16 *) &ac_current,           1, cb, 1);  
-		mb.readHreg(remote, REG_I_AC_Power,    (uint16 *) &power_inverter,       1, cb, 1);  //Power Inverter
-		mb.readHreg(remote, REG_I_AC_Power_SF, (uint16 *) &power_inverter_scale, 1, cb, 1);  //Power Inverter Scale Factor
-		mb.readHreg(remote, REG_M_AC_Power,    (uint16 *) &power_meter,          1, cb, 1);  //Power Zähler
-		mb.readHreg(remote, REG_M_AC_Power_SF, (uint16 *) &power_meter_scale,    1, cb, 1);  //Power Zähler Scale Factor
+	
+	// Connect and read SolarEdge
+	if (cfgInverterType == 1) {
+		if (!isConnected) {            // Check if connection to Modbus Slave is established
+			mb.connect(remote, INVERTER_SE_PORT);    // Try to connect if no connection
+		} else {  
+			mb.readHreg(remote, REG_SE_I_AC_Current,  (uint16 *) &ac_current,           1, cb, INVERTER_SE_ADDRESS);  
+			mb.readHreg(remote, REG_SE_I_AC_Power,    (uint16 *) &power_inverter,       1, cb, INVERTER_SE_ADDRESS);  //Power Inverter
+			mb.readHreg(remote, REG_SE_I_AC_Power_SF, (uint16 *) &power_inverter_scale, 1, cb, INVERTER_SE_ADDRESS);  //Power Inverter Scale Factor
+			mb.readHreg(remote, REG_SE_M_AC_Power,    (uint16 *) &power_meter,          1, cb, SMARTMETER_SE_ADDRESS);  //Power Zähler
+			mb.readHreg(remote, REG_SE_M_AC_Power_SF, (uint16 *) &power_meter_scale,    1, cb, SMARTMETER_SE_ADDRESS);  //Power Zähler Scale Factor
+		}
+	}
+
+	// Connect and read Fronius
+	if (cfgInverterType == 2) {
+		if (!isConnected) {            // Check if connection to Modbus Slave is established
+			mb.connect(remote, INVERTER_FR_PORT);    // Try to connect if no connection
+		} else {  
+			//mb.readHreg(remote, REG_I_AC_Current,  (uint16 *) &ac_current,           1, cb, INVERTER_ADDRESS);  
+			mb.readHreg(remote, REG_FR_I_AC_Power,    (uint16 *) &power_inverter,       1, cb, INVERTER_FR_ADDRESS);  //Power Inverter
+			mb.readHreg(remote, REG_FR_I_AC_Power_SF, (uint16 *) &power_inverter_scale, 1, cb, INVERTER_FR_ADDRESS);  //Power Inverter Scale Factor
+			mb.readHreg(remote, REG_FR_M_AC_Power,    (uint16 *) &power_meter,          1, cb, SMARTMETER_FR_ADDRESS);  //Power Zähler
+			mb.readHreg(remote, REG_FR_M_AC_Power_SF, (uint16 *) &power_meter_scale,    1, cb, SMARTMETER_FR_ADDRESS);  //Power Zähler Scale Factor
+		}
 	}
 
 	mb.task();  // Common local Modbus task
@@ -96,9 +114,9 @@ void solarEdge_loop() {
 }
 
 
-String solarEdge_getStatus() {
-	StaticJsonDocument<SOLAR_EDGE_JSON_LEN> data;
-	data[F("solaredge")][F("isConnected")] = String(isConnected);
+String inverter_getStatus() {
+	StaticJsonDocument<INVERTER_JSON_LEN> data;
+	data[F("inverter")][F("isConnected")]  = String(isConnected);
 	data[F("power")][F("AC_Total")]        = String(ac_current);
 	data[F("power")][F("house")]           = String(power_house);
 	data[F("power")][F("inverter")]        = String(power_inverter);

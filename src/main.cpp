@@ -65,7 +65,7 @@ void setup() {
   mqtt_begin();
   rfid_setup();
   powerfox_setup();
-  solarEdge_setup();
+  inverter_setup();
   btn_setup();
   pv_setup();
   lm_setup();
@@ -85,7 +85,7 @@ void loop() {
     webSocket_loop();
     rfid_loop();
     powerfox_loop(); 
-    solarEdge_loop();
+    inverter_loop();
     btn_loop();
     pv_loop();
     //pc_handle();
