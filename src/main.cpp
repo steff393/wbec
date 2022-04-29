@@ -5,6 +5,7 @@
 #include <button.h>
 #include <globalConfig.h>
 #include <goEmulator.h>
+#include <inverter.h>
 #include <LittleFS.h>
 #include <loadManager.h>
 #include <logger.h>
@@ -14,7 +15,6 @@
 #include <powerfox.h>
 #include <pvAlgo.h>
 #include <rfid.h>
-#include <solarEdge.h>
 #define WIFI_MANAGER_USE_ASYNC_WEB_SERVER
 #include <WiFiManager.h>
 #include <webServer.h>

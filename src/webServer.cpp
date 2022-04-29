@@ -11,6 +11,7 @@
 #include <ESPAsyncWebServer.h>
 #include <globalConfig.h>
 #include <goEmulator.h>
+#include <inverter.h>
 #include <LittleFS.h>
 #include <loadManager.h>
 #include <logger.h>
@@ -19,7 +20,6 @@
 #include <powerfox.h>
 #include <pvAlgo.h>
 #include <rfid.h>
-#include <solarEdge.h>
 #include <SPIFFSEditor.h>
 #include <webServer.h>
 #define WIFI_MANAGER_USE_ASYNC_WEB_SERVER

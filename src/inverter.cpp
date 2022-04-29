@@ -4,13 +4,11 @@
 #include <AsyncJson.h>
 #include <ArduinoJson.h>
 #include <globalConfig.h>
-#include <solarEdge.h>
+#include <inverter.h>
 #include <IPAddress.h>
 #include <ModbusIP_ESP8266.h>
 #include <pvAlgo.h>
 
-#define SOLAR_EDGE_PORT        1502
-#define SOLAR_EDGE_JSON_LEN     256
 
 static IPAddress remote;   // Address of Modbus Slave device
 static ModbusIP  mb;       // Declare ModbusTCP instance
