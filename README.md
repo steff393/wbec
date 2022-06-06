@@ -26,7 +26,7 @@ Ziel des Projekts ist es, eine WLAN-Schnittstelle zu entwickeln, die gleichzeiti
 
 ## Kontakt
 Bei Fragen oder wenn ihr Unterstützung braucht gerne einfach eine Mail schicken (wbec393@gmail.com)    
-Bitte schaut auch ins [Wiki](https://github.com/steff393/wbec/wiki) und in meine anderen [Projekte](https://github.com/steff393/hgdo).  
+Bitte schaut auch ins [Wiki](https://github.com/steff393/wbec/wiki) und in meine anderen Projekte, z.B. den [SmartUploader](https://github.com/steff393/SmartUploader) zum Auslesen von Wechselrichtern und [hgdo](https://github.com/steff393/hgdo) zur Steuerung von Torantrieben.  
 
 ## Bilder
 <p align="center"> 
