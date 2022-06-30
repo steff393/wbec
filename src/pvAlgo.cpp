@@ -8,7 +8,7 @@
 #include <loadManager.h>
 #include <mbComm.h>
 #include <pvAlgo.h>
-#include <rtcvars.h>
+#include <RTCVars.h>
 
 
 const uint8_t m = 11;
