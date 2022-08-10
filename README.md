@@ -33,10 +33,6 @@ Bitte schaut auch ins [Wiki](https://github.com/steff393/wbec/wiki) und in meine
   <img src="/images/wbec_pcb.jpg"> 
 </p>
   
-## Dank
-<img src="https://i.ibb.co/XzpgVq3/50stars.png">
-  
-  
 # wbec
 Wifi interface to Heidelberg **W**all**B**ox **E**nergy **C**ontrol using ESP8266  
   
