@@ -11,8 +11,6 @@ const uint8_t m = 5;
 char cfgWbecVersion[]     = "v0.4.5";              // wbec version
 char cfgBuildDate[]       = __DATE__ " " __TIME__;    // wbec build date
 
-char     cfgSsid[32];                 // <don't use - only for testing> 
-char     cfgPass[63];                 // <don't use - only for testing>
 char     cfgApSsid[32];               // SSID of the initial Access Point
 char     cfgApPass[63];               // Password of the initial Access Point
 uint8_t  cfgCntWb;                    // number of connected wallboxes in the system
@@ -45,11 +43,38 @@ uint16_t cfgBootlogSize;              // Size of the bootlog buffer for debuggin
 uint16_t cfgBtnDebounce;              // Debounce time for button [ms]
 
 
-static boolean checkConfig(JsonDocument& doc, const char *file) {
-	File configFile = LittleFS.open(file, "r");
+static bool createConfig() {
+	StaticJsonDocument<1024> doc;
+
+	// default configuration parameters
+	doc["cfgApSsid"]              = F("wbec");
+	doc["cfgApPass"]              = F("wbec1234"); // older version had "cebw1234"
+	doc["cfgCntWb"]               = 1;
+	doc["cfgMqttIp"]              = F("");
+	doc["cfgMqttLp"]              = serialized("[]");   // already serialized
+	
+	File configFile = LittleFS.open(F("/cfg.json"), "w");
 	if (!configFile) {
-		LOG(m, "Failed to open config file...","")
 		return(false);
+	}
+
+	serializeJson(doc, configFile);
+	configFile.close();
+	return (true);
+}
+
+
+static boolean checkConfig(JsonDocument& doc) {
+	File configFile = LittleFS.open(F("/cfg.json"), "r");
+	if (!configFile) {
+		LOG(m, "Failed to open config file... Creating default config...","")
+		if (createConfig()) {
+			LOG(0, "Successful!", "");
+			configFile = LittleFS.open(F("/cfg.json"), "r");
+		} else {
+			LOG(m, "Failed to create default config... Please try to erase flash","");
+			return(false);
+		}
 	}
 
 	size_t size = configFile.size();
@@ -72,14 +97,17 @@ static boolean checkConfig(JsonDocument& doc, const char *file) {
 		return(false);
 	}
 	configFile.close();
-
+	
+	//configFile = LittleFS.open("/cfg.json", "r");
+	//log(m, configFile.readString());
+	//configFile.close();
 	return(true);
 }
 
 
 void loadConfig() {
 	StaticJsonDocument<1024> doc;
-	if (!checkConfig(doc, "/cfg.json")) {
+	if (!checkConfig(doc)) {
 		LOG(m, "Using default config", "");
 		deserializeJson(doc, F("{}"));
 	}
@@ -128,14 +156,4 @@ void loadConfig() {
 			cfgMqttLp[i]            = 0;
 		}
 	}
-}
-
-
-void loadConfigWifi() {
-	StaticJsonDocument<256> doc;
-	if (!checkConfig(doc, "/wifi.json")) {
-		deserializeJson(doc, F("{}"));
-	}
-	strncpy(cfgSsid,            doc["cfgSsid"]              | "",                 sizeof(cfgSsid));
-	strncpy(cfgPass,            doc["cfgPass"]              | "",                 sizeof(cfgPass));
 }

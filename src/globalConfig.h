@@ -23,9 +23,7 @@
 
 extern char     cfgWbecVersion[];	           // wbec version
 extern char     cfgBuildDate[];	          	 // wbec build date
-
-extern char     cfgSsid[32];                 // <don't use - only for testing> 
-extern char     cfgPass[63];                 // <don't use - only for testing> 
+ 
 extern char     cfgApSsid[32];               // SSID of the initial Access Point
 extern char     cfgApPass[63];               // Password of the initial Access Point
 extern uint8_t  cfgCntWb;                    // number of connected wallboxes in the system
@@ -58,6 +56,5 @@ extern uint16_t cfgBootlogSize;              // Size of the bootlog buffer for d
 extern uint16_t cfgBtnDebounce;              // Debounce time for button [ms]
 
 extern void loadConfig();
-extern void loadConfigWifi();
 
 #endif	/* GLOBALCONFIG_H */

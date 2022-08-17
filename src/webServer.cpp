@@ -115,7 +115,7 @@ void webServer_setup() {
 	});
 
 	server.on("/resetwifi", HTTP_GET, [](AsyncWebServerRequest *request){
-		request->send(200, F("text/plain"), F("Resetting the WiFi credentials... Please power off/on"));
+		request->send(200, F("text/plain"), F("WiFi credentials deleted!"));
 		resetwifiRequested = true;
 	});
 
@@ -309,6 +309,6 @@ void webServer_loop() {
 	if (resetwifiRequested) {
 		WiFi.disconnect(true);
 		ESP.eraseConfig();
-		resetwifiRequested = false;
+		ESP.restart();
 	}
 }

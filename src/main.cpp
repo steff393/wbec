@@ -24,21 +24,6 @@
 static bool _handlingOTA = false;
 
 
-bool initWiFi_test() {
-	if(!strcmp(cfgSsid, "") || !strcmp(cfgPass, "")){
-		return(false);
-	}
-
-	WiFi.mode(WIFI_AP_STA);
-	WiFi.begin(cfgSsid, cfgPass);
-	while(WiFi.status() != WL_CONNECTED) {
-		Serial.println(F("."));
-	}
-	Serial.println(WiFi.localIP());
-	return(true);
-}
-
-
 void setup() {
   Serial.begin(115200);
   Serial.println(F("\n\nStarting wbec ;-)"));
@@ -50,15 +35,11 @@ void setup() {
   }
 
   loadConfig();
-  loadConfigWifi();
 
-  if (!initWiFi_test()) {
-    // normal connection over WifiManager
-    WiFiManager wifiManager;
-    char ssid[32]; strcpy(ssid, cfgApSsid);
-    char pass[63]; strcpy(pass, cfgApPass);
-    wifiManager.autoConnect(ssid, pass);
-  }  
+  WiFiManager wifiManager;
+  char ssid[32]; strcpy(ssid, cfgApSsid);
+  char pass[63]; strcpy(pass, cfgApPass);
+  wifiManager.autoConnect(ssid, pass);
 
   // still experimental (see #12):
   if (cfgWifiSleepMode >= WIFI_NONE_SLEEP && cfgWifiSleepMode <= WIFI_MODEM_SLEEP) {
