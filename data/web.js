@@ -42,6 +42,7 @@ function processReceivedCommand(evt)
 		document.getElementById('wbStat').innerHTML = wbStat;
 		document.getElementById('power').innerHTML = obj.power;
 		document.getElementById('energyI').innerHTML = obj.energyI;
+		document.getElementById('energyC').innerHTML = obj.energyC;
 		document.getElementById('currLim').innerHTML = obj.currLim;
 		document.getElementById('watt').innerHTML = obj.watt;
 		document.getElementById('timeNow').innerHTML = obj.timeNow;
@@ -81,6 +82,7 @@ document.getElementById('btnExit').addEventListener('click', function() {
 	document.getElementById('wbStat').innerHTML = '-';
 	document.getElementById('power').innerHTML = '-';
 	document.getElementById('energyI').innerHTML = '-';
+	document.getElementById('energyC').innerHTML = '-';
 	document.getElementById('currLim').innerHTML = '-';
 	document.getElementById('watt').innerHTML = '-';
 	document.getElementById('timeNow').innerHTML = '-';

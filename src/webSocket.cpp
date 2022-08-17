@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <globalConfig.h>
+#include <goEmulator.h>
 #include <logger.h>
 #include <loadManager.h>
 #include <mbComm.h>
@@ -64,6 +65,7 @@ void webSocket_loop() {
 	data[F("chgStat")]  = content[id][1];
 	data[F("power")]    = content[id][10];
 	data[F("energyI")]  = (float)((uint32_t) content[id][13] << 16 | (uint32_t)content[id][14]) / 1000.0;
+	data[F("energyC")]  = (float)goE_getEnergySincePlugged(id) / 1000.0;
 	data[F("currLim")]  = (float)content[id][53]/10.0;
 	data[F("watt")]     = pv_getWatt();
 	data[F("pvMode")]   = pv_getMode();

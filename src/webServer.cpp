@@ -181,8 +181,9 @@ void webServer_setup() {
 			data[F("box")][i][F("voltL3")]   = content[i][8];
 			data[F("box")][i][F("extLock")]  = content[i][9];
 			data[F("box")][i][F("power")]    = content[i][10];
-			data[F("box")][i][F("energyP")]   = (float)((uint32_t) content[i][11] << 16 | (uint32_t)content[i][12]) / 1000.0;
-			data[F("box")][i][F("energyI")]   = (float)((uint32_t) content[i][13] << 16 | (uint32_t)content[i][14]) / 1000.0;
+			data[F("box")][i][F("energyP")]  = (float)((uint32_t) content[i][11] << 16 | (uint32_t)content[i][12]) / 1000.0;
+			data[F("box")][i][F("energyI")]  = (float)((uint32_t) content[i][13] << 16 | (uint32_t)content[i][14]) / 1000.0;
+			data[F("box")][i][F("energyC")]  = (float)goE_getEnergySincePlugged(i) / 1000.0;
 			data[F("box")][i][F("currMax")]  = content[i][15];
 			data[F("box")][i][F("currMin")]  = content[i][16];
 			char txt[65]; mb_getAscii(i, 17, 32, txt);

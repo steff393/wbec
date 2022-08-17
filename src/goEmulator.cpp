@@ -164,3 +164,9 @@ String goE_getStatus(uint8_t id, boolean fromApp) {
 	log(m, response);
 	return(response);
 }
+
+
+uint32_t goE_getEnergySincePlugged(uint8_t id) {
+	// substract the stored energy counter at plugging from the current energy counter
+	return(((uint32_t) content[id][13] << 16 | (uint32_t)content[id][14]) - box[id].energyI);
+}
