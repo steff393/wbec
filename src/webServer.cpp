@@ -254,7 +254,7 @@ void webServer_setup() {
 		request->send(200, F("text/plain"), String(pc_getState()));
 	});
 
-	server.on("/pfox", HTTP_GET, [](AsyncWebServerRequest *request) {
+	server.on("/pv", HTTP_GET, [](AsyncWebServerRequest *request) {
 		StaticJsonDocument<PFOX_JSON_LEN> data;
 		uint8_t id = 0;
 		// modify values
