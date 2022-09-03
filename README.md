@@ -4,7 +4,6 @@
 WLAN-Anbindung der Heidelberg **W**all**B**ox **E**nergy **C**ontrol über ESP8266  
   
 ![GitHub all releases](https://img.shields.io/github/downloads/steff393/wbec/total?color=blue&style=flat-square) 
-![Lines of code](https://img.shields.io/tokei/lines/github.com/steff393/wbec?color=blue&style=flat-square)  
   
 Die Heidelberg Wallbox Energy Control ist eine hochwertige Ladestation, bietet aber nur Modbus RTU als Schnittstelle.  
 Ziel des Projekts ist es, eine WLAN-Schnittstelle zu entwickeln, die gleichzeitig die Modbus-Leader-Funktion übernimmt.  
@@ -16,17 +15,21 @@ Ziel des Projekts ist es, eine WLAN-Schnittstelle zu entwickeln, die gleichzeiti
 - PV-Überschussladen, Zielladen, etc. mit den o.g. Steuerungen
 - RFID-Kartenleser zur Freischaltung der Wallbox mit gültiger Karte/Chip (spezielle HW nötig, s. Wiki)  
 - Ansteuerung aller verbundenen Ladestationen (bis zu 16 Follower am Modbus, bis zu 8 openWB-Ladepunkte)
-- Lesen/Schreiben der Modbus-Register über ein JSON-Web-Interface 
-- Standby-Funktion der Ladestation einstellbar
-- Einfacher Prototyp einer Webseite zur Steuerung
 - Einfacher Prototyp eines lokalen Lastmanagements (in Entwicklung)
 - Softwareupdate per WLAN (Over The Air), z.B. mit PlatformIO oder einfach per Browser (s. Wiki)
 - Access-Point-Modus zur initialen Einstellung des WLANs (SSID/Passwort, s. Wiki)
 - Weniger als 1W Strombedarf (trotz Ansteuerung von bis zu 16 Ladestationen)
 
 ## Kontakt
-Bei Fragen oder wenn ihr Unterstützung braucht gerne einfach eine Mail schicken (wbec393@gmail.com)    
+Bei Fragen oder wenn ihr Unterstützung braucht gerne einfach eine Mail schicken (wbec393@gmail.com).    
 Bitte schaut auch ins [Wiki](https://github.com/steff393/wbec/wiki) und in meine anderen Projekte, z.B. den [SmartUploader](https://github.com/steff393/SmartUploader) zum Auslesen von Wechselrichtern und [hgdo](https://github.com/steff393/hgdo) zur Steuerung von Torantrieben.  
+
+## Beispiel
+Einfaches Web-Interface (geeignet für alle Browser, Smartphone, PC, etc.):  
+`http://wbec.local/`  
+<p align="center"> 
+  <img src="https://i.ibb.co/DtZC9tp/wbec-Web-Interface2.png"> 
+</p>
 
 ## Bilder
 <p align="center"> 
@@ -45,9 +48,6 @@ Goal of this project is to establish an Wifi interface, which also acts as Modbu
 - Support of Android App [Wallbox Steuerung](https://android.chk.digital/ecar-charger-control/)  
 - RFID card reader for unlocking the wallbox only with valid card/chip (needs special HW, s. Wiki)  
 - Prepared for supporting up to all 16 connected boxes (up to 8 openWB load points)
-- Modbus registers can be read/written via JSON web interface
-- Standby of Wallbox can be configured
-- Simple prototype of a web interface
 - Simple prototype of a local load management
 - Update via WiFi (OTA), e.g. with PlatformIO or simply via Web browser (s. Wiki)
 - Access point mode, to configure your WiFi network/password (s. Wiki)
@@ -66,8 +66,8 @@ S5 = 0000
 S6 = 0100 (terminator 120 Ohm, only on last box)  
 
 ## Examples
-Simple web interface (example with powerfox setup):  
-`http://x.x.x.x/web.html` 
+Simple web interface (for all browsers, Smartphones, PC, etc.):  
+`http://wbec.local/`  
 <p align="center"> 
   <img src="https://i.ibb.co/DtZC9tp/wbec-Web-Interface2.png"> 
 </p>
