@@ -88,6 +88,8 @@ void inverter_loop() {
 			mb.readHreg(remote,   REG_FR_I_AC_Power_SF, (uint16 *) &power_inverter_scale, 1, cb, INVERTER_FR_ADDRESS);    //Power Inverter Scale Factor
 			mb.readHreg(remote,   REG_FR_M_AC_Power,    (uint16 *) &power_meter,          1, cb, SMARTMETER_FR_ADDRESS);  //Power Zähler
 			mb.readHreg(remote,   REG_FR_M_AC_Power_SF, (uint16 *) &power_meter_scale,    1, cb, SMARTMETER_FR_ADDRESS);  //Power Zähler Scale Factor
+			// Fronius Smartmeter provides the value inverted (pos. = 'Bezug', neg. = 'Einspeisung'), see #24
+			power_meter = -1 * power_meter;
 		}
 	}
 	
