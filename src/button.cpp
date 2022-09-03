@@ -4,6 +4,7 @@
 #include <Bounce2.h>
 #include <globalConfig.h>
 #include <pvAlgo.h>
+#include <rfid.h>
 #include <loadManager.h>
 #include <mbComm.h>
 
@@ -15,12 +16,18 @@ static Bounce2::Button btn_PV_SWITCH = Bounce2::Button();
 
 
 void btn_setup() {
-	if (cfgBtnDebounce > 0) {
-		btn_PV_SWITCH.attach(PIN_RST_PV_SWITCH, INPUT_PULLUP); // USE INTERNAL PULL-UP
-		btn_PV_SWITCH.interval(cfgBtnDebounce);
+	if (rfid_getEnabled()) {
+		; // if RFID is enabled, then it's not possible to use the GPIOs for other purposes
 	} else {
-		pinMode(PIN_RST_PV_SWITCH, OUTPUT);
+		// if RFID is not active, then PV_SWITCH can be used to change the PV mode
+		if (cfgBtnDebounce > 0) {
+			btn_PV_SWITCH.attach(PIN_PV_SWITCH, INPUT_PULLUP); // USE INTERNAL PULL-UP
+			btn_PV_SWITCH.interval(cfgBtnDebounce);
+		}
+		// and RST can be used as an output
+		pinMode(PIN_RST, OUTPUT);
 	}
+	
 }
 
 

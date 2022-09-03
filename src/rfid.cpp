@@ -27,7 +27,7 @@ boolean   rfid_enabled      = false;
 boolean   rfid_released     = false;
 uint16_t  rfid_chgStat_old 	= 0;
 
-MFRC522 mfrc522(PIN_SS, PIN_RST_PV_SWITCH);
+MFRC522 mfrc522(PIN_SS, PIN_RST);
 
 
 boolean readCards() {

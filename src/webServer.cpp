@@ -91,22 +91,27 @@ void webServer_setup() {
 	server.on("/gpio", HTTP_GET, [](AsyncWebServerRequest *request){
 		StaticJsonDocument<GPIO_JSON_LEN> data;
 
-		if ((!rfid_getEnabled()) && (cfgBtnDebounce==0)) {
+		if (rfid_getEnabled()) {
+			// if RFID is enabled, then it's not possible to use the GPIOs for other purposes
+			request->send(200, F("text/plain"), F("Not possible, RFID active!"));
+		} else {
 			// Set GPIO as an OUTPUT
 			if (request->hasParam(F("on"))) {
-				digitalWrite(PIN_RST_PV_SWITCH, HIGH);
+				digitalWrite(PIN_RST, HIGH);
 			}
 			if (request->hasParam(F("off"))) {
-				digitalWrite(PIN_RST_PV_SWITCH, LOW);
+				digitalWrite(PIN_RST, LOW);
 			}
-			data[F("D3")] = digitalRead(PIN_RST_PV_SWITCH);
-		} else {    
-			// Read GPIO as an INPUT
-			data[F("D3")] = btn_getState() ? 1 : 0;
-		}
-		char response[GPIO_JSON_LEN];
-		serializeJson(data, response, GPIO_JSON_LEN);
-		request->send(200, F("application/json"), response);
+			data[F("D3")] = digitalRead(PIN_RST);
+			if (cfgBtnDebounce==0) {
+				data[F("D7")] = digitalRead(PIN_PV_SWITCH);
+			} else {
+				data[F("D7")] = btn_getState() ? 1 : 0;
+			}
+			char response[GPIO_JSON_LEN];
+			serializeJson(data, response, GPIO_JSON_LEN);
+			request->send(200, F("application/json"), response);
+		} 
 	});
 
 	server.on("/reset", HTTP_GET, [](AsyncWebServerRequest *request){
