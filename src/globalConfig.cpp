@@ -8,7 +8,7 @@
 
 const uint8_t m = 5;
 
-char cfgWbecVersion[]     = "v0.4.5";              // wbec version
+char cfgWbecVersion[]     = "v0.4.5+";              // wbec version
 char cfgBuildDate[]       = __DATE__ " " __TIME__;    // wbec build date
 
 char     cfgApSsid[32];               // SSID of the initial Access Point
@@ -41,6 +41,7 @@ char     cfgInverterIp[16];           // IP address of Inverter, "" to disable
 uint8_t  cfgInverterType;             // 0=off, 1=SolarEdge, 2=Fronius, 3=Kostal
 uint16_t cfgBootlogSize;              // Size of the bootlog buffer for debugging, max. 5000 [bytes]
 uint16_t cfgBtnDebounce;              // Debounce time for button [ms]
+uint16_t cfgWifiConnectTimeout;       // Timeout in seconds to connect to Wifi before change to AP-Mode.
 
 
 static bool createConfig() {
@@ -112,35 +113,36 @@ void loadConfig() {
 		deserializeJson(doc, F("{}"));
 	}
 
-	strncpy(cfgApSsid,          doc["cfgApSsid"]            | "wbec",             sizeof(cfgApSsid));
-	strncpy(cfgApPass,          doc["cfgApPass"]            | "wbec1234",         sizeof(cfgApPass));
-	cfgCntWb                  = doc["cfgCntWb"]             | 1;
-	cfgMbCycleTime            = doc["cfgMbCycleTime"]       | 10; 
-	cfgMbDelay                = doc["cfgMbDelay"]           | 100UL; 
-	cfgMbTimeout              = doc["cfgMbTimeout"]         | 60000UL;
-	cfgStandby                = doc["cfgStandby"]           | 4UL; 
-	strncpy(cfgMqttIp,          doc["cfgMqttIp"]            | "",                 sizeof(cfgMqttIp));
-	cfgMqttPort               = doc["cfgMqttPort"]          | 1883UL;
-	strncpy(cfgMqttUser,        doc["cfgMqttUser"]          | "",                 sizeof(cfgMqttUser));
-	strncpy(cfgMqttPass,        doc["cfgMqttPass"]          | "",                 sizeof(cfgMqttPass));
-	strncpy(cfgNtpServer,       doc["cfgNtpServer"]         | "europe.pool.ntp.org", sizeof(cfgNtpServer));
-	strncpy(cfgFoxUser,         doc["cfgFoxUser"]           | "",                 sizeof(cfgFoxUser));
-	strncpy(cfgFoxPass,         doc["cfgFoxPass"]           | "",                 sizeof(cfgFoxPass));
-	strncpy(cfgFoxDevId,        doc["cfgFoxDevId"]          | "",                 sizeof(cfgFoxDevId));
-	cfgPvActive               = doc["cfgPvActive"]          | 0; 
-	cfgPvCycleTime            = doc["cfgPvCycleTime"]       | 30; 
-	cfgPvLimStart             = doc["cfgPvLimStart"]        | 61; 
-	cfgPvLimStop              = doc["cfgPvLimStop"]         | 50; 
-	cfgPvPhFactor             = doc["cfgPvPhFactor"]        | 69; 
-	cfgPvOffset               = doc["cfgPvOffset"]          | 0UL;
-	cfgTotalCurrMax           = doc["cfgTotalCurrMax"]      | 0UL;
-	cfgHwVersion              = doc["cfgHwVersion"]         | 15;
-	cfgWifiSleepMode          = doc["cfgWifiSleepMode"]     | 0;
-	cfgLoopDelay              = doc["cfgLoopDelay"]         | 255;
-	strncpy(cfgInverterIp,      doc["cfgInverterIp"]        | "",                 sizeof(cfgInverterIp));
-	cfgInverterType           = doc["cfgInverterType"]      | 0;
-	cfgBootlogSize            = doc["cfgBootlogSize"]       | 2000;
-	cfgBtnDebounce            = doc["cfgBtnDebounce"]       | 0;
+	strncpy(cfgApSsid,          doc["cfgApSsid"]             | "wbec",             sizeof(cfgApSsid));
+	strncpy(cfgApPass,          doc["cfgApPass"]             | "wbec1234",         sizeof(cfgApPass));
+	cfgCntWb                  = doc["cfgCntWb"]              | 1;
+	cfgMbCycleTime            = doc["cfgMbCycleTime"]        | 10; 
+	cfgMbDelay                = doc["cfgMbDelay"]            | 100UL; 
+	cfgMbTimeout              = doc["cfgMbTimeout"]          | 60000UL;
+	cfgStandby                = doc["cfgStandby"]            | 4UL; 
+	strncpy(cfgMqttIp,          doc["cfgMqttIp"]             | "",                 sizeof(cfgMqttIp));
+	cfgMqttPort               = doc["cfgMqttPort"]           | 1883UL;
+	strncpy(cfgMqttUser,        doc["cfgMqttUser"]           | "",                 sizeof(cfgMqttUser));
+	strncpy(cfgMqttPass,        doc["cfgMqttPass"]           | "",                 sizeof(cfgMqttPass));
+	strncpy(cfgNtpServer,       doc["cfgNtpServer"]          | "europe.pool.ntp.org", sizeof(cfgNtpServer));
+	strncpy(cfgFoxUser,         doc["cfgFoxUser"]            | "",                 sizeof(cfgFoxUser));
+	strncpy(cfgFoxPass,         doc["cfgFoxPass"]            | "",                 sizeof(cfgFoxPass));
+	strncpy(cfgFoxDevId,        doc["cfgFoxDevId"]           | "",                 sizeof(cfgFoxDevId));
+	cfgPvActive               = doc["cfgPvActive"]           | 0; 
+	cfgPvCycleTime            = doc["cfgPvCycleTime"]        | 30; 
+	cfgPvLimStart             = doc["cfgPvLimStart"]         | 61; 
+	cfgPvLimStop              = doc["cfgPvLimStop"]          | 50; 
+	cfgPvPhFactor             = doc["cfgPvPhFactor"]         | 69; 
+	cfgPvOffset               = doc["cfgPvOffset"]           | 0UL;
+	cfgTotalCurrMax           = doc["cfgTotalCurrMax"]       | 0UL;
+	cfgHwVersion              = doc["cfgHwVersion"]          | 15;
+	cfgWifiSleepMode          = doc["cfgWifiSleepMode"]      | 0;
+	cfgLoopDelay              = doc["cfgLoopDelay"]          | 255;
+	strncpy(cfgInverterIp,      doc["cfgInverterIp"]         | "",                 sizeof(cfgInverterIp));
+	cfgInverterType           = doc["cfgInverterType"]       | 0;
+	cfgBootlogSize            = doc["cfgBootlogSize"]        | 2000;
+	cfgBtnDebounce            = doc["cfgBtnDebounce"]        | 0;
+	cfgWifiConnectTimeout     = doc["cfgWifiConnectTimeout"] | 10;
 	
 	LOG(m, "cfgWbecVersion: %s", cfgWbecVersion);
 	LOG(m, "cfgBuildDate: %s"  , cfgBuildDate);

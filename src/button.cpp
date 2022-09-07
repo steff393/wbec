@@ -23,6 +23,16 @@ void btn_setup() {
 		if (cfgBtnDebounce > 0) {
 			btn_PV_SWITCH.attach(PIN_PV_SWITCH, INPUT_PULLUP); // USE INTERNAL PULL-UP
 			btn_PV_SWITCH.interval(cfgBtnDebounce);
+			btn_PV_SWITCH.setPressedState(LOW);
+			btn_PV_SWITCH.update();
+			if (btn_PV_SWITCH.isPressed()) {
+				pv_setMode(PV_ACTIVE);
+			}
+			if (!btn_PV_SWITCH.isPressed()) {
+				pv_setMode(PV_OFF);
+				delay(3000); // if Power loss: Wallbox is booting ~2s slower than WBEC: "lm_storeRequest" would be lost.
+				lm_storeRequest(BOXID, CURR_ABS_MAX);
+			}
 		}
 		// and RST can be used as an output
 		pinMode(PIN_RST, OUTPUT);
@@ -46,5 +56,5 @@ void btn_loop() {
 
 
 boolean btn_getState() {
-	return(btn_PV_SWITCH.pressed());
+	return(btn_PV_SWITCH.isPressed());
 }

@@ -55,6 +55,8 @@ extern char     cfgInverterIp[16];           // IP address of Inverter, "" to di
 extern uint8_t  cfgInverterType;             // 0=off, 1=SolarEdge, 2=Fronius, 3=Kostal
 extern uint16_t cfgBootlogSize;              // Size of the bootlog buffer for debugging, e.g. 5000 bytes
 extern uint16_t cfgBtnDebounce;              // Debounce time for button [ms]
+extern uint16_t cfgWifiConnectTimeout;       // Timeout in seconds to connect to Wifi before change to AP-Mode.
+
 
 extern void loadConfig();
 

@@ -39,6 +39,7 @@ void setup() {
   WiFiManager wifiManager;
   char ssid[32]; strcpy(ssid, cfgApSsid);
   char pass[63]; strcpy(pass, cfgApPass);
+  wifiManager.setConnectTimeout(cfgWifiConnectTimeout);
   wifiManager.autoConnect(ssid, pass);
 
   // still experimental (see #12):

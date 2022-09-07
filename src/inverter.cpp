@@ -76,6 +76,7 @@ void inverter_loop() {
 			mb.readHreg(remote, REG_SE_M_AC_Power,    (uint16 *) &power_meter,          1, cb, SMARTMETER_SE_ADDRESS);  //Power Zähler
 			mb.readHreg(remote, REG_SE_M_AC_Power_SF, (uint16 *) &power_meter_scale,    1, cb, SMARTMETER_SE_ADDRESS);  //Power Zähler Scale Factor
 		}
+		mb.task();  // Common local Modbus task
 	}
 
 	// Connect and read Fronius
@@ -88,9 +89,10 @@ void inverter_loop() {
 			mb.readHreg(remote,   REG_FR_I_AC_Power_SF, (uint16 *) &power_inverter_scale, 1, cb, INVERTER_FR_ADDRESS);    //Power Inverter Scale Factor
 			mb.readHreg(remote,   REG_FR_M_AC_Power,    (uint16 *) &power_meter,          1, cb, SMARTMETER_FR_ADDRESS);  //Power Zähler
 			mb.readHreg(remote,   REG_FR_M_AC_Power_SF, (uint16 *) &power_meter_scale,    1, cb, SMARTMETER_FR_ADDRESS);  //Power Zähler Scale Factor
-			// Fronius Smartmeter provides the value inverted (pos. = 'Bezug', neg. = 'Einspeisung'), see #24
-			power_meter = -1 * power_meter;
 		}
+		mb.task();  // Common local Modbus task
+		// Fronius Smartmeter provides the value inverted (pos. = 'Bezug', neg. = 'Einspeisung'), see #24
+		power_meter = -1 * power_meter;
 	}
 	
 	// Connect and read Kostal
@@ -104,9 +106,8 @@ void inverter_loop() {
 			mb.readHreg(remote,   REG_KO_M_AC_Power,    (uint16 *) &power_meter,          1, cb, SMARTMETER_KO_ADDRESS);  //Power Zähler
 			mb.readHreg(remote,   REG_KO_M_AC_Power_SF, (uint16 *) &power_meter_scale,    1, cb, SMARTMETER_KO_ADDRESS);  //Power Zähler Scale Factor
 		}
+		mb.task();  // Common local Modbus task
 	}
-
-	mb.task();  // Common local Modbus task
 
 	int16_t pwrInv;
 	int16_t pwrMet;
