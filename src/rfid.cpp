@@ -130,6 +130,7 @@ boolean rfid_getEnabled() {
   return(rfid_enabled);
 }
 
+
 boolean rfid_getReleased() {
   return(rfid_released);
 }
@@ -138,4 +139,3 @@ boolean rfid_getReleased() {
 char * rfid_getLastID() {
   return(chipID);
 }
-

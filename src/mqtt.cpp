@@ -63,7 +63,7 @@ void callback(char* topic, byte* payload, uint8_t length)
 			val = val * 10;
 			// set current
 			if (val == 0 || (val >= CURR_ABS_MIN && val <= CURR_ABS_MAX)) {
-				LOG(0, ", Write to box: %d Value: %d", i, (uint16) val)
+				LOG(0, ", Write to box: %d Value: %d", i, (uint16_t) val)
 				lm_storeRequest(i, val);
 			}
 		} else {

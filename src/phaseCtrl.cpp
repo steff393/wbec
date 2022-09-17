@@ -68,7 +68,7 @@ bool pc_check0Amp() {
 }
 
 
-uint8 getRequestedPhases() {
+uint8_t getRequestedPhases() {
 	return(pcRequest);
 	// read available power from e.g. openWB
 	/* if (power > 4kW) {

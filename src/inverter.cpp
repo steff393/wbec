@@ -70,11 +70,11 @@ void inverter_loop() {
 		if (!isConnected) {            // Check if connection to Modbus Slave is established
 			mb.connect(remote, INVERTER_SE_PORT);    // Try to connect if no connection
 		} else {  
-			mb.readHreg(remote, REG_SE_I_AC_Current,  (uint16 *) &ac_current,           1, cb, INVERTER_SE_ADDRESS);  
-			mb.readHreg(remote, REG_SE_I_AC_Power,    (uint16 *) &power_inverter,       1, cb, INVERTER_SE_ADDRESS);    //Power Inverter
-			mb.readHreg(remote, REG_SE_I_AC_Power_SF, (uint16 *) &power_inverter_scale, 1, cb, INVERTER_SE_ADDRESS);    //Power Inverter Scale Factor
-			mb.readHreg(remote, REG_SE_M_AC_Power,    (uint16 *) &power_meter,          1, cb, SMARTMETER_SE_ADDRESS);  //Power Zähler
-			mb.readHreg(remote, REG_SE_M_AC_Power_SF, (uint16 *) &power_meter_scale,    1, cb, SMARTMETER_SE_ADDRESS);  //Power Zähler Scale Factor
+			mb.readHreg(remote, REG_SE_I_AC_Current,  (uint16_t *) &ac_current,           1, cb, INVERTER_SE_ADDRESS);  
+			mb.readHreg(remote, REG_SE_I_AC_Power,    (uint16_t *) &power_inverter,       1, cb, INVERTER_SE_ADDRESS);    //Power Inverter
+			mb.readHreg(remote, REG_SE_I_AC_Power_SF, (uint16_t *) &power_inverter_scale, 1, cb, INVERTER_SE_ADDRESS);    //Power Inverter Scale Factor
+			mb.readHreg(remote, REG_SE_M_AC_Power,    (uint16_t *) &power_meter,          1, cb, SMARTMETER_SE_ADDRESS);  //Power Zähler
+			mb.readHreg(remote, REG_SE_M_AC_Power_SF, (uint16_t *) &power_meter_scale,    1, cb, SMARTMETER_SE_ADDRESS);  //Power Zähler Scale Factor
 		}
 	}
 
@@ -83,11 +83,11 @@ void inverter_loop() {
 		if (!isConnected) {            // Check if connection to Modbus Slave is established
 			mb.connect(remote, INVERTER_FR_PORT);    // Try to connect if no connection
 		} else {  
-			//mb.readHreg(remote, REG_FR_I_AC_Current,  (uint16 *) &ac_current,           1, cb, INVERTER_FR_ADDRESS);  
-			mb.readHreg(remote,   REG_FR_I_AC_Power,    (uint16 *) &power_inverter,       1, cb, INVERTER_FR_ADDRESS);    //Power Inverter
-			mb.readHreg(remote,   REG_FR_I_AC_Power_SF, (uint16 *) &power_inverter_scale, 1, cb, INVERTER_FR_ADDRESS);    //Power Inverter Scale Factor
-			mb.readHreg(remote,   REG_FR_M_AC_Power,    (uint16 *) &power_meter,          1, cb, SMARTMETER_FR_ADDRESS);  //Power Zähler
-			mb.readHreg(remote,   REG_FR_M_AC_Power_SF, (uint16 *) &power_meter_scale,    1, cb, SMARTMETER_FR_ADDRESS);  //Power Zähler Scale Factor
+			//mb.readHreg(remote, REG_FR_I_AC_Current,  (uint16_t *) &ac_current,           1, cb, INVERTER_FR_ADDRESS);  
+			mb.readHreg(remote,   REG_FR_I_AC_Power,    (uint16_t *) &power_inverter,       1, cb, INVERTER_FR_ADDRESS);    //Power Inverter
+			mb.readHreg(remote,   REG_FR_I_AC_Power_SF, (uint16_t *) &power_inverter_scale, 1, cb, INVERTER_FR_ADDRESS);    //Power Inverter Scale Factor
+			mb.readHreg(remote,   REG_FR_M_AC_Power,    (uint16_t *) &power_meter,          1, cb, SMARTMETER_FR_ADDRESS);  //Power Zähler
+			mb.readHreg(remote,   REG_FR_M_AC_Power_SF, (uint16_t *) &power_meter_scale,    1, cb, SMARTMETER_FR_ADDRESS);  //Power Zähler Scale Factor
 			// Fronius Smartmeter provides the value inverted (pos. = 'Bezug', neg. = 'Einspeisung'), see #24
 			power_meter = -1 * power_meter;
 		}
@@ -98,11 +98,11 @@ void inverter_loop() {
 		if (!isConnected) {            // Check if connection to Modbus Slave is established
 			mb.connect(remote, INVERTER_KO_PORT);    // Try to connect if no connection
 		} else {  
-			//mb.readHreg(remote, REG_KO_I_AC_Current,  (uint16 *) &ac_current,           1, cb, INVERTER_KO_ADDRESS);  
-			//mb.readHreg(remote, REG_KO_I_AC_Power,    (uint16 *) &power_inverter,       1, cb, INVERTER_KO_ADDRESS);    //Power Inverter
-			//mb.readHreg(remote, REG_KO_I_AC_Power_SF, (uint16 *) &power_inverter_scale, 1, cb, INVERTER_KO_ADDRESS);    //Power Inverter Scale Factor
-			mb.readHreg(remote,   REG_KO_M_AC_Power,    (uint16 *) &power_meter,          1, cb, SMARTMETER_KO_ADDRESS);  //Power Zähler
-			mb.readHreg(remote,   REG_KO_M_AC_Power_SF, (uint16 *) &power_meter_scale,    1, cb, SMARTMETER_KO_ADDRESS);  //Power Zähler Scale Factor
+			//mb.readHreg(remote, REG_KO_I_AC_Current,  (uint16_t *) &ac_current,           1, cb, INVERTER_KO_ADDRESS);  
+			//mb.readHreg(remote, REG_KO_I_AC_Power,    (uint16_t *) &power_inverter,       1, cb, INVERTER_KO_ADDRESS);    //Power Inverter
+			//mb.readHreg(remote, REG_KO_I_AC_Power_SF, (uint16_t *) &power_inverter_scale, 1, cb, INVERTER_KO_ADDRESS);    //Power Inverter Scale Factor
+			mb.readHreg(remote,   REG_KO_M_AC_Power,    (uint16_t *) &power_meter,          1, cb, SMARTMETER_KO_ADDRESS);  //Power Zähler
+			mb.readHreg(remote,   REG_KO_M_AC_Power_SF, (uint16_t *) &power_meter_scale,    1, cb, SMARTMETER_KO_ADDRESS);  //Power Zähler Scale Factor
 		}
 	}
 
