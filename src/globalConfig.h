@@ -58,6 +58,8 @@ extern uint16_t cfgInverterAddr;             // Overwrite default inverter addre
 extern uint16_t cfgInvSmartAddr;             // Overwrite default smart meter address setting
 extern uint16_t cfgBootlogSize;              // Size of the bootlog buffer for debugging, e.g. 5000 bytes
 extern uint16_t cfgBtnDebounce;              // Debounce time for button [ms]
+extern uint16_t cfgWifiConnectTimeout;       // Timeout in seconds to connect to Wifi before change to AP-Mode.
+
 
 extern void loadConfig();
 
