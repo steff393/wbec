@@ -39,6 +39,9 @@ uint8_t  cfgWifiSleepMode;            // Set sleep type for power saving, recome
 uint8_t  cfgLoopDelay;                // Delay [ms] at end of main loop, might have an impact on web server reactivitiy, default: 255 = inactive
 char     cfgInverterIp[16];           // IP address of Inverter, "" to disable 
 uint8_t  cfgInverterType;             // 0=off, 1=SolarEdge, 2=Fronius, 3=Kostal
+uint16_t cfgInverterPort;             // Overwrite default inverter port setting
+uint16_t cfgInverterAddr;             // Overwrite default inverter address setting
+uint16_t cfgInvSmartAddr;             // Overwrite default smart meter address setting
 uint16_t cfgBootlogSize;              // Size of the bootlog buffer for debugging, max. 5000 [bytes]
 uint16_t cfgBtnDebounce;              // Debounce time for button [ms]
 
@@ -139,6 +142,9 @@ void loadConfig() {
 	cfgLoopDelay              = doc["cfgLoopDelay"]         | 255;
 	strncpy(cfgInverterIp,      doc["cfgInverterIp"]        | "",                 sizeof(cfgInverterIp));
 	cfgInverterType           = doc["cfgInverterType"]      | 0;
+	cfgInverterPort           = doc["cfgInverterPort"]      | 0UL;
+	cfgInverterAddr           = doc["cfgInverterAddr"]      | 0UL;
+	cfgInvSmartAddr           = doc["cfgInvSmartAddr"]      | 0UL;
 	cfgBootlogSize            = doc["cfgBootlogSize"]       | 2000;
 	cfgBtnDebounce            = doc["cfgBtnDebounce"]       | 0;
 	

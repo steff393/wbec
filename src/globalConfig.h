@@ -53,6 +53,9 @@ extern uint8_t  cfgWifiSleepMode;            // Set sleep type for power saving,
 extern uint8_t  cfgLoopDelay;                // Delay [ms] at end of main loop, might have an impact on web server reactivitiy, default: 255 = inactive
 extern char     cfgInverterIp[16];           // IP address of Inverter, "" to disable 
 extern uint8_t  cfgInverterType;             // 0=off, 1=SolarEdge, 2=Fronius, 3=Kostal
+extern uint16_t cfgInverterPort;             // Overwrite default inverter port setting
+extern uint16_t cfgInverterAddr;             // Overwrite default inverter address setting
+extern uint16_t cfgInvSmartAddr;             // Overwrite default smart meter address setting
 extern uint16_t cfgBootlogSize;              // Size of the bootlog buffer for debugging, e.g. 5000 bytes
 extern uint16_t cfgBtnDebounce;              // Debounce time for button [ms]
 
