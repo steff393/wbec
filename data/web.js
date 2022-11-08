@@ -13,9 +13,9 @@ function init()
 // Update the current slider value (each time you drag the slider handle)
 document.getElementById("slideCurr").oninput = function() {
 	var val = parseInt(this.value);
-	if (val == 0 || (val >= 6 && val <=16)) {
-		document.getElementById("currLim").innerHTML = val;
-		sendText('currLim=' + val * 10);
+	if (val == 0 || (val >= 60 && val <=160)) {
+		document.getElementById("currLim").innerHTML = val / 10;
+		sendText('currLim=' + val);
 	} else {
 		document.getElementById("currLim").innerHTML = 0;
 		document.getElementById("slideCurr").value = 0;
@@ -46,11 +46,14 @@ function processReceivedCommand(evt)
 		document.getElementById('currLim').innerHTML = obj.currLim;
 		document.getElementById('watt').innerHTML = obj.watt;
 		document.getElementById('timeNow').innerHTML = obj.timeNow;
-		document.getElementById("slideCurr").value = obj.currLim;
+		document.getElementById("slideCurr").value = obj.currLim * 10;
+		var btnAus   = document.getElementById('btnAus');
+		var btnPv    = document.getElementById('btnPv');
+		var btnMinPv = document.getElementById('btnMinPv');
 		switch (obj.pvMode) {
-			case 1:  document.getElementById('pvMode').innerHTML = 'Aus';    showPFoxElements("visible"); break;
-			case 2:  document.getElementById('pvMode').innerHTML = 'PV';     showPFoxElements("visible"); break;
-			case 3:  document.getElementById('pvMode').innerHTML = 'Min+PV'; showPFoxElements("visible");break;
+			case 1:  document.getElementById('pvMode').innerHTML = 'Aus';    btnAus.style.backgroundColor="orange"; btnPv.style.backgroundColor="grey"; btnMinPv.style.backgroundColor="grey"; showPFoxElements("visible"); break;
+			case 2:  document.getElementById('pvMode').innerHTML = 'PV';     btnAus.style.backgroundColor="grey"; btnPv.style.backgroundColor="orange"; btnMinPv.style.backgroundColor="grey"; showPFoxElements("visible"); break;
+			case 3:  document.getElementById('pvMode').innerHTML = 'Min+PV'; btnAus.style.backgroundColor="grey"; btnPv.style.backgroundColor="grey"; btnMinPv.style.backgroundColor="orange"; showPFoxElements("visible");break;
 			default: {
 				document.getElementById('pvMode').innerHTML = '-'; showPFoxElements("hidden");
 			}
@@ -60,7 +63,7 @@ function processReceivedCommand(evt)
 
 function showPFoxElements(state) {
 	document.getElementById('trPFox1').style.visibility = state;
-	document.getElementById('trPFox2').style.visibility = state;
+	//document.getElementById('trPFox2').style.visibility = state;
 	document.getElementById('pvLaden').style.visibility = state;
 }
  
