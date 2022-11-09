@@ -51,9 +51,9 @@ function processReceivedCommand(evt)
 		var btnPv    = document.getElementById('btnPv');
 		var btnMinPv = document.getElementById('btnMinPv');
 		switch (obj.pvMode) {
-			case 1:  document.getElementById('pvMode').innerHTML = 'Aus';    btnAus.style.backgroundColor="orange"; btnPv.style.backgroundColor="grey"; btnMinPv.style.backgroundColor="grey"; showPFoxElements("visible"); break;
-			case 2:  document.getElementById('pvMode').innerHTML = 'PV';     btnAus.style.backgroundColor="grey"; btnPv.style.backgroundColor="orange"; btnMinPv.style.backgroundColor="grey"; showPFoxElements("visible"); break;
-			case 3:  document.getElementById('pvMode').innerHTML = 'Min+PV'; btnAus.style.backgroundColor="grey"; btnPv.style.backgroundColor="grey"; btnMinPv.style.backgroundColor="orange"; showPFoxElements("visible");break;
+			case 1:  btnAus.style.backgroundColor="orange"; btnPv.style.backgroundColor="grey"; btnMinPv.style.backgroundColor="grey"; showPFoxElements("visible"); break;
+			case 2:  btnAus.style.backgroundColor="grey"; btnPv.style.backgroundColor="orange"; btnMinPv.style.backgroundColor="grey"; showPFoxElements("visible"); break;
+			case 3:  btnAus.style.backgroundColor="grey"; btnPv.style.backgroundColor="grey"; btnMinPv.style.backgroundColor="orange"; showPFoxElements("visible");break;
 			default: {
 				document.getElementById('pvMode').innerHTML = '-'; showPFoxElements("hidden");
 			}
@@ -89,6 +89,9 @@ document.getElementById('btnExit').addEventListener('click', function() {
 	document.getElementById('currLim').innerHTML = '-';
 	document.getElementById('watt').innerHTML = '-';
 	document.getElementById('timeNow').innerHTML = '-';
+	document.getElementById('btnAus').style.backgroundColor="grey"; 
+	document.getElementById('btnPv').style.backgroundColor="grey"; 
+	document.getElementById('btnMinPv').style.backgroundColor="grey"; 
 	Socket.close();
 });
 

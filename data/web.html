@@ -1,20 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>wbec</title>
-    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport'>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+		<title>wbec</title>
+		<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport'>
 </head>
 
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="flash" viewBox="0 0 19 36">
+    <g transform="translate(0,36) scale(0.1,-0.1)"><path d="M87 258 l-86 -103 34 -3 33 -3 -29 -71 c-16 -39 -28 -73 -26 -75 2 -2 43 43 90 99 l87 103 -34 3 -34 3 29 71 c16 39 28 73 26 75 -2 1 -42 -43 -90 -99z"/></g>
+  </symbol>
+  <symbol id="panel" viewBox="0 0 43 36">
+    <g transform="translate(0,36) scale(0.1,-0.1)"><path d="M22 337 c-12 -13 -22 -35 -22 -50 l0 -27 100 0 100 0 0 50 0 50 -78 0 c-69 0 -81 -3 -100 -23z"/><path d="M230 310 l0 -50 100 0 100 0 0 28 c0 17 -10 37 -23 50 -20 19 -35 22 -100 22 l-77 0 0 -50z"/><path d="M0 180 l0 -50 100 0 100 0 0 50 0 50 -100 0 -100 0 0 -50z"/><path d="M230 180 l0 -50 100 0 100 0 0 50 0 50 -100 0 -100 0 0 -50z"/><path d="M0 72 c0 -17 10 -37 23 -50 20 -19 35 -22 100 -22 l77 0 0 50 0 50 -100 0 -100 0 0 -28z"/><path d="M230 50 l0 -50 78 0 c69 0 81 3 100 23 12 13 22 35 22 50 l0 27 -100 0 -100 0 0 -50z"/></g>
+  </symbol>
+</svg>
+
 <body>
-  <center>
+	<center>
 		<div>
 			<right>
 				<button id='btnExit' style="font-size: 6pt; float: right;">X</button><br>
 			</right>
 		</div>
 		<h1>wbec</h1>
-		<h2>Heidelberg Wallbox Energy Control</h2>
+		<h2>Heidelberg Energy Control</h2>
 		<!--
 		<div id='boxSelection'>
 			<button id='btn1' class="button">1</button>
@@ -24,9 +32,7 @@
 		<br>
 		-->
 		<div class="box">
-			<h3>
-			<svg class="flash" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 36"><g transform="translate(0,36) scale(0.1,-0.1)"><path d="M87 258 l-86 -103 34 -3 33 -3 -29 -71 c-16 -39 -28 -73 -26 -75 2 -2 43 43 90 99 l87 103 -34 3 -34 3 29 71 c16 39 28 73 26 75 -2 1 -42 -43 -90 -99z"/></g></svg>
-			Ladestrom</h3>
+			<h3><svg class="flash"><use xlink:href="#flash"></svg> Ladestrom</h3>
 			<table><tr><td>max. <span id='currLim'>-</span>A</td></tr></table>
 			<table>
 				<tr>
@@ -37,9 +43,7 @@
 			</table>
 		</div>
 		<div class="box">
-  		<h3>
-  		<svg class="flash" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 36"><g transform="translate(0,36) scale(0.1,-0.1)"><path d="M87 258 l-86 -103 34 -3 33 -3 -29 -71 c-16 -39 -28 -73 -26 -75 2 -2 43 43 90 99 l87 103 -34 3 -34 3 29 71 c16 39 28 73 26 75 -2 1 -42 -43 -90 -99z"/></g></svg>
-  		Status</h3>
+			<h3><svg class="flash"><use xlink:href="#flash"></svg> Status</h3>
 			<table width=100%>
 				<tr>
 					<td>Fahrzeug verbunden</td>
@@ -70,119 +74,122 @@
 					<td align="right">W</td>
 				</tr>
 			</table>
-  	</div>
+		</div>
 		<div class="box" id='pvLaden'>
-		<h3 class="pv">
-		<svg class="panel" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 43 36"><g transform="translate(0,36) scale(0.1,-0.1)"><path d="M22 337 c-12 -13 -22 -35 -22 -50 l0 -27 100 0 100 0 0 50 0 50 -78 0 c-69 0 -81 -3 -100 -23z"/><path d="M230 310 l0 -50 100 0 100 0 0 28 c0 17 -10 37 -23 50 -20 19 -35 22 -100 22 l-77 0 0 -50z"/><path d="M0 180 l0 -50 100 0 100 0 0 50 0 50 -100 0 -100 0 0 -50z"/><path d="M230 180 l0 -50 100 0 100 0 0 50 0 50 -100 0 -100 0 0 -50z"/><path d="M0 72 c0 -17 10 -37 23 -50 20 -19 35 -22 100 -22 l77 0 0 50 0 50 -100 0 -100 0 0 -28z"/><path d="M230 50 l0 -50 78 0 c69 0 81 3 100 23 12 13 22 35 22 50 l0 27 -100 0 -100 0 0 -50z"/></g></svg>
-		PV-Modus: <span id='pvMode'>-</span></h3>
+		  <h3 class="pv"><svg class="panel"><use xlink:href="#panel"></svg> PV Laden</h3>
 			<button id='btnAus'   class="pvButton">
-			<svg class="pvButSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 36"><g transform="translate(0,36) scale(0.1,-0.1)"><path d="M87 258 l-86 -103 34 -3 33 -3 -29 -71 c-16 -39 -28 -73 -26 -75 2 -2 43 43 90 99 l87 103 -34 3 -34 3 29 71 c16 39 28 73 26 75 -2 1 -42 -43 -90 -99z"/></g></svg>
+			  <svg class="flash" style="fill:white"><use xlink:href="#flash"></svg> 
 			Aus</button>
 			<button id='btnPv'    class="pvButton">
-			<svg class="pvButSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 43 36"><g transform="translate(0,36) scale(0.1,-0.1)"><path d="M22 337 c-12 -13 -22 -35 -22 -50 l0 -27 100 0 100 0 0 50 0 50 -78 0 c-69 0 -81 -3 -100 -23z"/><path d="M230 310 l0 -50 100 0 100 0 0 28 c0 17 -10 37 -23 50 -20 19 -35 22 -100 22 l-77 0 0 -50z"/><path d="M0 180 l0 -50 100 0 100 0 0 50 0 50 -100 0 -100 0 0 -50z"/><path d="M230 180 l0 -50 100 0 100 0 0 50 0 50 -100 0 -100 0 0 -50z"/><path d="M0 72 c0 -17 10 -37 23 -50 20 -19 35 -22 100 -22 l77 0 0 50 0 50 -100 0 -100 0 0 -28z"/><path d="M230 50 l0 -50 78 0 c69 0 81 3 100 23 12 13 22 35 22 50 l0 27 -100 0 -100 0 0 -50z"/></g></svg>
+			  <svg class="panel" style="fill:white"><use xlink:href="#panel"></svg>
 			PV</button>
 			<button id='btnMinPv' class="pvButton">
-			<svg class="pvButSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 43 36"><g transform="translate(0,36) scale(0.1,-0.1)"><path d="M22 337 c-12 -13 -22 -35 -22 -50 l0 -27 100 0 100 0 0 50 0 50 -78 0 c-69 0 -81 -3 -100 -23z"/><path d="M230 310 l0 -50 100 0 100 0 0 28 c0 17 -10 37 -23 50 -20 19 -35 22 -100 22 l-77 0 0 -50z"/><path d="M0 180 l0 -50 100 0 100 0 0 50 0 50 -100 0 -100 0 0 -50z"/><path d="M230 180 l0 -50 100 0 100 0 0 50 0 50 -100 0 -100 0 0 -50z"/><path d="M0 72 c0 -17 10 -37 23 -50 20 -19 35 -22 100 -22 l77 0 0 50 0 50 -100 0 -100 0 0 -28z"/><path d="M230 50 l0 -50 78 0 c69 0 81 3 100 23 12 13 22 35 22 50 l0 27 -100 0 -100 0 0 -50z"/></g></svg>
-			<svg class="pvButSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 36"><g transform="translate(0,36) scale(0.1,-0.1)"><path d="M87 258 l-86 -103 34 -3 33 -3 -29 -71 c-16 -39 -28 -73 -26 -75 2 -2 43 43 90 99 l87 103 -34 3 -34 3 29 71 c16 39 28 73 26 75 -2 1 -42 -43 -90 -99z"/></g></svg>
+			  <svg class="flash" style="fill:white"><use xlink:href="#flash"></svg>
+			  <svg class="panel" style="fill:white"><use xlink:href="#panel"></svg>
 			Min+PV</button>
 		</div>
-		<span style="font-size:8pt" id='timeNow'>-</span>
-  </center>
+		<div class="time">
+		  <span id='timeNow'>-</span>
+		</div>
+	</center>
+</body>
 
-  <script src="web.js"></script>
+<script src="web.js"></script>
 
-  <style>
+<style>
 	body {
-	    font-family: 'Arial', sans-serif;
-	    font-size: 18pt;
-	    margin: 0;
-			background-color: rgb(106, 106, 106);
+		font-family: 'Arial', sans-serif;
+		font-size: 18pt;
+		margin: 0;
+		background-color: rgb(106, 106, 106);
 	}
-
+	
+	center {
+		padding: 0.3em;
+		margin: auto;
+		width: 30%;
+		box-sizing: border-box;
+	}
+	
 	h1 {
-	    font-family: 'Arial', sans-serif;
-	    font-size: 1.5em;
-	    font-weight: bold;
-			color: rgb(255, 125, 0);
-			margin-top: 0;
+		font-family: 'Arial', sans-serif;
+		font-size: 1.5em;
+		font-weight: bold;
+		color: rgb(255, 125, 0);
+		margin-top: 0;
 	}
+	
 	h2 {
-	    font-family: 'Arial', sans-serif;
-	    font-size: 0.7em;
-	    font-weight: normal;
-			color: white;
+		font-family: 'Arial', sans-serif;
+		font-size: 0.7em;
+		font-weight: normal;
+		color: white;
 	}
+	
 	h3 {
-    font-family: 'Arial', sans-serif;
-    font-size: 0.8em;
-	  text-align: left;
-	  margin: 0px;
-	  color: orange;
-	  font-weight: bold;
+		font-family: 'Arial', sans-serif;
+		font-size: 0.8em;
+		text-align: left;
+		margin: 0px;
+		color: orange;
+		font-weight: bold;
 	}
+	
 	h3.pv {
-	  color: orange; //rgb(0,122,255); // blue
-	  font-weight: normal;
+		color: orange; //rgb(0,122,255); // blue
+		font-weight: normal;
 	}
+	
 	div.box {
 		background-color: rgb(239, 239, 243);
 		border-radius: 10px;
 		padding: 10px 20px 20px 20px;
 		margin-bottom: 40px;
 	}
-  table {
-    font-size: 0.8em;
-  }
-
-  svg.flash {
-    height: 18px;
-	  fill: orange;
-	}
-	svg.panel {
-    height: 18px;
-	  fill: orange; //rgb(0,122,255); // blue
-	}
-	svg.pvButSvg {
-    height: 18px;
-	  fill: white;
-	}
-
-	center {
-	    padding: 0.3em;
-	    margin: auto;
-	    width: 30%;
-	    //box-shadow: #777 2px 2px 5px;
-	    box-sizing: border-box;
-	}
-	button {
-	  font-size: 0.7em;
-	  font-weight: normal;
-	  //width: 6em;
-	  
+	
+	div.time {
+		font-size: 0.4em;
+		color: white;
 	}
 	
-  button.pvButton {
-    background-color: darkgrey;
-    border: none;
-    color: white;
-    font-size: 0.8em;
-    height: 50px;
-    border-radius: 10px;
-    padding: 10px;
-    margin: 10px 0px 10px 0px;
-  }
-
-	#loading {
-		margin-bottom: 12px;
+	table {
+		font-size: 0.8em;
+	}
+	
+	svg.flash {
+		height: 18px;
+		width: 10px;
+		fill: orange;
+	}
+	
+	svg.panel {
+		height: 18px;
+		width: 22px;
+		fill: orange; //rgb(0,122,255); // blue
+	}
+	
+	button {
+		font-size: 0.7em;
+		font-weight: normal;
+	}
+	
+	button.pvButton {
+		background-color: darkgrey;
+		border: none;
+		color: white;
+		font-size: 0.8em;
+		height: 50px;
+		border-radius: 10px;
+		padding: 10px;
+		margin: 10px 0px 10px 0px;
 	}
 
-	/* The slider itself */
 	.slider {
 		-webkit-appearance: none;  /* Override default CSS styles */
 		appearance: none;
 		width: 100%; /* Full-width */
 		height: 10px;
-  	border-radius: 5px; 
+		border-radius: 5px; 
 		background: darkgray; /* Grey background */
 		outline: none; /* Remove outline */
 		opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
@@ -190,7 +197,6 @@
 		transition: opacity .2s;
 	}
 
-	/* Mouse-over effects */
 	.slider:hover {
 		opacity: 1; /* Fully shown on mouse-over */
 	}
@@ -201,7 +207,7 @@
 		appearance: none;
 		width: 25px; /* Set a specific slider handle width */
 		height: 25px;
-  	border-radius: 50%; 
+		border-radius: 50%; 
 		background: orange;
 		cursor: pointer; /* Cursor on hover */
 	}
@@ -209,7 +215,7 @@
 	.slider::-moz-range-thumb {
 		width: 25px; /* Set a specific slider handle width */
 		height: 25px;
-  	border-radius: 50%;
+		border-radius: 50%;
 		background: orange;
 		cursor: pointer; /* Cursor on hover */
 	}
@@ -221,7 +227,6 @@
 			overflow: auto;
 		}
 	}
-  </style>
-</body>
+</style>
 
 </html>
