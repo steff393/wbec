@@ -53,32 +53,42 @@ function processReceivedCommand(evt)
 		switch (obj.pvMode) {
 			case 1:  btnAus.style.backgroundColor="orange"; btnPv.style.backgroundColor="grey"; btnMinPv.style.backgroundColor="grey"; showPFoxElements("visible"); break;
 			case 2:  btnAus.style.backgroundColor="grey"; btnPv.style.backgroundColor="orange"; btnMinPv.style.backgroundColor="grey"; showPFoxElements("visible"); break;
-			case 3:  btnAus.style.backgroundColor="grey"; btnPv.style.backgroundColor="grey"; btnMinPv.style.backgroundColor="orange"; showPFoxElements("visible");break;
+			case 3:  btnAus.style.backgroundColor="grey"; btnPv.style.backgroundColor="grey"; btnMinPv.style.backgroundColor="orange"; showPFoxElements("visible"); break;
 			default: {
-				document.getElementById('pvMode').innerHTML = '-'; showPFoxElements("hidden");
+				showPFoxElements("hidden");
 			}
 		}
+		/* begin BoxSelection */
+		var btn1     = document.getElementById('btn1');
+		var btn2     = document.getElementById('btn2');
+		var btn3     = document.getElementById('btn3');
+		switch (obj.id) {
+			case 0:  btn1.style.backgroundColor="orange"; btn2.style.backgroundColor="grey"; btn3.style.backgroundColor="grey"; break;
+			case 1:  btn1.style.backgroundColor="grey"; btn2.style.backgroundColor="orange"; btn3.style.backgroundColor="grey"; break;
+			case 2:  btn1.style.backgroundColor="grey"; btn2.style.backgroundColor="grey"; btn3.style.backgroundColor="orange"; break;
+			default: {
+				btn1.style.backgroundColor="grey"; btn2.style.backgroundColor="grey"; btn3.style.backgroundColor="grey";
+			}
+		}
+		/* end BoxSelection */
 }
 
 
 function showPFoxElements(state) {
-	document.getElementById('trPFox1').style.visibility = state;
-	//document.getElementById('trPFox2').style.visibility = state;
-	document.getElementById('pvLaden').style.visibility = state;
+	var stylePv = document.getElementById('pvLaden').style;
+	if (state == "hidden") { stylePv.display = "none"; } else { stylePv.display = "block"; }
+	document.getElementById('boxSelection').style.display = "none"; // choose "block" if the buttons shall appear /* BoxSelection */
 }
  
  
 document.getElementById('btnAus').addEventListener('click', function() {
 	sendText('PV_OFF');
-	document.getElementById("pvStat").innerHTML = 'Aus';
 });
 document.getElementById('btnPv').addEventListener('click', function() {
 	sendText('PV_ACTIVE');
-	document.getElementById("pvStat").innerHTML = 'PV';
 });
 document.getElementById('btnMinPv').addEventListener('click', function() {
 	sendText('PV_MIN_PV');
-	document.getElementById("pvStat").innerHTML = 'Min+PV';
 });
 document.getElementById('btnExit').addEventListener('click', function() {
 	document.getElementById('carStat').innerHTML = '-';
@@ -92,11 +102,14 @@ document.getElementById('btnExit').addEventListener('click', function() {
 	document.getElementById('btnAus').style.backgroundColor="grey"; 
 	document.getElementById('btnPv').style.backgroundColor="grey"; 
 	document.getElementById('btnMinPv').style.backgroundColor="grey"; 
+	document.getElementById('btn1').style.backgroundColor="grey"; /* BoxSelection */
+	document.getElementById('btn2').style.backgroundColor="grey"; /* BoxSelection */
+	document.getElementById('btn3').style.backgroundColor="grey"; /* BoxSelection */
 	Socket.close();
 });
 
 
-/*
+/* begin BoxSelection */
 document.getElementById('btn1').addEventListener('click', function() {
 	sendText('id=0');
 });
@@ -106,7 +119,7 @@ document.getElementById('btn2').addEventListener('click', function() {
 document.getElementById('btn3').addEventListener('click', function() {
 	sendText('id=2');
 });
-*/
+/* end BoxSelection */
 
 
 function sendText(data){
