@@ -34,7 +34,9 @@ static void webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t le
 			char * pch;
 			pch = strtok((char *)payload, "=");
 			pch = strtok(NULL, "=");
-			id = atoi(pch);
+			if (atoi(pch) < cfgCntWb) {
+				id = atoi(pch);
+			}
 		} else if (strstr_P((char *)payload, PSTR("PV_OFF"))) {
 			pv_setMode(PV_OFF);
 		} else if (strstr_P((char *)payload, PSTR("PV_ACTIVE"))) {
