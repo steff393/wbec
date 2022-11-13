@@ -37,6 +37,7 @@ uint16_t cfgTotalCurrMax;             // <don't use - still beta> Total current 
 uint8_t  cfgHwVersion;                // Selection of the used HW
 uint8_t  cfgWifiSleepMode;            // Set sleep type for power saving, recomendation is 255 (=no influence) or 0 (=WIFI_NONE_SLEEP)
 uint8_t  cfgLoopDelay;                // Delay [ms] at end of main loop, might have an impact on web server reactivitiy, default: 255 = inactive
+char     cfgShellyIp[16];             // IP address of Shelly 3em, "" to disable 
 char     cfgInverterIp[16];           // IP address of Inverter, "" to disable 
 uint8_t  cfgInverterType;             // 0=off, 1=SolarEdge, 2=Fronius, 3=Kostal
 uint16_t cfgInverterPort;             // Overwrite default inverter port setting
@@ -141,6 +142,7 @@ void loadConfig() {
 	cfgHwVersion              = doc["cfgHwVersion"]          | 15;
 	cfgWifiSleepMode          = doc["cfgWifiSleepMode"]      | 0;
 	cfgLoopDelay              = doc["cfgLoopDelay"]          | 255;
+	strncpy(cfgShellyIp,        doc["cfgShellyIp"]           | "",                 sizeof(cfgShellyIp));
 	strncpy(cfgInverterIp,      doc["cfgInverterIp"]         | "",                 sizeof(cfgInverterIp));
 	cfgInverterType           = doc["cfgInverterType"]       | 0;
 	cfgInverterPort           = doc["cfgInverterPort"]       | 0UL;

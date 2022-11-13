@@ -15,6 +15,7 @@
 #include <powerfox.h>
 #include <pvAlgo.h>
 #include <rfid.h>
+#include <shelly.h>
 #define WIFI_MANAGER_USE_ASYNC_WEB_SERVER
 #include <WiFiManager.h>
 #include <webServer.h>
@@ -66,6 +67,7 @@ void setup() {
   mqtt_begin();
   rfid_setup();
   powerfox_setup();
+  shelly_setup();
   inverter_setup();
   btn_setup();
   pv_setup();
@@ -86,6 +88,7 @@ void loop() {
     webSocket_loop();
     rfid_loop();
     powerfox_loop(); 
+    shelly_loop();
     inverter_loop();
     btn_loop();
     pv_loop();
