@@ -51,9 +51,9 @@ function processReceivedCommand(evt)
 		var btnPv    = document.getElementById('btnPv');
 		var btnMinPv = document.getElementById('btnMinPv');
 		switch (obj.pvMode) {
-			case 1:  btnAus.style.backgroundColor="orange"; btnPv.style.backgroundColor="grey"; btnMinPv.style.backgroundColor="grey"; showPFoxElements("visible"); break;
-			case 2:  btnAus.style.backgroundColor="grey"; btnPv.style.backgroundColor="orange"; btnMinPv.style.backgroundColor="grey"; showPFoxElements("visible"); break;
-			case 3:  btnAus.style.backgroundColor="grey"; btnPv.style.backgroundColor="grey"; btnMinPv.style.backgroundColor="orange"; showPFoxElements("visible"); break;
+			case 1:  btnAus.style.backgroundColor="rgb(40, 152, 161)"; btnPv.style.backgroundColor="grey"; btnMinPv.style.backgroundColor="grey"; showPFoxElements("visible"); break;
+			case 2:  btnAus.style.backgroundColor="grey"; btnPv.style.backgroundColor="rgb(40, 152, 161)"; btnMinPv.style.backgroundColor="grey"; showPFoxElements("visible"); break;
+			case 3:  btnAus.style.backgroundColor="grey"; btnPv.style.backgroundColor="grey"; btnMinPv.style.backgroundColor="rgb(40, 152, 161)"; showPFoxElements("visible"); break;
 			default: {
 				showPFoxElements("hidden");
 			}
@@ -63,9 +63,9 @@ function processReceivedCommand(evt)
 		var btn2     = document.getElementById('btn2');
 		var btn3     = document.getElementById('btn3');
 		switch (obj.id) {
-			case 0:  btn1.style.backgroundColor="orange"; btn2.style.backgroundColor="grey"; btn3.style.backgroundColor="grey"; break;
-			case 1:  btn1.style.backgroundColor="grey"; btn2.style.backgroundColor="orange"; btn3.style.backgroundColor="grey"; break;
-			case 2:  btn1.style.backgroundColor="grey"; btn2.style.backgroundColor="grey"; btn3.style.backgroundColor="orange"; break;
+			case 0:  btn1.style.backgroundColor="rgb(40, 152, 161)"; btn2.style.backgroundColor="grey"; btn3.style.backgroundColor="grey"; break;
+			case 1:  btn1.style.backgroundColor="grey"; btn2.style.backgroundColor="rgb(40, 152, 161)"; btn3.style.backgroundColor="grey"; break;
+			case 2:  btn1.style.backgroundColor="grey"; btn2.style.backgroundColor="grey"; btn3.style.backgroundColor="rgb(40, 152, 161)"; break;
 			default: {
 				btn1.style.backgroundColor="grey"; btn2.style.backgroundColor="grey"; btn3.style.backgroundColor="grey";
 			}
