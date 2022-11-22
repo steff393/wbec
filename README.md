@@ -28,7 +28,7 @@ Bitte schaut auch ins [Wiki](https://github.com/steff393/wbec/wiki) und in meine
 Einfaches Web-Interface (geeignet für alle Browser, Smartphone, PC, etc.):  
 `http://wbec.local/`  
 <p align="center"> 
-  <img src="https://i.ibb.co/DtZC9tp/wbec-Web-Interface2.png"> 
+  <img src="https://i.ibb.co/3sg0YdL/wbec-web3.png"> 
 </p>
 
 ## Bilder
