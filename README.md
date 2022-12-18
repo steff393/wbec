@@ -1,81 +1,39 @@
-< scroll down for English version and additional information >
+**wbec** - WLAN-Anbindung der Heidelberg **W**all**B**ox **E**nergy **C**ontrol über ESP8266  
 
-# wbec
-WLAN-Anbindung der Heidelberg **W**all**B**ox **E**nergy **C**ontrol über ESP8266  
-  
-![GitHub all releases](https://img.shields.io/github/downloads/steff393/wbec/total?color=blue&style=flat-square) 
-  
 Die Heidelberg Wallbox Energy Control ist eine hochwertige Ladestation, bietet aber nur Modbus RTU als Schnittstelle.  
-Ziel des Projekts ist es, eine WLAN-Schnittstelle zu entwickeln, die gleichzeitig die Modbus-Leader-Funktion übernimmt.  
+Ziel des Projekts ist es, eine WLAN-Schnittstelle zu entwickeln um zusätzliche Funktionen (z.B. PV-Überschussladen) zu ermöglichen.  
+
+[wbec Homepage](https://steff393.github.io/wbec-site/)  
+[Empfehlung im Heidelberg Amperfied Blog](https://www.amperfied.de/de/clever-laden/blog/wbec-fuer-heidelberg-wallbox-energy-control-blog/)  
+  
+![GitHub all releases](https://img.shields.io/github/downloads/steff393/wbec/total?color=blue&style=flat-square)  
 
 ## Funktionen
-- Anbindung an openWB, EVCC, Solaranzeige (per tlw. Emulation der go-eCharger API)
+- Anbindung an openWB, EVCC, Solaranzeige
 - MQTT-Kommunikation mit openWB und EVCC (ideal für mehrere Ladestationen)
 - Steuerbar per Android App [Wallbox Steuerung](https://android.chk.digital/ecar-charger-control/) 
 - PV-Überschussladen, Zielladen, etc. mit den o.g. Steuerungen
+- Abfrage von Shelly 3EM, powerfox, Solaredge, Fronius, ...
 - RFID-Kartenleser zur Freischaltung der Wallbox mit gültiger Karte/Chip (spezielle HW nötig, s. Wiki)  
 - Ansteuerung aller verbundenen Ladestationen (bis zu 16 Follower am Modbus, bis zu 8 openWB-Ladepunkte)
-- Einfacher Prototyp eines lokalen Lastmanagements (in Entwicklung)
+- Einfacher Prototyp eines lokalen Lastmanagements für zwei Wallboxen (in Entwicklung)
 - Softwareupdate per WLAN (Over The Air), z.B. mit PlatformIO oder einfach per Browser (s. Wiki)
-- Access-Point-Modus zur initialen Einstellung des WLANs (SSID/Passwort, s. Wiki)
 - Weniger als 1W Strombedarf (trotz Ansteuerung von bis zu 16 Ladestationen)
 
 ## Kontakt
 Bei Fragen oder wenn ihr Unterstützung braucht gerne einfach eine Mail schicken (wbec393@gmail.com).    
 Bitte schaut auch ins [Wiki](https://github.com/steff393/wbec/wiki) und in meine anderen Projekte, z.B. den [SmartUploader](https://github.com/steff393/SmartUploader) zum Auslesen von Wechselrichtern und [hgdo](https://github.com/steff393/hgdo) zur Steuerung von Torantrieben.  
 
-## Beispiel
+## Beispiele
 Einfaches Web-Interface (geeignet für alle Browser, Smartphone, PC, etc.):  
 `http://wbec.local/`  
 <p align="center"> 
   <img src="https://i.ibb.co/3sg0YdL/wbec-web3.png"> 
 </p>
 
-## Bilder
-<p align="center"> 
-  <img src="/images/wbec_pcb.jpg"> 
-</p>
-  
-# wbec
-Wifi interface to Heidelberg **W**all**B**ox **E**nergy **C**ontrol using ESP8266  
-  
-The Heidelberg Wallbox Energy Control is a high quality wallbox, but it offers only a Modbus RTU interface.
-Goal of this project is to establish an Wifi interface, which also acts as Modbus master.  
-
-## Features
-- Works with openWB, EVCC, Solaranzeige (by emulation of parts of the go-eCharger API)
-- Support of MQTT communication to openWB and EVCC (perfect for multiple wallboxes)
-- Support of Android App [Wallbox Steuerung](https://android.chk.digital/ecar-charger-control/)  
-- RFID card reader for unlocking the wallbox only with valid card/chip (needs special HW, s. Wiki)  
-- Prepared for supporting up to all 16 connected boxes (up to 8 openWB load points)
-- Simple prototype of a local load management
-- Update via WiFi (OTA), e.g. with PlatformIO or simply via Web browser (s. Wiki)
-- Access point mode, to configure your WiFi network/password (s. Wiki)
-- < 1W power consumption (for controlling up to 16 boxes)
-
-## Contact
-In case of any questions or in case you need support, feel free to send a mail (wbec393@gmail.com)  ;-)  
-Please also take a look to the [Wiki](https://github.com/steff393/wbec/wiki).
-
-## Switch configuration of wallbox
-S1 >= 5 (16A max)  
-S2 = 0000  
-S3 = 0 (6A min)  
-S4 = 0001 (slave address, Bus-ID)  
-S5 = 0000  
-S6 = 0100 (terminator 120 Ohm, only on last box)  
-
-## Examples
-Simple web interface (for all browsers, Smartphones, PC, etc.):  
-`http://wbec.local/`  
-<p align="center"> 
-  <img src="https://i.ibb.co/DtZC9tp/wbec-Web-Interface2.png"> 
-</p>
-
-Get current status (here for 2 configured wallboxes, but only 1 connected):
+JSON API Schnittstelle:  
+`http://wbec.local/json`  
 ```c++
-http://192.168.xx.yy/json
-
 {
   "wbec": {
     "version": "v0.3.0"         // wbec version
@@ -137,33 +95,19 @@ http://192.168.xx.yy/json
 }
 ```
 
-Set allowed current:
+Maximalen Ladestrom einstellen:
 ```c++
 http://192.168.xx.yy/json?currLim=120      --> set current limit to 12A (on the box with id=0, i.e. ModBus Bus-ID=1)
 http://192.168.xx.yy/json?currLim=60&id=2  --> set current limit to 6A on the box with id=2 (i.e. ModBus Bus-ID=3)
 ```
 
-Set Watchdog timeout:
+Watchdog Timeout einstellen:
 ```c++
-http://192.168.xx.yy/json?wdTmOut=20000
+http://192.168.xx.yy/json?wdTmOut=20000  --> 20s
 ```
 
-## go-eCharger API
-wbec can partly emulate the API of Go-eCharger (https://github.com/goecharger/go-eCharger-API-v1) via the following HTTP commands:
-```c++
-Read:
-http://x.x.x.x/status
-{"car":"1","alw":"1","amp":"6","err":"0","stp":"0","tmp":"307","dws":"5955","ubi":"0","eto":"59","nrg":[231,232,234,0,0,0,0,0,0,0,0,0,0,0,0,0],"fwv":"40"}
-{"version":"B","car":"1","err":"0","alw":"1","amp":"6","amx":"6","stp":"0","pha":"63","tmp":"307","dws":"0","dwo":"0","uby":"0","eto":"59","nrg":[233,234,233,0,0,0,0,0,0,0,0,0,0,0,0,0],"fwv":"40","sse":"123456","ama":"16","ust":"2"}
-
-Write:
-http://x.x.x.x/mqtt?payload=...
-```
-
-This offers a simple way to integrate wbec into Energy Management Systems, which support go-eCharger, but not the Heidelberg Energy Control, such as EVCC or Solaranzeige.  
-
-## Credits
-Third-party libraries included/adapted in wbec:
+## Danksagung
+Folgende Projekte wurden in wbec genutzt/angepasst:  
 - [modbus-esp8266](https://github.com/emelianov/modbus-esp8266)
 - [ESP Async WebServer](https://github.com/me-no-dev/ESPAsyncWebServer)
 - [ArduinoJson](https://github.com/bblanchon/ArduinoJson)
@@ -177,7 +121,7 @@ Third-party libraries included/adapted in wbec:
 - [A Beginner's Guide to the ESP8266 - article](https://github.com/tttapa/ESP8266)
 - [AsyncElegantOTA](https://github.com/ayushsharma82/AsyncElegantOTA)
 
-Special thanks also to the early testers and supporters: mli987, profex1337, Clanchef and many more!
+Ein besonderer Dank ergeht an die frühen Tester und Unterstützer: mli987, profex1337, Clanchef und viele mehr!
 
-## Support the project
-You like wbec? Please [star this project on GitHub](https://github.com/steff393/wbec/stargazers)!
+## Unterstützung des Projektes
+wbec gefällt dir? Dann gib dem Projekt [einen Stern auf GitHub](https://github.com/steff393/wbec/stargazers)!
