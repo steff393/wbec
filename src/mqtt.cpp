@@ -3,10 +3,12 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <globalConfig.h>
+#include <inverter.h>
 #include <logger.h>
 #include <loadManager.h>
 #include <mbComm.h>
 #include <PubSubClient.h>
+#include <pvAlgo.h>
 
 const uint8_t m = 2;
 
@@ -237,6 +239,32 @@ void mqtt_publish(uint8_t i) {
 	for (uint8_t ph = 1; ph <= 3; ph++) {
 		snprintf_P(topic, sizeof(topic), PSTR("%s/currL%d"), header, ph);
 		snprintf_P(value, sizeof(value), PSTR("%.1f"), (float)content[i][ph+1]/10.0);	// L1 = 2, L2 = 3, L3 = 4
+		client.publish(topic, value, retain);
+	}
+
+	// publish values from inverter
+	if (strcmp(cfgInverterIp, "") != 0) {
+		snprintf_P(header, sizeof(header), PSTR("wbec/inverter"));
+
+		snprintf_P(topic, sizeof(topic), PSTR("%s/pwrInv"), header);
+		snprintf_P(value, sizeof(value), PSTR("%d"), inverter_getPwrInv());
+		client.publish(topic, value, retain);
+
+		snprintf_P(topic, sizeof(topic), PSTR("%s/pwrMet"), header);
+		snprintf_P(value, sizeof(value), PSTR("%d"), inverter_getPwrMet());
+		client.publish(topic, value, retain);
+	}
+
+	// publish values from pvAlgo
+	if (pv_getMode()) {
+		snprintf_P(header, sizeof(header), PSTR("wbec/pv"));
+
+		snprintf_P(topic, sizeof(topic), PSTR("%s/mode"), header);
+		snprintf_P(value, sizeof(value), PSTR("%d"), pv_getMode());
+		client.publish(topic, value, retain);
+
+		snprintf_P(topic, sizeof(topic), PSTR("%s/watt"), header);
+		snprintf_P(value, sizeof(value), PSTR("%ld"), pv_getWatt());
 		client.publish(topic, value, retain);
 	}
 }

@@ -33,6 +33,9 @@ static uint16_t  ac_current                 = 0;
 static uint16_t  power_house                = 0; 
 static uint32_t  lastHandleCall             = 0;
 
+static int16_t   pwrInv                     = 0;
+static int16_t   pwrMet                     = 0;
+
 
 static bool cb(Modbus::ResultCode event, uint16_t transactionId, void *data) {
 	if (event != Modbus::EX_SUCCESS) {
@@ -128,9 +131,6 @@ void inverter_loop() {
 		power_meter = -1 * power_meter;
 	}
 
-	int16_t pwrInv;
-	int16_t pwrMet;
-
 	if (power_inverter_scale < 0) {  // if negative, then divide
 		pwrInv = power_inverter / pow_int16(10, (uint16_t)(-power_inverter_scale));
 	} else {                         // if positive, then multiply
@@ -160,4 +160,14 @@ String inverter_getStatus() {
   String response;
   serializeJson(data, response);
 	return(response);
+}
+
+
+int16_t inverter_getPwrInv() {
+	return(pwrInv);
+}
+
+
+int16_t inverter_getPwrMet() {
+	return(pwrMet);
 }
