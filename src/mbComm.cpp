@@ -1,4 +1,4 @@
-// Copyright (c) 2021 steff393, MIT license
+// Copyright (c) 2023 steff393, MIT license
 
 #include <Arduino.h>
 #include "globalConfig.h"
@@ -148,6 +148,7 @@ void mb_loop() {
 					case 6: if (!modbusResultCode[id])                          { mb.readHreg (id+1, REG_CURR_LIMIT,   &content[id][53],   2, cbWrite); } break;
 					case 7: if (!modbusResultCode[id])                          { mb.writeHreg(id+1, REG_WD_TIME_OUT,  &cfgMbTimeout,      1, cbWrite); } break;
 					case 8: if (!modbusResultCode[id])                          { mb.writeHreg(id+1, REG_STANDBY_CTRL, &cfgStandby,        1, cbWrite); } break;
+					case 9: if (!modbusResultCode[id])                          { mb.writeHreg(id+1, REG_CURR_LIMIT_FS,&cfgFailsafeCurrent,1, cbWrite); } break;
 					default: ; // do nothing, should not happen
 				}
 				modbusLastMsgSentTime = millis();
@@ -156,8 +157,8 @@ void mb_loop() {
 					id = 0;
 					msgCnt++;
 				}
-				if (msgCnt > 8 || 
-					 (msgCnt > 7 && modbusLastTime != 0)) {						// write the REG_WD_TIME_OUT and REG_STANDBY_CTRL only on the very first loop
+				if (msgCnt > 9 || 
+					 (msgCnt > 6 && modbusLastTime != 0)) {						// write the REG_WD_TIME_OUT and REG_STANDBY_CTRL and REG_CURR_LIMIT_FS only on the very first loop
 					msgCnt = 0;
 					//Serial.print("Time:");Serial.println(millis()-modbusLastTime);
 					modbusLastTime = millis();

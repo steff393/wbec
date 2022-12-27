@@ -1,4 +1,4 @@
-// Copyright (c) 2021 steff393, MIT license
+// Copyright (c) 2023 steff393, MIT license
 // based on https://github.com/esp8266/Arduino/blob/master/libraries/esp8266/examples/ConfigFile/ConfigFile.ino
 
 #include <ArduinoJson.h>
@@ -8,7 +8,7 @@
 
 const uint8_t m = 5;
 
-char cfgWbecVersion[]     = "v0.4.5";              // wbec version
+char cfgWbecVersion[]     = "v0.4.6";                 // wbec version
 char cfgBuildDate[]       = __DATE__ " " __TIME__;    // wbec build date
 
 char     cfgApSsid[32];               // SSID of the initial Access Point
@@ -18,6 +18,7 @@ uint8_t  cfgMbCycleTime;              // cycle time of the modbus (in seconds)
 uint16_t cfgMbDelay;                  // delay time of the modbus before sending new message (in milliseconds)
 uint16_t cfgMbTimeout;                // Reg. 257: Modbus timeout (in milliseconds)
 uint16_t cfgStandby;                  // Reg. 258: Standby Function Control: 0 = enable standby, 4 = disable standby
+uint16_t cfgFailsafeCurrent;          // <don't use - still beta> Reg. 262: Failsafe Current configuration in case of loss of Modbus communication (in 0.1A)
 char     cfgMqttIp[16];               // IP address of MQTT broker, "" to disable MQTT
 uint16_t cfgMqttPort;                 // Port of MQTT broker (optional)
 char     cfgMqttUser[32];             // MQTT: Username
@@ -124,6 +125,7 @@ void loadConfig() {
 	cfgMbDelay                = doc["cfgMbDelay"]            | 100UL; 
 	cfgMbTimeout              = doc["cfgMbTimeout"]          | 60000UL;
 	cfgStandby                = doc["cfgStandby"]            | 4UL; 
+	cfgFailsafeCurrent        = doc["cfgFailsafeCurrent"]    | 0UL; 
 	strncpy(cfgMqttIp,          doc["cfgMqttIp"]             | "",                 sizeof(cfgMqttIp));
 	cfgMqttPort               = doc["cfgMqttPort"]           | 1883UL;
 	strncpy(cfgMqttUser,        doc["cfgMqttUser"]           | "",                 sizeof(cfgMqttUser));

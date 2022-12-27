@@ -2,56 +2,62 @@
 <html>
 <!-- based on https://github.com/tttapa/ESP8266, GPL-3.0 License -->
 <head>
-    <title>wbec Chart</title>
-    <link href='https://fonts.googleapis.com/css?family=Roboto:300' rel='stylesheet' type='text/css'>
-    <meta name="theme-color" content="#00878f">
-    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport'>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <title>wbec Chart</title>
+  <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport'>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
 
 <body>
-    <center>
-        <h1>wbec Chart</h1>
-		<div id="chart_div"></div>
-		<div id="loading">Loading ...</div>
-        <div id="dateselect" style="visibility: hidden;">
-            <div id="date"></div>
-            <button id="prev">&lt;</button>
-            <button id="next">&gt;</button><br>
-            <button id="zoomout">-</button>
-            <button id="zoomin">+</button><br>
-            <button id="reset" style="width: 4.4em;">Reset</button><br>
-            <button id="refresh" style="width: 4.4em;">Refresh</button>
-        </div>
-    </center>
+  <center>
+  <h1>wbec</h1>
+  <h2>Heidelberg Wallbox Energy Control</h2>
+	<div id="chart_div"></div>
+	<div id="loading">Loading ...</div>
+  <div id="dateselect" style="visibility: hidden;">
+      <div id="date"></div>
+      <button id="prev">&lt;</button>
+      <button id="next">&gt;</button>
+      <button id="zoomout">-</button>
+      <button id="zoomin">+</button><br>
+      <button id="reset" style="width: 4.4em;">Reset</button>
+      <button id="refresh" style="width: 4.4em;">Refresh</button>
+  </div>
+  </center>
+</body>
 
-    <script src="pvChart.js"></script>
+<script src="pvChart.js"></script>
 
-    <style>
+<style>
 	body {
-	    font-family: 'Roboto', sans-serif;
-	    font-size: 22pt;
-	    margin: 0;
-	    margin-top: 6px;
+    font-family: 'Arial', sans-serif;
+    font-size: 22pt;
+    margin-top: 6px;
+    background-color: rgb(106, 106, 106);
+    color: white;
 	}
 
 	h1 {
-	    font-size: 1.5em;
-	    font-weight: normal;
-	    margin: 0px 0px 12px 0px;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: rgb(40, 152, 161);
+    margin-top: 0;
+	}
+	
+	h2 {
+		font-size: 0.7em;
+		font-weight: normal;
+		color: white;
 	}
 
 	button {
-	    font-size: 14pt;
-	    width: 2em;
+    font-size: 14pt;
+    width: 2em;
 	}
 
 	center {
-	    padding: 1em;
-	    margin: auto;
-	    width: 90%;
-	    box-shadow: #777 2px 2px 5px;
-	    box-sizing: border-box;
+    padding: 1em;
+    margin: auto;
+    width: 90%;
 	}
 
 	#loading {
@@ -59,13 +65,12 @@
 	}
 
 	@media only screen and (max-device-width: 700px) {
-	    center {
+  center {
 		width: 100%;
 		height: 100vh;
 		overflow: auto;
-	    }
+  }
 	}
-    </style>
-</body>
+</style>
 
 </html>

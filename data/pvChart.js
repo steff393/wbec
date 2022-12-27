@@ -68,17 +68,17 @@ function parseCSV(string) {
 function drawChart() {
     var data = new google.visualization.DataTable();
     data.addColumn('datetime', 'UNIX');
-    data.addColumn('number', 'Verbrauch/Einspeisung');
-    data.addColumn('number', 'Ladeleistung');
+    data.addColumn('number', 'Bezug(+)/Einspeisung(-)');
+    data.addColumn('number', 'Ladeleistung der Wallbox');
 
     data.addRows(dataArray);
 
     var options = {
         curveType: 'function',
 
-        height: 360,
+        height: 840,
 
-        legend: { position: 'none' },
+        legend: { position: 'top' },
 
         hAxis: {
             viewWindow: {
@@ -88,7 +88,7 @@ function drawChart() {
             gridlines: {
                 count: -1,
                 units: {
-                    days: { format: ['MMM dd'] },
+                    days: { format: ['dd. MMM'] },
                     hours: { format: ['HH:mm', 'ha'] },
                 }
             },
@@ -100,7 +100,7 @@ function drawChart() {
             }
         },
         vAxis: {
-            title: "Leistung (kW)"
+            title: "Leistung [W]"
         }
     };
 
@@ -117,15 +117,18 @@ function drawChart() {
 
 function displayDate() { // Display the start and end date on the page
     var dateDiv = document.getElementById("date");
-
-    var endDay = viewportEndTime.getDate();
-    var endMonth = viewportEndTime.getMonth();
-    var startDay = viewportStartTime.getDate();
-    var startMonth = viewportStartTime.getMonth()
+    
+    var startDay   = viewportStartTime.getDate();
+    var startMonth = viewportStartTime.getMonth();
+    var startYear  = viewportStartTime.getFullYear();
+    var endDay     = viewportEndTime.getDate();
+    var endMonth   = viewportEndTime.getMonth();
+    var endYear    = viewportEndTime.getFullYear();
+    
     if (endDay == startDay && endMonth == startMonth) {
-        dateDiv.textContent = (endDay).toString() + "/" + (endMonth + 1).toString();
+      dateDiv.textContent = (endDay).toString() + "." + (endMonth + 1).toString() + "." + (endYear).toString();
     } else {
-        dateDiv.textContent = (startDay).toString() + "/" + (startMonth + 1).toString() + " - " + (endDay).toString() + "/" + (endMonth + 1).toString();
+      dateDiv.textContent = (startDay).toString() + "." + (startMonth + 1).toString() + "."  + (startYear).toString() + " - " + (endDay).toString() + "." + (endMonth + 1).toString() + "." + (endYear).toString();
     }
 }
 
@@ -167,7 +170,6 @@ function updateViewport() {
     drawChart();
 }
 function getViewportWidthTime() {
-    return defaultZoomTime*(2**zoomLevel); // exponential relation between zoom level and zoom time span
-                                           // every time you zoom, you double or halve the time scale
+  return(defaultZoomTime*(2**zoomLevel)); // exponential relation between zoom level and zoom time span
+                                         // every time you zoom, you double or halve the time scale
 }
-

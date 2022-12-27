@@ -1,4 +1,4 @@
-// Copyright (c) 2021 steff393, MIT license
+// Copyright (c) 2023 steff393, MIT license
 
 #ifndef GLOBALCONFIG_H
 #define GLOBALCONFIG_H
@@ -32,6 +32,7 @@ extern uint8_t  cfgMbCycleTime;              // cycle time of the modbus (in sec
 extern uint16_t cfgMbDelay;                  // delay time of the modbus before sending new message (in milliseconds)
 extern uint16_t cfgMbTimeout;                // Reg. 257: Modbus timeout (in milliseconds)
 extern uint16_t cfgStandby;                  // Reg. 258: Standby Function Control: 0 = enable standby, 4 = disable standby
+extern uint16_t cfgFailsafeCurrent;          // <don't use - still beta> Reg. 262: Failsafe Current configuration in case of loss of Modbus communication (in 0.1A)
 extern char     cfgMqttIp[16];               // IP address of MQTT broker, "" to disable MQTT
 extern uint16_t cfgMqttPort;                 // Port of MQTT broker (optional)
 extern char     cfgMqttUser[32];             // MQTT: Username
