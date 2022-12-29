@@ -308,7 +308,8 @@ void webServer_setup() {
 }
 
 void webServer_loop() {
-	if (resetRequested){
+	if (resetRequested || 
+		 ((cfgKnockOutTimer >= 20) && (millis() > ((uint32_t)cfgKnockOutTimer) * 60 * 1000))) {
 		ESP.restart();
 	}
 	if (resetwifiRequested) {

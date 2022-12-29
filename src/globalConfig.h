@@ -52,6 +52,7 @@ extern uint16_t cfgTotalCurrMax;             // <don't use - still beta> Total c
 extern uint8_t  cfgHwVersion;                // Selection of the used HW
 extern uint8_t  cfgWifiSleepMode;            // Set sleep type for power saving, recomendation is 255 (=no influence) or 0 (=WIFI_NONE_SLEEP)
 extern uint8_t  cfgLoopDelay;                // Delay [ms] at end of main loop, might have an impact on web server reactivitiy, default: 255 = inactive
+extern uint16_t cfgKnockOutTimer;            // Interval[min] after which wbec knocks itself out, i.e. triggers a reset, default: 0 = inactive; values < 20min not allowed
 extern char     cfgShellyIp[16];             // IP address of Shelly 3em, "" to disable 
 extern char     cfgInverterIp[16];           // IP address of Inverter, "" to disable 
 extern uint8_t  cfgInverterType;             // 0=off, 1=SolarEdge, 2=Fronius, 3=Kostal
