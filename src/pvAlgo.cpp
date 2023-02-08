@@ -130,7 +130,7 @@ int32_t pv_getWatt() {
 
 
 void pv_setWatt(int32_t val) {
-	if ((watt >= WATT_MIN) && (watt <= WATT_MAX)) {
+	if ((val >= WATT_MIN) && (watt <= WATT_MAX)) {
 			watt = val;
 	}
 }
