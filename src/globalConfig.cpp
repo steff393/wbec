@@ -8,8 +8,11 @@
 
 const uint8_t m = 5;
 
-char cfgWbecVersion[]     = "v0.4.6";                 // wbec version
-char cfgBuildDate[]       = __DATE__ " " __TIME__;    // wbec build date
+#define WBEC_VER(s) "v" MAJOR_VER_STRING(s) ".4.6"     // token stringification
+#define MAJOR_VER_STRING(s) #s                         // .. with two levels of macros
+
+char     cfgWbecVersion[]             = WBEC_VER(WBEC_VERSION_MAJOR); // wbec version
+char     cfgBuildDate[]               = __DATE__ " " __TIME__;        // wbec build date
 
 char     cfgApSsid[32];               // SSID of the initial Access Point
 char     cfgApPass[63];               // Password of the initial Access Point
