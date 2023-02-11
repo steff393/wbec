@@ -17,6 +17,14 @@ static NTPClient timeClient(ntpUDP, cfgNtpServer, 3600, 60000); // GMT+1 and upd
 static const char *mod[13] = {"", "MB  ", "MQTT", "WEBS", "GO-E", "CFG ", "1P3P", "LLOG", "RFID", "PFOX", "SOCK", "PV  ", "SHLY"};
 static char *   bootLog;
 static uint16_t bootLogSize;
+uint32_t uptimeSekunden = 3;
+uint32_t currMillis;
+uint32_t lastMillis;
+uint16_t upDays;
+uint8_t upHrs;
+uint8_t upMin;
+uint8_t upSec;
+uint32_t tmpTime;
 
 
 static boolean getDstGermany(uint32_t unixtime) {
@@ -188,10 +196,15 @@ void logger_setup() {
   } 
   // connect to NTP time server
   timeClient.begin();
+  currMillis = lastMillis = millis();
 }
 
 
 void logger_loop() {
 	timeClient.update();
 	if (getDstGermany(timeClient.getEpochTime())) timeClient.setTimeOffset(7200);
+	currMillis = millis();
+	if (currMillis - lastMillis >= 1000) {
+	uptimeSekunden++;
+	lastMillis += 1000;
 }
