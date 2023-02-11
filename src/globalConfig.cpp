@@ -27,6 +27,7 @@ uint16_t cfgMqttPort;                 // Port of MQTT broker (optional)
 char     cfgMqttUser[32];             // MQTT: Username
 char     cfgMqttPass[32];             // MQTT: Password
 uint8_t  cfgMqttLp[WB_CNT];           // Array with assignments to openWB loadpoints, e.g. [4,2,0,1]: Box0 = LP4, Box1 = LP2, Box2 = no MQTT, Box3 = LP1
+char     cfgMqttWattTopic[60];        // MQTT: Topic for setting the watt value for PV charging, default: "wbec/pv/setWatt"
 char     cfgNtpServer[30];            // NTP server
 char     cfgFoxUser[32];              // powerfox: Username
 char     cfgFoxPass[16];              // powerfox: Password
@@ -134,6 +135,7 @@ void loadConfig() {
 	cfgMqttPort               = doc["cfgMqttPort"]           | 1883UL;
 	strncpy(cfgMqttUser,        doc["cfgMqttUser"]           | "",                 sizeof(cfgMqttUser));
 	strncpy(cfgMqttPass,        doc["cfgMqttPass"]           | "",                 sizeof(cfgMqttPass));
+	strncpy(cfgMqttWattTopic,   doc["cfgMqttWattTopic"]      | "wbec/pv/setWatt",  sizeof(cfgMqttWattTopic));
 	strncpy(cfgNtpServer,       doc["cfgNtpServer"]          | "europe.pool.ntp.org", sizeof(cfgNtpServer));
 	strncpy(cfgFoxUser,         doc["cfgFoxUser"]            | "",                 sizeof(cfgFoxUser));
 	strncpy(cfgFoxPass,         doc["cfgFoxPass"]            | "",                 sizeof(cfgFoxPass));

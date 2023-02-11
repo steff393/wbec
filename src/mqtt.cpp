@@ -92,6 +92,12 @@ void callback(char* topic, byte* payload, uint8_t length)
 			LOG(0, ", no box assigned", "");
 		}
 	}
+
+	// set the watt value via MQTT (#54)
+	if (strcmp(topic, cfgMqttWattTopic) == 0) {
+		pv_setWatt(atol(buffer));
+	}
+
 	callbackActive = false;
 }
 
@@ -134,6 +140,7 @@ void reconnect() {
 				client.subscribe(topic);
 			}
 		}
+		client.subscribe(cfgMqttWattTopic);
 	} else {
 		LOG(m, "failed, rc=%d try again in 5 seconds", client.state())
 	}
