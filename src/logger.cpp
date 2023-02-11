@@ -143,6 +143,19 @@ uint32_t log_unixTime() {
 }
 
 
+String log_uptime() {
+  upDays = (int)(uptimeSekunden / SEC2DAYS);
+  tmpTime = uptimeSekunden % SEC2DAYS;
+  upHrs = (int)(tmpTime / SEC2HRS);
+  tmpTime = tmpTime % SEC2HRS;
+  upMin = (int)(tmpTime / SEC2MIN);
+  upSec = tmpTime % SEC2MIN;
+  char upTime[24];
+  sprintf(upTime, "%01dd %02d:%02d:%02d", upDays, upHrs, upMin, upSec);
+  return(upTime);
+}
+
+
 char* log_getBuffer() {
   return(bootLog);
 }
