@@ -1,6 +1,7 @@
 // Copyright (c) 2021 steff393, MIT license
 
 #include <Arduino.h>
+#include <ArduinoJson.h>
 #include <ESP8266WiFi.h>
 #include <globalConfig.h>
 #include <inverter.h>
@@ -9,6 +10,10 @@
 #include <mbComm.h>
 #include <PubSubClient.h>
 #include <pvAlgo.h>
+
+
+#define MAX_JSON_LEN        200
+
 
 const uint8_t m = 2;
 
@@ -95,7 +100,20 @@ void callback(char* topic, byte* payload, uint8_t length)
 
 	// set the watt value via MQTT (#54)
 	if (strcmp(topic, cfgMqttWattTopic) == 0) {
-		pv_setWatt(atol(buffer));
+		if (strcmp(cfgMqttWattJson, "") == 0) {
+			// directly take the value from the buffer
+			pv_setWatt(atol(buffer));
+		} else {
+			// extract the value from a JSON string
+			StaticJsonDocument<MAX_JSON_LEN> doc;
+			// Parse JSON object
+			DeserializationError error = deserializeJson(doc, buffer);
+			if (error) {
+				LOG(m, "deserializeJson() failed: %s", error.f_str())
+			} else {
+				pv_setWatt((long) doc[cfgMqttWattJson].as<float>());
+			}
+		}
 	}
 
 	callbackActive = false;
