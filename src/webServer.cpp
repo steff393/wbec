@@ -173,6 +173,7 @@ void webServer_setup() {
 		data[F("wbec")][F("version")] = cfgWbecVersion;
 		data[F("wbec")][F("bldDate")] = cfgBuildDate;
 		data[F("wbec")][F("timeNow")] = log_time();
+		data[F("wbec")][F("uptime")]  = log_uptime();
 		for (int i = from; i < to; i++) {
 			data[F("box")][i][F("busId")]    = i+1;
 			data[F("box")][i][F("version")]  = String(content[i][0], HEX);
