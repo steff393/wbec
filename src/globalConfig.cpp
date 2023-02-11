@@ -8,7 +8,7 @@
 
 const uint8_t m = 5;
 
-#define WBEC_VER(s) "v" MAJOR_VER_STRING(s) ".4.6"     // token stringification
+#define WBEC_VER(s) "v" MAJOR_VER_STRING(s) ".4.7"     // token stringification
 #define MAJOR_VER_STRING(s) #s                         // .. with two levels of macros
 
 char     cfgWbecVersion[]             = WBEC_VER(WBEC_VERSION_MAJOR); // wbec version
