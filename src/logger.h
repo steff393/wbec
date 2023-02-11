@@ -18,6 +18,7 @@ extern void     log(uint8_t module, String msg,      boolean newLine=true);
 extern void     log(uint8_t module, const char *msg, boolean newLine=true);
 extern String   log_time();
 extern uint32_t log_unixTime();
+extern String   log_uptime();
 
 extern char* log_getBuffer(); 
 extern void log_freeBuffer(); 
