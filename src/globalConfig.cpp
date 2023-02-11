@@ -8,7 +8,7 @@
 
 const uint8_t m = 5;
 
-#define WBEC_VER(s) "v" MAJOR_VER_STRING(s) ".4.6"     // token stringification
+#define WBEC_VER(s) "v" MAJOR_VER_STRING(s) ".4.7"     // token stringification
 #define MAJOR_VER_STRING(s) #s                         // .. with two levels of macros
 
 char     cfgWbecVersion[]             = WBEC_VER(WBEC_VERSION_MAJOR); // wbec version
@@ -28,6 +28,7 @@ char     cfgMqttUser[32];             // MQTT: Username
 char     cfgMqttPass[32];             // MQTT: Password
 uint8_t  cfgMqttLp[WB_CNT];           // Array with assignments to openWB loadpoints, e.g. [4,2,0,1]: Box0 = LP4, Box1 = LP2, Box2 = no MQTT, Box3 = LP1
 char     cfgMqttWattTopic[60];        // MQTT: Topic for setting the watt value for PV charging, default: "wbec/pv/setWatt"
+char     cfgMqttWattJson[15];         // MQTT: Optional: Element in a JSON string, which contains the power in watt, default: ""
 char     cfgNtpServer[30];            // NTP server
 char     cfgFoxUser[32];              // powerfox: Username
 char     cfgFoxPass[16];              // powerfox: Password
@@ -136,6 +137,7 @@ void loadConfig() {
 	strncpy(cfgMqttUser,        doc["cfgMqttUser"]           | "",                 sizeof(cfgMqttUser));
 	strncpy(cfgMqttPass,        doc["cfgMqttPass"]           | "",                 sizeof(cfgMqttPass));
 	strncpy(cfgMqttWattTopic,   doc["cfgMqttWattTopic"]      | "wbec/pv/setWatt",  sizeof(cfgMqttWattTopic));
+	strncpy(cfgMqttWattJson,    doc["cfgMqttWattJson"]       | "",                 sizeof(cfgMqttWattJson));
 	strncpy(cfgNtpServer,       doc["cfgNtpServer"]          | "europe.pool.ntp.org", sizeof(cfgNtpServer));
 	strncpy(cfgFoxUser,         doc["cfgFoxUser"]            | "",                 sizeof(cfgFoxUser));
 	strncpy(cfgFoxPass,         doc["cfgFoxPass"]            | "",                 sizeof(cfgFoxPass));

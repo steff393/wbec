@@ -10,6 +10,7 @@
 #include <PubSubClient.h>
 #include <pvAlgo.h>
 
+
 const uint8_t m = 2;
 
 WiFiClient espClient;
@@ -95,7 +96,18 @@ void callback(char* topic, byte* payload, uint8_t length)
 
 	// set the watt value via MQTT (#54)
 	if (strcmp(topic, cfgMqttWattTopic) == 0) {
-		pv_setWatt(atol(buffer));
+		if (strcmp(cfgMqttWattJson, "") == 0) {
+			// directly take the value from the buffer
+			pv_setWatt(atol(buffer));
+		} else {
+			// extract the value from a JSON string (only 1st occurence)
+			// Example: {"Time":"2022-12-10T17:25:46","Main":{"power":-123,"from_grid":441.231,"to_grid":9578.253}}
+			// cfgMqttWattJson = power\":                      |      |------>
+			// the slash \ will escape the quote " sign
+			char * pch;
+			pch = strstr(buffer, cfgMqttWattJson) + strlen(cfgMqttWattJson); // search the index of cfgMqttWattJson, then add it's length
+			pv_setWatt(atol(pch));
+		}
 	}
 
 	callbackActive = false;
