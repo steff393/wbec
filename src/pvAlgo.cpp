@@ -49,10 +49,11 @@ void pvAlgo() {
 		if ((actualCurr == 0 && targetCurr < cfgPvLimStart) ||
 				(actualCurr != 0 && targetCurr < cfgPvLimStop)) {
 			targetCurr = 0;
-		}
 
-		if (pvMode == PV_MIN_PV) {
-			targetCurr = content[BOXID][16]; // set minimal current configured in box
+			// MIN+PV, don't switch off, but ...
+			if (pvMode == PV_MIN_PV) {
+				targetCurr = content[BOXID][16]; // ... set minimal current configured in box
+			}
 		}
 
 		// Saturation to 0 or 6..16A
