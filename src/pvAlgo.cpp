@@ -132,7 +132,11 @@ int32_t pv_getWatt() {
 
 void pv_setWatt(int32_t val) {
 	if ((val >= WATT_MIN) && (val <= WATT_MAX)) {
+		if (cfgPvInvert) {
+			watt = -val;  // possibility to invert the value (#61)
+		} else {
 			watt = val;
+		}
 	}
 }
 
