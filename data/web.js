@@ -1,132 +1,122 @@
 // Copyright (c) 2021 steff393, MIT license
 
-var Socket;
+window.addEventListener('DOMContentLoaded', () => {
 
+	let Socket;
 
-function init() 
-{
-	Socket = new WebSocket('ws://' + window.location.hostname + ':81/');
-	Socket.onmessage = function(event) { processReceivedCommand(event); };
-	showPFoxElements("hidden");
-}
+	let elementCurrentSlider = document.getElementById('slideCurr');
+	let pvModeButtons = document.querySelectorAll('[data-pv-mode]');
+	let wallboxButtons = document.querySelectorAll('[data-wallbox-id]');
+	let valueContainerElements = document.querySelectorAll('[data-value]');
 
-// Update the current slider value (each time you drag the slider handle)
-document.getElementById("slideCurr").oninput = function() {
-	var val = parseInt(this.value);
-	if (val == 0 || (val >= 60 && val <=160)) {
-		document.getElementById("currLim").innerHTML = val / 10;
-		sendText('currLim=' + val);
-	} else {
-		document.getElementById("currLim").innerHTML = 0;
-		document.getElementById("slideCurr").value = 0;
-		sendText('currLim=0');
+	function init() {
+		setSectionVisibility('boxSelection', wallboxButtons.length > 1);
+		setSectionVisibility('pvLaden', false);
+
+		Socket = new WebSocket(`ws://${window.location.hostname}:81/`);
+		Socket.onmessage = processReceivedCommand;
+
+		document.getElementById('btnExit').addEventListener('click', exit);
+
+		// Update the current slider value (each time you drag the slider handle)
+		elementCurrentSlider.addEventListener('input', onSetCurrentSlider);
+
+		for (const element of document.querySelectorAll('[data-send-command]')) {
+			element.addEventListener('click', () => {
+				sendText(element.getAttribute('data-send-command'));
+			})
+		}
 	}
-}
- 
- 
-function processReceivedCommand(evt) 
-{
-		const obj = JSON.parse(evt.data);
-		var carStat;
-		var wbStat;
-		switch (obj.chgStat) {
+
+	function onSetCurrentSlider() {
+		let val = parseInt(elementCurrentSlider.value);
+		if (val !== 0 && !(val >= 60 && val <= 160)) {
+			elementCurrentSlider.value = val = 0;
+		}
+		assignValuesToHtml({
+			currLim: `${val / 10}`,
+		})
+		sendText(`currLim=${val}`);
+	}
+
+	function assignValuesToHtml(values) {
+		for (const element of valueContainerElements) {
+			const key = element.getAttribute('data-value');
+			if (values[key] !== undefined) {
+				element.innerHTML = values[key];
+			}
+		}
+	}
+
+	function setClass(element, className, state) {
+		if (state) {
+			element.classList.add(className)
+		} else {
+			element.classList.remove(className)
+		}
+	}
+
+	function processReceivedCommand(evt) {
+		const message = JSON.parse(evt.data);
+		let carStat;
+		let wbStat;
+		switch (message.chgStat) {
 			case  2: /*A1*/ carStat = 'nein'; wbStat = 'nein'; break;
 			case  3: /*A2*/ carStat = 'nein'; wbStat = 'ja'; break;
 			case  4: /*B1*/ carStat = 'ja, ohne Ladeanf.'; wbStat = 'nein'; break;
 			case  5: /*B2*/ carStat = 'ja, ohne Ladeanf.'; wbStat = 'ja'; break;
 			case  6: /*C1*/ carStat = 'ja,  mit Ladeanf.'; wbStat = 'nein'; break;
 			case  7: /*C2*/ carStat = 'ja,  mit Ladeanf.'; wbStat = 'ja'; break;
-			default: carStat = obj.chgStat; wbStat = '-';
+			default: carStat = message.chgStat; wbStat = '-';
 		}
-		document.getElementById('carStat').innerHTML = carStat;
-		document.getElementById('wbStat').innerHTML = wbStat;
-		document.getElementById('power').innerHTML = obj.power;
-		document.getElementById('energyI').innerHTML = obj.energyI;
-		document.getElementById('energyC').innerHTML = obj.energyC;
-		document.getElementById('currLim').innerHTML = obj.currLim;
-		document.getElementById('watt').innerHTML = obj.watt;
-		document.getElementById('timeNow').innerHTML = obj.timeNow;
-		document.getElementById("slideCurr").value = obj.currLim * 10;
-		var btnAus   = document.getElementById('btnAus');
-		var btnPv    = document.getElementById('btnPv');
-		var btnMinPv = document.getElementById('btnMinPv');
-		switch (obj.pvMode) {
-			case 1:  btnAus.style.backgroundColor="rgb(40, 152, 161)"; btnPv.style.backgroundColor="grey"; btnMinPv.style.backgroundColor="grey"; showPFoxElements("visible"); break;
-			case 2:  btnAus.style.backgroundColor="grey"; btnPv.style.backgroundColor="rgb(40, 152, 161)"; btnMinPv.style.backgroundColor="grey"; showPFoxElements("visible"); break;
-			case 3:  btnAus.style.backgroundColor="grey"; btnPv.style.backgroundColor="grey"; btnMinPv.style.backgroundColor="rgb(40, 152, 161)"; showPFoxElements("visible"); break;
-			default: {
-				showPFoxElements("hidden");
-			}
+		assignValuesToHtml({
+			carStat: carStat,
+			wbStat: wbStat,
+			power: message.power,
+			energyI: message.energyI,
+			energyC: message.energyC,
+			currLim: message.currLim,
+			watt: message.watt,
+			timeNow: message.timeNow,
+		})
+		elementCurrentSlider.value = message.currLim * 10;
+
+		for (const element of pvModeButtons) {
+			setClass(element, 'active', message.pvMode === parseInt(element.getAttribute('data-pv-mode')));
 		}
-		/* begin BoxSelection */
-		var btn1     = document.getElementById('btn1');
-		var btn2     = document.getElementById('btn2');
-		var btn3     = document.getElementById('btn3');
-		switch (obj.id) {
-			case 0:  btn1.style.backgroundColor="rgb(40, 152, 161)"; btn2.style.backgroundColor="grey"; btn3.style.backgroundColor="grey"; break;
-			case 1:  btn1.style.backgroundColor="grey"; btn2.style.backgroundColor="rgb(40, 152, 161)"; btn3.style.backgroundColor="grey"; break;
-			case 2:  btn1.style.backgroundColor="grey"; btn2.style.backgroundColor="grey"; btn3.style.backgroundColor="rgb(40, 152, 161)"; break;
-			default: {
-				btn1.style.backgroundColor="grey"; btn2.style.backgroundColor="grey"; btn3.style.backgroundColor="grey";
-			}
+		setSectionVisibility('pvLaden', message.pvMode >= 1 && message.pvMode <= 3);
+
+		for (const element of wallboxButtons) {
+			setClass(element, 'active', message.id === parseInt(element.getAttribute('data-wallbox-id')));
 		}
-		/* end BoxSelection */
-}
+	}
 
+	function setSectionVisibility(sectionId, isVisible) {
+		setClass(document.getElementById(sectionId), 'not-available', !isVisible);
+	}
 
-function showPFoxElements(state) {
-	var stylePv = document.getElementById('pvLaden').style;
-	if (state == "hidden") { stylePv.display = "none"; } else { stylePv.display = "block"; }
-	document.getElementById('boxSelection').style.display = "none"; // choose "block" if the buttons shall appear /* BoxSelection */
-}
- 
- 
-document.getElementById('btnAus').addEventListener('click', function() {
-	sendText('PV_OFF');
-});
-document.getElementById('btnPv').addEventListener('click', function() {
-	sendText('PV_ACTIVE');
-});
-document.getElementById('btnMinPv').addEventListener('click', function() {
-	sendText('PV_MIN_PV');
-});
-document.getElementById('btnExit').addEventListener('click', function() {
-	document.getElementById('carStat').innerHTML = '-';
-	document.getElementById('wbStat').innerHTML = '-';
-	document.getElementById('power').innerHTML = '-';
-	document.getElementById('energyI').innerHTML = '-';
-	document.getElementById('energyC').innerHTML = '-';
-	document.getElementById('currLim').innerHTML = '-';
-	document.getElementById('watt').innerHTML = '-';
-	document.getElementById('timeNow').innerHTML = '-';
-	document.getElementById('btnAus').style.backgroundColor="grey"; 
-	document.getElementById('btnPv').style.backgroundColor="grey"; 
-	document.getElementById('btnMinPv').style.backgroundColor="grey"; 
-	document.getElementById('btn1').style.backgroundColor="grey"; /* BoxSelection */
-	document.getElementById('btn2').style.backgroundColor="grey"; /* BoxSelection */
-	document.getElementById('btn3').style.backgroundColor="grey"; /* BoxSelection */
-	Socket.close();
-});
+	function exit() {
+		assignValuesToHtml({
+			carStat: '-',
+			wbStat: '-',
+			power: '-',
+			energyI: '-',
+			energyC: '-',
+			currLim: '-',
+			watt: '-',
+			timeNow: '-',
+		})
+		for (const element of document.querySelectorAll('[data-wallbox-id],[data-pv-mode]')) {
+			setClass(element, 'active', false);
+			setClass(element, 'disabled', true);
+		}
+		Socket.close();
+	}
 
+	function sendText(data){
+		Socket.send(data);
+	}
 
-/* begin BoxSelection */
-document.getElementById('btn1').addEventListener('click', function() {
-	sendText('id=0');
-});
-document.getElementById('btn2').addEventListener('click', function() {
-	sendText('id=1');
-});
-document.getElementById('btn3').addEventListener('click', function() {
-	sendText('id=2');
-});
-/* end BoxSelection */
-
-
-function sendText(data){
-	Socket.send(data);
-}
-
-
-window.onload = function(e){ 
 	init();
-}
+
+});

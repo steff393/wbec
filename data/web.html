@@ -1,323 +1,144 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="de">
+
 <head>
-		<title>wbec</title>
-		<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport'>
+	<meta charset="utf-8">
+	<title>wbec</title>
+	<meta name="description" content="Heidelberg Wallbox Energy Control">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="web.css">
+	<script src="web.js" defer></script>
+
+	<meta name="theme-color" content="#6a6a6a">
 </head>
 
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-  <symbol id="flash" viewBox="0 0 19 36">
-    <g transform="translate(0,36) scale(0.1,-0.1)"><path d="M87 258 l-86 -103 34 -3 33 -3 -29 -71 c-16 -39 -28 -73 -26 -75 2 -2 43 43 90 99 l87 103 -34 3 -34 3 29 71 c16 39 28 73 26 75 -2 1 -42 -43 -90 -99z"/></g>
-  </symbol>
-  <symbol id="panel" viewBox="0 0 43 36">
-    <g transform="translate(0,36) scale(0.1,-0.1)"><path d="M22 337 c-12 -13 -22 -35 -22 -50 l0 -27 100 0 100 0 0 50 0 50 -78 0 c-69 0 -81 -3 -100 -23z"/><path d="M230 310 l0 -50 100 0 100 0 0 28 c0 17 -10 37 -23 50 -20 19 -35 22 -100 22 l-77 0 0 -50z"/><path d="M0 180 l0 -50 100 0 100 0 0 50 0 50 -100 0 -100 0 0 -50z"/><path d="M230 180 l0 -50 100 0 100 0 0 50 0 50 -100 0 -100 0 0 -50z"/><path d="M0 72 c0 -17 10 -37 23 -50 20 -19 35 -22 100 -22 l77 0 0 50 0 50 -100 0 -100 0 0 -28z"/><path d="M230 50 l0 -50 78 0 c69 0 81 3 100 23 12 13 22 35 22 50 l0 27 -100 0 -100 0 0 -50z"/></g>
-  </symbol>
-  <symbol id="car" viewBox="0 0 512 512">
-    <path d="M135.2 117.4L109.1 192H402.9l-26.1-74.6C372.3 104.6 360.2 96 346.6 96H165.4c-13.6 0-25.7 8.6-30.2 21.4zM39.6 196.8L74.8 96.3C88.3 57.8 124.6 32 165.4 32H346.6c40.8 0 77.1 25.8 90.6 64.3l35.2 100.5c23.2 9.6 39.6 32.5 39.6 59.2V400v48c0 17.7-14.3 32-32 32H448c-17.7 0-32-14.3-32-32V400H96v48c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32V400 256c0-26.7 16.4-49.6 39.6-59.2zM128 288c0-17.7-14.3-32-32-32s-32 14.3-32 32s14.3 32 32 32s32-14.3 32-32zm288 32c17.7 0 32-14.3 32-32s-14.3-32-32-32s-32 14.3-32 32s14.3 32 32 32z"/>
-  </symbol>
-  <symbol id="lock" viewBox="0 0 18 18">
-    <g transform="translate(0,18) scale(0.1,-0.1)"><path d="M102 168 c-7 -7 -12 -22 -12 -34 0 -20 -6 -23 -42 -26 l-43 -3 0 -50 0 -50 55 0 55 0 0 75 c0 68 2 75 20 75 13 0 21 -8 23 -22 4 -30 22 -30 22 0 0 29 -18 47 -45 47 -12 0 -26 -5 -33 -12z"/></g>
-  </symbol>
-  <symbol id="arrows" viewBox="0 0 908 908">
-    <path d="M591.672,907.618c28.995,0,52.5-23.505,52.5-52.5V179.839l42.191,41.688c10.232,10.11,23.567,15.155,36.898,15.155	c13.541,0,27.078-5.207,37.347-15.601c20.379-20.625,20.18-53.865-0.445-74.244L626.892,15.155C617.062,5.442,603.803,0,589.993,0 c-0.104,0-0.211,0-0.314,0.001c-13.923,0.084-27.244,5.694-37.03,15.6l-129.913,131.48c-20.379,20.625-20.18,53.865,0.445,74.244 c20.626,20.381,53.866,20.181,74.245-0.445l41.747-42.25v676.489C539.172,884.113,562.677,907.618,591.672,907.618z"/>
-	  <path d="M315.948,0c-28.995,0-52.5,23.505-52.5,52.5v676.489l-41.747-42.25c-20.379-20.625-53.62-20.825-74.245-0.445 c-20.625,20.379-20.825,53.619-0.445,74.244l129.912,131.479c9.787,9.905,23.106,15.518,37.029,15.601 c0.105,0.001,0.21,0.001,0.315,0.001c13.81,0,27.07-5.442,36.899-15.155L484.44,760.78c20.625-20.379,20.824-53.619,0.445-74.244 c-20.379-20.626-53.62-20.825-74.245-0.445l-42.192,41.688V52.5C368.448,23.505,344.943,0,315.948,0z"/>
-	 </symbol>
-  <symbol id="ecar" viewBox="0 0 18 22">
-    <path d="M 0,13.229166 C 0,7.5847219 0.01603535,7.4083329 0.52916667,7.4083329 c 0.44097223,0 0.52916663,-0.1763889 0.52916663,-1.0583332 0,-0.8819443 0.088195,-1.0583333 0.5291667,-1.0583333 0.4703704,0 0.5291667,-0.176389 0.5291667,-1.5874999 0,-1.4111111 0.058796,-1.5874999 0.5291666,-1.5874999 0.3527777,0 0.5291667,-0.1763889 0.5291667,-0.5291667 0,-0.3527777 0.176389,-0.5291666 0.5291667,-0.5291666 0.3527777,0 0.5291666,-0.17638891 0.5291666,-0.52916666 C 4.2333333,0.01356838 4.4097223,0 11.1125,0 c 6.702778,0 6.879167,0.01356838 6.879167,0.52916664 0,0.35277775 0.176389,0.52916666 0.529166,0.52916666 0.352778,0 0.529167,0.1763889 0.529167,0.5291666 0,0.3527778 0.176389,0.5291667 0.529167,0.5291667 0.47037,0 0.529166,0.1763888 0.529166,1.5874999 0,1.4111109 0.0588,1.5874999 0.529167,1.5874999 0.440972,0 0.529167,0.176389 0.529167,1.0583333 0,0.8819443 0.08819,1.0583332 0.529166,1.0583332 0.513132,0 0.529167,0.176389 0.529167,5.8208331 v 5.820833 H 20.6375 19.05 v -1.5875 -1.5875 H 11.1125 3.175 v 1.5875 1.5875 H 1.5875 0 Z m 21.166667,-2.116667 c 0,-2.4694438 -0.03528,-2.6458328 -0.529167,-2.6458328 -0.352778,0 -0.529167,-0.1763889 -0.529167,-0.5291666 0,-0.3527777 -0.176389,-0.5291667 -0.529166,-0.5291667 -0.470371,0 -0.529167,-0.1763889 -0.529167,-1.5874999 0,-1.4111109 -0.0588,-1.5874999 -0.529167,-1.5874999 -0.440972,0 -0.529166,-0.176389 -0.529166,-1.0583333 V 2.1166666 h -1.058334 c -0.881944,0 -1.058333,-0.088194 -1.058333,-0.5291667 0,-0.5095679 -0.176389,-0.5291666 -4.7625,-0.5291666 -4.586111,0 -4.7625,0.019599 -4.7625,0.5291666 0,0.4409722 -0.176389,0.5291667 -1.0583333,0.5291667 H 4.2333333 v 1.0583332 c 0,0.8819443 -0.088194,1.0583333 -0.5291666,1.0583333 -0.4703705,0 -0.5291667,0.176389 -0.5291667,1.5874999 0,1.411111 -0.058796,1.5874999 -0.5291667,1.5874999 -0.3527777,0 -0.5291666,0.176389 -0.5291666,0.5291667 0,0.3527777 -0.1763889,0.5291666 -0.5291667,0.5291666 -0.4938889,0 -0.5291667,0.176389 -0.5291667,2.6458328 v 2.645834 H 11.1125 21.166667 Z M 3.175,11.641666 v -1.058333 h 1.0583333 1.0583334 v 1.058333 1.058333 H 4.2333333 3.175 Z m 13.758333,0 V 10.583333 H 17.991667 19.05 v 1.058333 1.058333 H 17.991667 16.933333 Z M 8.73125,12.131628 c 0,-0.08393 0.347704,-0.995789 0.7726759,-2.026357 L 10.276602,8.2315136 9.3847637,8.1506524 8.4929255,8.0697912 10.772694,5.3576548 c 1.253873,-1.491675 2.32054,-2.6713655 2.370371,-2.6215344 0.04983,0.049831 -0.258115,0.9362487 -0.684324,1.969817 l -0.774926,1.8792149 0.902073,0.080861 0.902072,0.080861 -2.002708,2.3812499 C 9.2386883,11.799323 8.73125,12.352733 8.73125,12.131628 Z" />
-  </symbol>
+	<symbol id="flash" viewBox="0 0 19 36"><g transform="translate(0,36) scale(0.1,-0.1)"><path d="M87 258 l-86 -103 34 -3 33 -3 -29 -71 c-16 -39 -28 -73 -26 -75 2 -2 43 43 90 99 l87 103 -34 3 -34 3 29 71 c16 39 28 73 26 75 -2 1 -42 -43 -90 -99z"/></g></symbol>
+	<symbol id="panel" viewBox="0 0 43 36"><g transform="translate(0,36) scale(0.1,-0.1)"><path d="M22 337 c-12 -13 -22 -35 -22 -50 l0 -27 100 0 100 0 0 50 0 50 -78 0 c-69 0 -81 -3 -100 -23z"/><path d="M230 310 l0 -50 100 0 100 0 0 28 c0 17 -10 37 -23 50 -20 19 -35 22 -100 22 l-77 0 0 -50z"/><path d="M0 180 l0 -50 100 0 100 0 0 50 0 50 -100 0 -100 0 0 -50z"/><path d="M230 180 l0 -50 100 0 100 0 0 50 0 50 -100 0 -100 0 0 -50z"/><path d="M0 72 c0 -17 10 -37 23 -50 20 -19 35 -22 100 -22 l77 0 0 50 0 50 -100 0 -100 0 0 -28z"/><path d="M230 50 l0 -50 78 0 c69 0 81 3 100 23 12 13 22 35 22 50 l0 27 -100 0 -100 0 0 -50z"/></g></symbol>
+	<symbol id="car" viewBox="0 0 512 512"><path d="M135.2 117.4L109.1 192H402.9l-26.1-74.6C372.3 104.6 360.2 96 346.6 96H165.4c-13.6 0-25.7 8.6-30.2 21.4zM39.6 196.8L74.8 96.3C88.3 57.8 124.6 32 165.4 32H346.6c40.8 0 77.1 25.8 90.6 64.3l35.2 100.5c23.2 9.6 39.6 32.5 39.6 59.2V400v48c0 17.7-14.3 32-32 32H448c-17.7 0-32-14.3-32-32V400H96v48c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32V400 256c0-26.7 16.4-49.6 39.6-59.2zM128 288c0-17.7-14.3-32-32-32s-32 14.3-32 32s14.3 32 32 32s32-14.3 32-32zm288 32c17.7 0 32-14.3 32-32s-14.3-32-32-32s-32 14.3-32 32s14.3 32 32 32z"/></symbol>
+	<symbol id="lock" viewBox="0 0 18 18"><g transform="translate(0,18) scale(0.1,-0.1)"><path d="M102 168 c-7 -7 -12 -22 -12 -34 0 -20 -6 -23 -42 -26 l-43 -3 0 -50 0 -50 55 0 55 0 0 75 c0 68 2 75 20 75 13 0 21 -8 23 -22 4 -30 22 -30 22 0 0 29 -18 47 -45 47 -12 0 -26 -5 -33 -12z"/></g></symbol>
+	<symbol id="arrows" viewBox="0 0 908 908"><path d="M591.672,907.618c28.995,0,52.5-23.505,52.5-52.5V179.839l42.191,41.688c10.232,10.11,23.567,15.155,36.898,15.155	c13.541,0,27.078-5.207,37.347-15.601c20.379-20.625,20.18-53.865-0.445-74.244L626.892,15.155C617.062,5.442,603.803,0,589.993,0 c-0.104,0-0.211,0-0.314,0.001c-13.923,0.084-27.244,5.694-37.03,15.6l-129.913,131.48c-20.379,20.625-20.18,53.865,0.445,74.244 c20.626,20.381,53.866,20.181,74.245-0.445l41.747-42.25v676.489C539.172,884.113,562.677,907.618,591.672,907.618z"/><path d="M315.948,0c-28.995,0-52.5,23.505-52.5,52.5v676.489l-41.747-42.25c-20.379-20.625-53.62-20.825-74.245-0.445 c-20.625,20.379-20.825,53.619-0.445,74.244l129.912,131.479c9.787,9.905,23.106,15.518,37.029,15.601 c0.105,0.001,0.21,0.001,0.315,0.001c13.81,0,27.07-5.442,36.899-15.155L484.44,760.78c20.625-20.379,20.824-53.619,0.445-74.244 c-20.379-20.626-53.62-20.825-74.245-0.445l-42.192,41.688V52.5C368.448,23.505,344.943,0,315.948,0z"/></symbol>
+	<symbol id="ecar" viewBox="0 0 18 22"><path d="M 0,13.229166 C 0,7.5847219 0.01603535,7.4083329 0.52916667,7.4083329 c 0.44097223,0 0.52916663,-0.1763889 0.52916663,-1.0583332 0,-0.8819443 0.088195,-1.0583333 0.5291667,-1.0583333 0.4703704,0 0.5291667,-0.176389 0.5291667,-1.5874999 0,-1.4111111 0.058796,-1.5874999 0.5291666,-1.5874999 0.3527777,0 0.5291667,-0.1763889 0.5291667,-0.5291667 0,-0.3527777 0.176389,-0.5291666 0.5291667,-0.5291666 0.3527777,0 0.5291666,-0.17638891 0.5291666,-0.52916666 C 4.2333333,0.01356838 4.4097223,0 11.1125,0 c 6.702778,0 6.879167,0.01356838 6.879167,0.52916664 0,0.35277775 0.176389,0.52916666 0.529166,0.52916666 0.352778,0 0.529167,0.1763889 0.529167,0.5291666 0,0.3527778 0.176389,0.5291667 0.529167,0.5291667 0.47037,0 0.529166,0.1763888 0.529166,1.5874999 0,1.4111109 0.0588,1.5874999 0.529167,1.5874999 0.440972,0 0.529167,0.176389 0.529167,1.0583333 0,0.8819443 0.08819,1.0583332 0.529166,1.0583332 0.513132,0 0.529167,0.176389 0.529167,5.8208331 v 5.820833 H 20.6375 19.05 v -1.5875 -1.5875 H 11.1125 3.175 v 1.5875 1.5875 H 1.5875 0 Z m 21.166667,-2.116667 c 0,-2.4694438 -0.03528,-2.6458328 -0.529167,-2.6458328 -0.352778,0 -0.529167,-0.1763889 -0.529167,-0.5291666 0,-0.3527777 -0.176389,-0.5291667 -0.529166,-0.5291667 -0.470371,0 -0.529167,-0.1763889 -0.529167,-1.5874999 0,-1.4111109 -0.0588,-1.5874999 -0.529167,-1.5874999 -0.440972,0 -0.529166,-0.176389 -0.529166,-1.0583333 V 2.1166666 h -1.058334 c -0.881944,0 -1.058333,-0.088194 -1.058333,-0.5291667 0,-0.5095679 -0.176389,-0.5291666 -4.7625,-0.5291666 -4.586111,0 -4.7625,0.019599 -4.7625,0.5291666 0,0.4409722 -0.176389,0.5291667 -1.0583333,0.5291667 H 4.2333333 v 1.0583332 c 0,0.8819443 -0.088194,1.0583333 -0.5291666,1.0583333 -0.4703705,0 -0.5291667,0.176389 -0.5291667,1.5874999 0,1.411111 -0.058796,1.5874999 -0.5291667,1.5874999 -0.3527777,0 -0.5291666,0.176389 -0.5291666,0.5291667 0,0.3527777 -0.1763889,0.5291666 -0.5291667,0.5291666 -0.4938889,0 -0.5291667,0.176389 -0.5291667,2.6458328 v 2.645834 H 11.1125 21.166667 Z M 3.175,11.641666 v -1.058333 h 1.0583333 1.0583334 v 1.058333 1.058333 H 4.2333333 3.175 Z m 13.758333,0 V 10.583333 H 17.991667 19.05 v 1.058333 1.058333 H 17.991667 16.933333 Z M 8.73125,12.131628 c 0,-0.08393 0.347704,-0.995789 0.7726759,-2.026357 L 10.276602,8.2315136 9.3847637,8.1506524 8.4929255,8.0697912 10.772694,5.3576548 c 1.253873,-1.491675 2.32054,-2.6713655 2.370371,-2.6215344 0.04983,0.049831 -0.258115,0.9362487 -0.684324,1.969817 l -0.774926,1.8792149 0.902073,0.080861 0.902072,0.080861 -2.002708,2.3812499 C 9.2386883,11.799323 8.73125,12.352733 8.73125,12.131628 Z"/></symbol>
 </svg>
 
 <body>
-	<center>
-		<div>
-			<right>
-				<button id='btnExit' style="font-size: 6pt; float: right;">X</button><br>
-			</right>
-		</div>
+<div class="container">
+	<header>
+		<nav class="top-nav">
+			<button id="btnExit" class="top-nav-item">&times;</button>
+		</nav>
 		<h1>wbec</h1>
 		<h2>Heidelberg Wallbox Energy Control</h2>
-		
-		<div class="box" id='boxSelection'>
-			<button id='btn1' class="pvButton">Wallbox 1</button>
-			<button id='btn2' class="pvButton">Wallbox 2</button>
-			<button id='btn3' class="pvButton">Wallbox 3</button>
-		</div>
-		
+	</header>
+
+	<section class="box-group" id="boxSelection">
 		<div class="box">
-			<svg class="flash"><use xlink:href="#flash"></svg> 
-			<h3>Ladestrom</h3>
-			<table><tr><td>max. <span id='currLim'>-</span>A</td></tr></table>
-			<table>
-				<tr>
-					<td>0A</td>
-					<td width=90%><input type="range" min="0" max="160" value="60" class="slider" id="slideCurr"></td>
-					<td>16A</td>
-				</tr>
-			</table>
+			<div class="box-content">
+				<button class="btn" data-send-command="id=0" data-wallbox-id="0">Wallbox 1</button>
+				<!--<button class="btn" data-send-command="id=1" data-wallbox-id="1">Wallbox 2</button>-->
+				<!--<button class="btn" data-send-command="id=2" data-wallbox-id="2">Wallbox 3</button>-->
+			</div>
 		</div>
-		<!--<div class="box">
-			<svg class="flash"><use xlink:href="#flash"></svg>
-			<h3>Status</h3>
-			<table width=100%>
-				<tr>
-					<td>Fahrzeug verbunden</td>
-					<td align="right" colspan="2"><span id='carStat'>-</span></td>
-				</tr>
-				<tr>
-					<td>Wallbox erlaubt Laden</td>
-					<td align="right" colspan="2"><span id='wbStat'>-</span></td>
-				</tr>
-				<tr>
-					<td>Ladeleistung</td>
-					<td align="right"><span id='power'>-</span></td>
-					<td align="right">W</td>
-				</tr>
-				<tr>
-					<td>Energiez&auml;hler</td>
-					<td align="right"><span id='energyI'>-</span></td>
-					<td align="right">kWh</td>
-				</tr>
-				<tr>
-					<td>... seit Ladebeginn</td>
-					<td align="right"><span id='energyC'>-</span></td>
-					<td align="right">kWh</td>
-				</tr>
-				<tr id='trPFox1'>
-					<td>Bezug(+)/Einsp.(-)</td>
-					<td align="right"><span id='watt'>-</span></td>
-					<td align="right">W</td>
-				</tr>
-			</table>
-		</div>-->
-		<div class="box" id='pvLaden'>
-		  <svg class="panel"><use xlink:href="#panel"></svg>
-		  <h3>PV Laden</h3>
-			<button id='btnAus'   class="pvButton">
-			  <svg class="flash"><use xlink:href="#flash"></svg> 
-			Aus</button>
-			<button id='btnPv'    class="pvButton">
-			  <svg class="panel"><use xlink:href="#panel"></svg>
-			PV</button>
-			<button id='btnMinPv' class="pvButton">
-			  <svg class="flash"><use xlink:href="#flash"></svg> <svg class="panel"><use xlink:href="#panel"></svg>
-			Min+PV</button>
+	</section>
+
+	<section class="box-group">
+		<div class="box">
+			<h3 class="box-header">
+				<svg class="flash"><use xlink:href="#flash"></use></svg>&nbsp;<span>Ladestrom</span>
+			</h3>
+			<div class="box-content">
+				<label for="slideCurr" class="value">max <span data-value="currLim">-</span>A</label>
+				<div class="slider-wrapper">
+					<span class="slider-min">0A</span>
+					<input type="range" min="0" max="160" value="60" class="slider" id="slideCurr">
+					<span class="slider-max">16A</span>
+				</div>
+			</div>
 		</div>
-		<div class="tileL">
-		  <svg class="car"><use xlink:href="#car"></svg>
-		  <h4>verbunden</h4>
-		  <p class="tileContent"><span id='carStat'>-</span></p>
+	</section>
+
+	<section class="box-group" id="pvLaden">
+		<div class="box">
+			<h3 class="box-header">
+				<svg class="panel"><use xlink:href="#panel"></use></svg>&nbsp;<span>PV Laden</span>
+			</h3>
+			<div class="box-content">
+				<button class="btn" data-send-command="PV_OFF" data-pv-mode="1">
+					<svg class="flash"><use xlink:href="#flash"></use></svg>&nbsp;<span>Aus</span>
+				</button>
+				<button class="btn" data-send-command="PV_ACTIVE" data-pv-mode="2">
+					<svg class="panel"><use xlink:href="#panel"></use></svg>&nbsp;<span>PV</span>
+				</button>
+				<button class="btn" data-send-command="PV_MIN_PV" data-pv-mode="3">
+					<svg class="flash"><use xlink:href="#flash"></use></svg>&nbsp;<svg class="panel"><use xlink:href="#panel"></use></svg>&nbsp;<span>Min+PV</span>
+				</button>
+			</div>
 		</div>
-		<div class="tileR">
-		  <svg class="lock"><use xlink:href="#lock"></svg>
-		  <h4>Laden erlaubt</h4>
-		  <p class="tileContent"><span id='wbStat'>-</span></p>
+	</section>
+
+	<section class="box-group">
+
+		<div class="box">
+			<h3 class="box-header">
+				<svg class="car"><use xlink:href="#car"></use></svg>&nbsp;<span>Verbunden</span>
+			</h3>
+			<div class="box-content">
+				<span class="value"><span data-value="carStat">-</span></span>
+			</div>
 		</div>
-		<div class="clear"></div>
-		<div class="tileL">
-		  <svg class="flash"><use xlink:href="#flash"></svg>
-		  <h4>Energiez&auml;hler</h4>
-		  <p class="tileContent"><span id='energyI'>-</span> kWh</p>
+
+		<div class="box">
+			<h3 class="box-header">
+				<svg class="lock"><use xlink:href="#lock"></use></svg>&nbsp;<span>Laden erlaubt</span>
+			</h3>
+			<div class="box-content">
+				<span class="value"><span data-value="wbStat">-</span></span>
+			</div>
 		</div>
-		<div class="tileR">
-		  <svg class="flash"><use xlink:href="#flash"></svg>
-		  <h4>Ladevorgang</h4>
-		  <p class="tileContent"><span id='energyC'>-</span> kWh</p>
+
+		<div class="box">
+			<h3 class="box-header">
+				<svg class="flash"><use xlink:href="#flash"></use></svg>&nbsp;<span>Energiezähler</span>
+			</h3>
+			<div class="box-content">
+				<span class="value"><span data-value="energyI">-</span> kWh</span>
+			</div>
 		</div>
-		<div class="clear"></div>
-		<div class="tileL">
-		  <svg class="ecar"><use xlink:href="#ecar"></svg>
-		  <h4>Ladeleistung</h4>
-		  <p class="tileContent"><span id='power'>-</span> W</p>
+
+		<div class="box">
+			<h3 class="box-header">
+				<svg class="flash"><use xlink:href="#flash"></use></svg>&nbsp;<span>Ladevorgang</span>
+			</h3>
+			<div class="box-content">
+				<span class="value"><span data-value="energyC">-</span> kWh</span>
+			</div>
 		</div>
-		<div class="tileR">
-		  <svg class="arrows"><use xlink:href="#arrows"></svg>
-		  <h4>Bezug(+)/Einsp.(-)</h4>
-		  <p class="tileContent"><span id='watt'>-</span> W</p>
+
+		<div class="box">
+			<h3 class="box-header">
+				<svg class="ecar"><use xlink:href="#ecar"></use></svg>&nbsp;<span>Ladeleistung</span>
+			</h3>
+			<div class="box-content">
+				<span class="value"><span data-value="power">-</span> W</span>
+			</div>
 		</div>
-		<div class="clear"></div>
-		<div class="time">
-		  <span id='timeNow'>-</span>
+
+		<div class="box">
+			<h3 class="box-header">
+				<svg class="arrows"><use xlink:href="#arrows"></use></svg>&nbsp;<span>Bezug(+) / Einsp.(-)</span>
+			</h3>
+			<div class="box-content">
+				<span class="value"><span data-value="watt">-</span> W</span>
+			</div>
 		</div>
-	</center>
+
+	</section>
+
+	<footer>
+		<div data-value="timeNow">-</div>
+	</footer>
+</div>
 </body>
-
-<script src="web.js"></script>
-
-<style>
-	body {
-		font-family: 'Arial', sans-serif;
-		font-size: 18pt;
-		margin: 0;
-		background-color: rgb(106, 106, 106);
-	}
-	
-	center {
-		padding: 0.3em;
-		margin: auto;
-		width: 30%;
-		box-sizing: border-box;
-	}
-	
-	h1 {
-		font-size: 1.5em;
-		font-weight: bold;
-		color: rgb(40, 152, 161); /*orange;*/
-		margin-top: 0;
-	}
-	
-	h2 {
-		font-size: 0.7em;
-		font-weight: normal;
-		color: white;
-	}
-	
-	h3, h4 {
-		font-size: 0.8em;
-		text-align: left;
-		margin: 0px;
-		color: rgb(40, 152, 161); /*orange;*/
-		font-weight: bold;
-	}
-	
-	div.box, div.tileL, div.tileR {    /* common for all boxes */
-	  background-color: rgb(239, 239, 243);
-		height: 3.5em;
-		border-radius: 10px;
-	}
-	
-	div.box {
-		padding: 10px 0px 20px 0px;
-		margin-bottom: 20px;
-	}
-	
-  div.tileL, div.tileR {
-    width: 48%;
-    display: inline-block;
-    text-align: center;
-		padding: 10px 0px 0px 0px;
-		margin-bottom: 15px;
-  }
-  
-	div.tileL {
-    float: left;
-  }
-
-  div.tileR {
-    float: right;
-  }
-  
-  div.clear {
-    clear: both; /* make sure that it's not covered by 'float'ing elements, but instead being moved down */
-  }
-	
-	
-	div.time {
-		font-size: 0.4em;
-		color: white;
-		margin: 20px 0px 40px 0px;
-	}
-	
-	table, p.tileContent {
-	  font-size: 0.7em;
-		font-weight: bold;
-		margin-left: 15px;
-		margin-right: 15px;
-	}
-	
-	svg.flash, svg.panel, svg.lock, svg.car, svg.ecar, svg.arrows {
-	  height: 18px;
-	  float: left;
-	  margin: 2px 3px 0px 15px;
-		fill: rgb(40, 152, 161); /*orange;*/
-	}
-	
-	svg.flash {
-		width: 10px;
-	}
-	
-	svg.panel {
-		width: 22px;
-	}
-	
-	svg.ecar {
-		width: 22px;
-	}
-	
-	svg.car, svg.lock, svg.arrows {
-		width: 18px;
-	}
-	
-	button svg.flash, button svg.panel {     /* all svg icons that are in a button */
-	  fill: white;
-	  margin: 2px 3px 0px 3px;
-	}
-	
-	button {
-		font-size: 0.7em;
-		font-weight: normal;
-	}
-	
-	button.pvButton {
-		background-color: darkgrey;
-		border: none;
-		color: white;
-		font-size: 0.8em;
-		height: 50px;
-		border-radius: 10px;
-		padding: 10px;
-		margin: 10px 0px 10px 0px;
-	}
-
-	.slider {
-		-webkit-appearance: none;  /* Override default CSS styles */
-		appearance: none;
-		width: 100%; /* Full-width */
-		height: 10px;
-		border-radius: 5px; 
-		background: darkgray; /* Grey background */
-		outline: none; /* Remove outline */
-		opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
-		-webkit-transition: .2s; /* 0.2 seconds transition on hover */
-		transition: opacity .2s;
-	}
-
-	.slider:hover {
-		opacity: 1; /* Fully shown on mouse-over */
-	}
-
-	/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
-	.slider::-webkit-slider-thumb {
-		-webkit-appearance: none; /* Override default look */
-		appearance: none;
-		width: 25px; /* Set a specific slider handle width */
-		height: 25px;
-		border-radius: 50%; 
-		background: rgb(40, 152, 161); /*orange;*/
-		cursor: pointer; /* Cursor on hover */
-	}
-
-	.slider::-moz-range-thumb {
-		width: 25px; /* Set a specific slider handle width */
-		height: 25px;
-		border-radius: 50%;
-		background: rgb(40, 152, 161); /*orange;*/
-		cursor: pointer; /* Cursor on hover */
-	}
-
-@media only screen and (max-device-width: 700px) {
-	center {
-		width: 100%;
-		height: 100vh;
-		overflow: auto;
-	}
-	h3, h4 {
-	  font-size: 0.6em;
-    font-weight: normal;
-	}
-	svg {
-		margin: 0px 3px 0px 5px;
-	}
-}
-</style>
 
 </html>
