@@ -126,10 +126,6 @@ void inverter_loop() {
 		if (regPowerMetS) { mb.readHreg(remote, regPowerMetS, (uint16_t *) &power_meter_scale,    1, cb, smartmetAddr); }    //Power Zähler Scale Factor
 	}
 	mb.task();  // Common local Modbus task
-	if (cfgInverterType == 2) {
-		// Fronius Smartmeter provides the value inverted (pos. = 'Bezug', neg. = 'Einspeisung'), see #24
-		power_meter = -1 * power_meter;
-	}
 
 	if (power_inverter_scale < 0) {  // if negative, then divide
 		pwrInv = power_inverter / pow_int16(10, (uint16_t)(-power_inverter_scale));
