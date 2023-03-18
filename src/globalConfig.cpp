@@ -8,7 +8,7 @@
 
 const uint8_t m = 5;
 
-#define WBEC_VER(s) "v" MAJOR_VER_STRING(s) ".4.7"     // token stringification
+#define WBEC_VER(s) "v" MAJOR_VER_STRING(s) ".4.8"     // token stringification
 #define MAJOR_VER_STRING(s) #s                         // .. with two levels of macros
 
 char     cfgWbecVersion[]             = WBEC_VER(WBEC_VERSION_MAJOR); // wbec version
@@ -28,7 +28,7 @@ char     cfgMqttUser[32];             // MQTT: Username
 char     cfgMqttPass[32];             // MQTT: Password
 uint8_t  cfgMqttLp[WB_CNT];           // Array with assignments to openWB loadpoints, e.g. [4,2,0,1]: Box0 = LP4, Box1 = LP2, Box2 = no MQTT, Box3 = LP1
 char     cfgMqttWattTopic[60];        // MQTT: Topic for setting the watt value for PV charging, default: "wbec/pv/setWatt"
-char     cfgMqttWattJson[15];         // MQTT: Optional: Element in a JSON string, which contains the power in watt, default: ""
+char     cfgMqttWattJson[30];         // MQTT: Optional: Element in a JSON string, which contains the power in watt, default: ""
 char     cfgNtpServer[30];            // NTP server
 char     cfgFoxUser[32];              // powerfox: Username
 char     cfgFoxPass[16];              // powerfox: Password
@@ -57,14 +57,11 @@ uint16_t cfgWifiConnectTimeout;       // Timeout in seconds to connect to Wifi b
 
 
 static bool createConfig() {
-	StaticJsonDocument<1024> doc;
+	StaticJsonDocument<128> doc;
 
 	// default configuration parameters
-	doc["cfgApSsid"]              = F("wbec");
 	doc["cfgApPass"]              = F("wbec1234"); // older version had "cebw1234"
 	doc["cfgCntWb"]               = 1;
-	doc["cfgMqttIp"]              = F("");
-	doc["cfgMqttLp"]              = serialized("[]");   // already serialized
 	
 	File configFile = LittleFS.open(F("/cfg.json"), "w");
 	if (!configFile) {
@@ -91,7 +88,7 @@ static boolean checkConfig(JsonDocument& doc) {
 	}
 
 	size_t size = configFile.size();
-	if (size > 1024) {
+	if (size > 2048) {
 		LOG(m, "Config file size is too large","");
 		return(false);
 	}
@@ -119,7 +116,7 @@ static boolean checkConfig(JsonDocument& doc) {
 
 
 void loadConfig() {
-	StaticJsonDocument<1024> doc;
+	StaticJsonDocument<2048> doc;
 	if (!checkConfig(doc)) {
 		LOG(m, "Using default config", "");
 		deserializeJson(doc, F("{}"));
