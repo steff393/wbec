@@ -1,12 +1,10 @@
 // Copyright (c) 2021 steff393, MIT license
 
 window.addEventListener('DOMContentLoaded', () => {
-
 	let Socket;
-
-	let elementCurrentSlider = document.getElementById('slideCurr');
-	let pvModeButtons = document.querySelectorAll('[data-pv-mode]');
-	let wallboxButtons = document.querySelectorAll('[data-wallbox-id]');
+	let elementCurrentSlider   = document.getElementById('slideCurr');
+	let pvModeButtons          = document.querySelectorAll('[data-pv-mode]');
+	let wallboxButtons         = document.querySelectorAll('[data-wallbox-id]');
 	let valueContainerElements = document.querySelectorAll('[data-value]');
 
 	function init() {
@@ -71,12 +69,12 @@ window.addEventListener('DOMContentLoaded', () => {
 		}
 		assignValuesToHtml({
 			carStat: carStat,
-			wbStat: wbStat,
-			power: message.power,
+			wbStat:  wbStat,
+			power:   message.power,
 			energyI: message.energyI,
 			energyC: message.energyC,
 			currLim: message.currLim,
-			watt: message.watt,
+			watt:    message.watt,
 			timeNow: message.timeNow,
 		})
 		elementCurrentSlider.value = message.currLim * 10;
@@ -98,12 +96,12 @@ window.addEventListener('DOMContentLoaded', () => {
 	function exit() {
 		assignValuesToHtml({
 			carStat: '-',
-			wbStat: '-',
-			power: '-',
+			wbStat:  '-',
+			power:   '-',
 			energyI: '-',
 			energyC: '-',
 			currLim: '-',
-			watt: '-',
+			watt:    '-',
 			timeNow: '-',
 		})
 		for (const element of document.querySelectorAll('[data-wallbox-id],[data-pv-mode]')) {
