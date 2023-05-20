@@ -39,8 +39,9 @@ uint8_t  cfgPvLimStart;               // PV charging: Target current needed for 
 uint8_t  cfgPvLimStop;                // PV charging: Target current to stop charging when below (in 0.1A)
 uint8_t  cfgPvPhFactor;               // PV charging: Power/Current factor, e.g. 69: 1A equals 690W at 3phases, 23: 1A equals 230W at 1phase
 uint16_t cfgPvOffset;                 // PV charging: Offset for the available power calculation (in W); can be used to assure that no/less current is consumed from net
-uint8_t  cfgPvInvert;                 // Invert the watt value (pos./neg.)
-uint16_t cfgTotalCurrMax;             // <don't use - still beta> Total current limit for load management (in 0.1A)
+uint8_t  cfgPvInvert;                 // PV charging: Invert the watt value (pos./neg.)
+uint8_t  cfgPvMinTime;                // PV charging: Minimum activation time (in minutes), 0 to disable
+uint16_t cfgTotalCurrMax;             // Total current limit for load management (in 0.1A) - !! Additional fuse mandatory !!
 uint8_t  cfgHwVersion;                // Selection of the used HW
 uint8_t  cfgWifiSleepMode;            // Set sleep type for power saving, recomendation is 255 (=no influence) or 0 (=WIFI_NONE_SLEEP)
 uint8_t  cfgLoopDelay;                // Delay [ms] at end of main loop, might have an impact on web server reactivitiy, default: 255 = inactive
@@ -146,7 +147,8 @@ void loadConfig() {
 	cfgPvLimStop              = doc["cfgPvLimStop"]          | 50; 
 	cfgPvPhFactor             = doc["cfgPvPhFactor"]         | 69; 
 	cfgPvOffset               = doc["cfgPvOffset"]           | 0UL;
-	cfgPvInvert               = doc["cfgPvInvert"]           | 0UL;
+	cfgPvInvert               = doc["cfgPvInvert"]           | 0L;
+	cfgPvMinTime              = doc["cfgPvMinTime"]          | 0L;
 	cfgTotalCurrMax           = doc["cfgTotalCurrMax"]       | 0UL;
 	cfgHwVersion              = doc["cfgHwVersion"]          | 15;
 	cfgWifiSleepMode          = doc["cfgWifiSleepMode"]      | 0;

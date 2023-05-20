@@ -18,7 +18,9 @@ const uint8_t m = 11;
 #define BOXID                 0		// only 1 box supported
 
 RTCVars rtc;                               // used to memorize a few global variables over reset (not for cold boot / power on reset)
-static uint32_t  lastHandleCall       = 0;
+
+static uint32_t  lastCall             = 0;
+static uint32_t  lastActivation       = 0;  // timestamp of the recent switch-on (#71), to avoid to frequent on/off
 static int32_t   watt                 = 0;  // power from powerfox API (neg. = 'Einspeisung', pos. = 'Bezug')
 static int32_t   availPowerPrev       = 0;  // availPower from previous cycle
 static pvMode_t  pvMode               = PV_OFF;
@@ -51,7 +53,8 @@ void pvAlgo() {
 			targetCurr = 0;
 
 			// MIN+PV, don't switch off, but ...
-			if (pvMode == PV_MIN_PV) {
+			if ((pvMode == PV_MIN_PV) ||
+			    (cfgPvMinTime != 0 && lastActivation != 0 && (millis() - lastActivation < ((uint32_t)cfgPvMinTime) * 60 * 1000))) {   // also if MinTime not elapsed (#71)
 				targetCurr = content[BOXID][16]; // ... set minimal current configured in box
 			}
 		}
@@ -63,6 +66,11 @@ void pvAlgo() {
 			} else if (targetCurr > CURR_ABS_MAX) {
 				targetCurr = CURR_ABS_MAX;
 			} 
+		}
+
+		if (actualCurr == 0 && targetCurr >= CURR_ABS_MIN) {
+			// switch on => remember timestamp for cfgPvMinTime (#71)
+			lastActivation = millis();
 		}
 	} else {
 		// no car connected
@@ -109,11 +117,11 @@ void pv_setup() {
 
 
 void pv_loop() {
-	if ((millis() - lastHandleCall < (uint16_t)cfgPvCycleTime * 1000)  ||      // avoid unnecessary frequent calls
+	if ((millis() - lastCall < (uint16_t)cfgPvCycleTime * 1000)  ||      // avoid unnecessary frequent calls
 			(pvMode == PV_DISABLED)) {
 		return;
 	}
-	lastHandleCall = millis();
+	lastCall = millis();
 
 	// Call algo
 	if (pvMode > PV_OFF) {  // PV algo active 
@@ -149,5 +157,5 @@ pvMode_t pv_getMode() {
 void pv_setMode(pvMode_t val) {
 	pvMode = val;
 	rtc.saveToRTC();     // memorize over reset
-	lastHandleCall = 0;  // make sure to call pv_Algo() in the next pv_loop() call
+	lastCall = 0;  // make sure to call pv_Algo() in the next pv_loop() call
 }
