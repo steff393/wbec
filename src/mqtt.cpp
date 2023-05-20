@@ -9,6 +9,7 @@
 #include <mbComm.h>
 #include <PubSubClient.h>
 #include <pvAlgo.h>
+#include <rfid.h>
 
 
 const uint8_t m = 2;
@@ -285,6 +286,10 @@ void mqtt_publish(uint8_t i) {
 
 	snprintf_P(topic, sizeof(topic), PSTR("%s/get/phases_in_use"), header);
 	snprintf_P(value, sizeof(value), PSTR("%d"), cfgPvPhFactor / 23);
+	client.publish(topic, value, retain);
+	
+	snprintf_P(topic, sizeof(topic), PSTR("%s/get/rfid_tag"), header);
+	snprintf_P(value, sizeof(value), PSTR("%s"), rfid_getLastID());
 	client.publish(topic, value, retain);
 
 	// topics for EVCC
