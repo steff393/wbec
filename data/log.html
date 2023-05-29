@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="de">
+
+<head>
+	<meta charset="utf-8">
+	<title>wbec Log</title>
+	<meta name="description" content="Heidelberg Wallbox Energy Control">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="web.css">
+	<script src="log.js" defer></script>
+
+	<meta name="theme-color" content="#6a6a6a">
+</head>
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+	<symbol id="flash" viewBox="0 0 19 36"><g transform="translate(0,36) scale(0.1,-0.1)"><path d="M87 258 l-86 -103 34 -3 33 -3 -29 -71 c-16 -39 -28 -73 -26 -75 2 -2 43 43 90 99 l87 103 -34 3 -34 3 29 71 c16 39 28 73 26 75 -2 1 -42 -43 -90 -99z"/></g></symbol>
+</svg>
+
+<body>
+<div class="container">
+	<header>
+		<nav class="top-nav">
+			<button id="btnLog"  class="top-nav-text">Ladelog</button>
+			<button id="btnCfg"  class="top-nav-text">Config</button>
+			<button id="btnJson" class="top-nav-text">Json</button>
+			<button id="btnEdit" class="top-nav-text">Edit</button>
+			<button id="btnUpd"  class="top-nav-text">Update</button>
+			<button id="btnExit" class="top-nav-item">&times;</button>
+		</nav>
+		<h1>wbec</h1>
+		<h2>Heidelberg Wallbox Energy Control</h2>
+	</header>
+
+	<section class="box-group">
+		<div class="box">
+			<h3 class="box-header">
+				<svg class="flash"><use xlink:href="#flash"></use></svg>&nbsp;<span>Ladeübersicht</span>
+			</h3>
+			<div class="box-content">
+				<div class="table" id="logTable">
+					<div class="table-row">
+						<div class="table-head">Start</div>
+						<div class="table-head">Ende</div>
+						<div class="table-head">Geladene<br>kWh</div>
+						<div class="table-head">Ladedauer<br>hh:mm</div>
+						<div class="table-head">Wallbox</div>
+					</div>
+				</div>
+				<button onclick="exportToExcel()">Export CSV</button>
+			</div>
+		</div>
+	</section>
+
+</div>
+</body>
+
+</html>

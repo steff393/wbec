@@ -14,6 +14,11 @@ window.addEventListener('DOMContentLoaded', () => {
 		Socket = new WebSocket(`ws://${window.location.hostname}:81/`);
 		Socket.onmessage = processReceivedCommand;
 
+		document.getElementById('btnLog'). addEventListener('click', function() {window.location.href = "/log.html"});
+		document.getElementById('btnCfg'). addEventListener('click', function() {window.location.href = "/cfg.html"});
+		document.getElementById('btnJson').addEventListener('click', function() {window.location.href = "/json"});
+		document.getElementById('btnEdit').addEventListener('click', function() {window.location.href = "/edit"});
+		document.getElementById('btnUpd'). addEventListener('click', function() {window.location.href = "/update"});
 		document.getElementById('btnExit').addEventListener('click', exit);
 
 		// Update the current slider value (each time you drag the slider handle)
