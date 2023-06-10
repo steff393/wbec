@@ -7,6 +7,8 @@ window.addEventListener('DOMContentLoaded', () => {
 	let wallboxButtons         = document.querySelectorAll('[data-wallbox-id]');
 	let valueContainerElements = document.querySelectorAll('[data-value]');
 
+	let sliderSliding = false;
+
 	function init() {
 		setSectionVisibility('boxSelection', wallboxButtons.length > 1);
 		setSectionVisibility('pvLaden', false);
@@ -22,7 +24,8 @@ window.addEventListener('DOMContentLoaded', () => {
 		document.getElementById('btnExit').addEventListener('click', exit);
 
 		// Update the current slider value (each time you drag the slider handle)
-		elementCurrentSlider.addEventListener('input', onSetCurrentSlider);
+		elementCurrentSlider.addEventListener('input', onStartSliderSliding);
+		elementCurrentSlider.addEventListener('change', onSliderReleased);
 
 		for (const element of document.querySelectorAll('[data-send-command]')) {
 			element.addEventListener('click', () => {
@@ -30,16 +33,28 @@ window.addEventListener('DOMContentLoaded', () => {
 			})
 		}
 	}
+	
+	function onStartSliderSliding() {
+		sliderSliding = true;
 
-	function onSetCurrentSlider() {
 		let val = parseInt(elementCurrentSlider.value);
 		if (val !== 0 && !(val >= 60 && val <= 160)) {
 			elementCurrentSlider.value = val = 0;
 		}
+
 		assignValuesToHtml({
 			currLim: `${val / 10}`,
 		})
+	}
+
+	function onSliderReleased() {
+		let val = parseInt(elementCurrentSlider.value);
+		if (val !== 0 && !(val >= 60 && val <= 160)) {
+			elementCurrentSlider.value = val = 0;
+		}
+
 		sendText(`currLim=${val}`);
+		sliderSliding = false;
 	}
 
 	function assignValuesToHtml(values) {
@@ -78,11 +93,16 @@ window.addEventListener('DOMContentLoaded', () => {
 			power:   message.power,
 			energyI: message.energyI,
 			energyC: message.energyC,
-			currLim: message.currLim,
 			watt:    message.watt,
 			timeNow: message.timeNow,
 		})
-		elementCurrentSlider.value = message.currLim * 10;
+
+		if (!sliderSliding) {
+			assignValuesToHtml({
+				currLim: message.currLim
+			});
+			elementCurrentSlider.value = message.currLim * 10;
+		}
 
 		for (const element of pvModeButtons) {
 			setClass(element, 'active', message.pvMode === parseInt(element.getAttribute('data-pv-mode')));
