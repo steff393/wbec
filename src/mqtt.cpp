@@ -351,11 +351,11 @@ void mqtt_publish(uint8_t i) {
 	snprintf_P(value, sizeof(value), PSTR("%d"), WiFi.channel());
 	client.publish(topic, value, retain);
 
-	snprintf_P(topic, sizeof(topic), PSTR("%s/plug_state"), header);
+	snprintf_P(topic, sizeof(topic), PSTR("%s/plugState"), header);
 	snprintf_P(value, sizeof(value), PSTR("%s"), ps?"true":"false");
 	client.publish(topic, value, retain);
 
-	snprintf_P(topic, sizeof(topic), PSTR("%s/charge_state"), header);
+	snprintf_P(topic, sizeof(topic), PSTR("%s/chargeState"), header);
 	snprintf_P(value, sizeof(value), PSTR("%s"), cs?"true":"false");
 	client.publish(topic, value, retain);
 
