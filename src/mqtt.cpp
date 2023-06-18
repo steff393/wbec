@@ -13,6 +13,11 @@
 
 
 const uint8_t m = 2;
+const char*   lastWillTopic  = "wbec/connection";
+const char*   lastWillMsgOff = "offline";
+const char*   lastWillMsgOn  = "online";
+const uint8_t lastWillQos    = 1;
+const bool	  lastWillRetain = true;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -158,9 +163,9 @@ void reconnect() {
 	// Attempt to connect
 	boolean con = false;
 	if (strcmp(cfgMqttUser, "") != 0 && strcmp(cfgMqttPass, "") != 0) {
-		con = client.connect(clientId, cfgMqttUser, cfgMqttPass);
+		con = client.connect(clientId, cfgMqttUser, cfgMqttPass, lastWillTopic, lastWillQos, lastWillRetain, lastWillMsgOff);
 	} else {
-		con = client.connect(clientId);
+		con = client.connect(clientId, lastWillTopic, lastWillQos, lastWillRetain, lastWillMsgOff);
 	}
 	if (con)
 	{
@@ -320,7 +325,41 @@ void mqtt_publish(uint8_t i) {
 		snprintf_P(value, sizeof(value), PSTR("%.1f"), (float)content[i][ph+1]/10.0);	// L1 = 2, L2 = 3, L3 = 4
 		client.publish(topic, value, retain);
 	}
+	
+	for (uint8_t ph = 1; ph <= 3; ph++) {
+		snprintf_P(topic, sizeof(topic), PSTR("%s/voltL%d"), header, ph);
+		snprintf_P(value, sizeof(value), PSTR("%d"), content[i][ph+5]);	// L1 = 2, L2 = 3, L3 = 4
+		client.publish(topic, value, retain);
+	}
+	snprintf_P(topic, sizeof(topic), PSTR("%s/currLimit"), header);
+	snprintf_P(value, sizeof(value), PSTR("%.1f"), (float)content[i][53]/10.0);
+	client.publish(topic, value, retain);
 
+	snprintf_P(topic, sizeof(topic), PSTR("%s/pcbTemp"), header);
+	snprintf_P(value, sizeof(value), PSTR("%.1f"), (float)content[i][5]/10.0);
+	client.publish(topic, value, retain);
+
+	snprintf_P(topic, sizeof(topic), PSTR("%s/resCode"), header);
+	snprintf_P(value, sizeof(value), PSTR("%s"), String(modbusResultCode[i], HEX));
+	client.publish(topic, value, retain);
+
+	int qrssi = WiFi.RSSI();     
+	snprintf_P(topic, sizeof(topic), PSTR("%s/wifiRssi"), header);
+	snprintf_P(value, sizeof(value), PSTR("%d"), qrssi);
+	client.publish(topic, value, retain);
+	snprintf_P(topic, sizeof(topic), PSTR("%s/wifiChannel"), header);
+	snprintf_P(value, sizeof(value), PSTR("%d"), WiFi.channel());
+	client.publish(topic, value, retain);
+
+	snprintf_P(topic, sizeof(topic), PSTR("%s/plug_state"), header);
+	snprintf_P(value, sizeof(value), PSTR("%s"), ps?"true":"false");
+	client.publish(topic, value, retain);
+
+	snprintf_P(topic, sizeof(topic), PSTR("%s/charge_state"), header);
+	snprintf_P(value, sizeof(value), PSTR("%s"), cs?"true":"false");
+	client.publish(topic, value, retain);
+
+	
 	// publish values from inverter
 	if (strcmp(cfgInverterIp, "") != 0) {
 		snprintf_P(header, sizeof(header), PSTR("wbec/inverter"));
@@ -346,6 +385,9 @@ void mqtt_publish(uint8_t i) {
 		snprintf_P(value, sizeof(value), PSTR("%ld"), pv_getWatt());
 		client.publish(topic, value, retain);
 	}
+
+	// Wbec-Connection Status
+	client.publish(lastWillTopic, lastWillMsgOn, lastWillRetain);
 }
 
 void mqtt_log(const char *output, const char *msg) {
