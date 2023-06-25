@@ -16,9 +16,10 @@ Ziel des Projekts ist es, eine WLAN-Schnittstelle zu entwickeln um zusätzliche 
 - Abfrage von Shelly 3EM, powerfox, Solaredge, Fronius, ...
 - RFID-Kartenleser zur Freischaltung der Wallbox mit gültiger Karte/Chip (spezielle HW nötig, s. Wiki)  
 - Ansteuerung aller verbundenen Ladestationen (bis zu 16 Follower am Modbus, bis zu 8 openWB-Ladepunkte)
-- Einfacher Prototyp eines lokalen Lastmanagements für zwei Wallboxen (in Entwicklung)
+- Lokales Lastmanagement für zwei Wallboxen
 - Softwareupdate per WLAN (Over The Air), z.B. mit PlatformIO oder einfach per Browser (s. Wiki)
 - Weniger als 1W Strombedarf (trotz Ansteuerung von bis zu 16 Ladestationen)
+- [-> Neue Funktionen](https://steff393.github.io/wbec-site/features.html)
 
 ## Kontakt
 Bei Fragen oder wenn ihr Unterstützung braucht gerne einfach eine Mail schicken (wbec393@gmail.com).    
@@ -101,11 +102,6 @@ http://192.168.xx.yy/json?currLim=120      --> set current limit to 12A (on the 
 http://192.168.xx.yy/json?currLim=60&id=2  --> set current limit to 6A on the box with id=2 (i.e. ModBus Bus-ID=3)
 ```
 
-Watchdog Timeout einstellen:
-```c++
-http://192.168.xx.yy/json?wdTmOut=20000  --> 20s
-```
-
 ## Danksagung
 Folgende Projekte wurden in wbec genutzt/angepasst:  
 - [modbus-esp8266](https://github.com/emelianov/modbus-esp8266)
@@ -124,4 +120,6 @@ Folgende Projekte wurden in wbec genutzt/angepasst:
 Ein besonderer Dank ergeht an die frühen Tester und Unterstützer: mli987, profex1337, Clanchef und viele mehr!
 
 ## Unterstützung des Projektes
-wbec gefällt dir? Dann gib dem Projekt [einen Stern auf GitHub](https://github.com/steff393/wbec/stargazers)!
+wbec gefällt dir? Dann gib dem Projekt [einen Stern auf GitHub](https://github.com/steff393/wbec/stargazers)!  
+
+[![Star History Chart](https://api.star-history.com/svg?repos=steff393/wbec&type=Date)](https://star-history.com/#steff393/wbec&Date)
