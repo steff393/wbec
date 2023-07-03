@@ -20,9 +20,11 @@
 #include <WiFiManager.h>
 #include <webServer.h>
 #include <webSocket.h>
+#include <DeviceManager.hpp>
 
 
 static bool _handlingOTA = false;
+DeviceManager deviceManager;
 
 
 void setup() {
@@ -72,6 +74,7 @@ void setup() {
   btn_setup();
   pv_setup();
   lm_setup();
+  deviceManager.setup();
   Serial.print(F("Boot time: ")); Serial.println(millis());
   Serial.print(F("Free heap: ")); Serial.println(ESP.getFreeHeap());
 }
@@ -94,6 +97,7 @@ void loop() {
     pv_loop();
     //pc_handle();
     lm_loop();
+    deviceManager.loop();
     if (cfgLoopDelay <= 10) {          // see #18, might have an effect to reactivity of webserver in some environments 
       delay(cfgLoopDelay);
     }

@@ -10,7 +10,7 @@
 
 // Default settings 22.05.2023
 const defaultObj = JSON.parse(
-	'{"cfgApSsid":"wbec","cfgApPass":"wbec1234","cfgCntWb":1,"cfgMbCycleTime":10,"cfgMbDelay":100,"cfgMbTimeout":60000,"cfgStandby":4,"cfgFailsafeCurrent":0,"cfgMqttIp":"","cfgMqttLp":[],"cfgMqttPort":1883,"cfgMqttUser":"","cfgMqttPass":"","cfgMqttWattTopic":"wbec/pv/setWatt","cfgMqttWattJson":"","cfgNtpServer":"europe.pool.ntp.org","cfgFoxUser":"","cfgFoxPass":"","cfgFoxDevId":"","cfgPvActive":0,"cfgPvCycleTime":30,"cfgPvLimStart":61,"cfgPvLimStop":50,"cfgPvPhFactor":69,"cfgPvOffset":1,"cfgPvCalcMode":0,"cfgPvInvert":0,"cfgPvInvertBatt":0,"cfgPvMinTime":0,"cfgPvHttpIp":"","cfgPvHttpPath":"/","cfgPvHttpJson":"","cfgPvHttpPort":80,"cfgTotalCurrMax":0,"cfgHwVersion":15,"cfgWifiSleepMode":0,"cfgLoopDelay":255,"cfgKnockOutTimer":0,"cfgShellyIp":"","cfgInverterIp":"","cfgInverterType":0,"cfgInverterPort":0,"cfgInverterAddr":0,"cfgInvSmartAddr":0,"cfgInvRegToGrid":0,"cfgInvRegFromGrid":0,"cfgInvRegBattery":0,"cfgBootlogSize":2000,"cfgBtnDebounce":0,"cfgWifiConnectTimeout":10,"cfgEnergyOffset":0,"cfgDisplayAutoOff":2,"cfgWifiAutoReconnect":1,"cfgLedIp":1,"cfgWifiOff":0,"cfgChargeLog":0,"cfgWbecMac":237,"cfgWbecIp":""}'
+	'{"cfgApSsid":"wbec","cfgApPass":"wbec1234","cfgCntWb":1,"cfgMbCycleTime":10,"cfgMbDelay":100,"cfgMbTimeout":60000,"cfgStandby":4,"cfgFailsafeCurrent":0,"cfgMqttIp":"","cfgMqttLp":[],"cfgMqttPort":1883,"cfgMqttUser":"","cfgMqttPass":"","cfgMqttWattTopic":"wbec/pv/setWatt","cfgMqttWattJson":"","cfgNtpServer":"europe.pool.ntp.org","cfgFoxUser":"","cfgFoxPass":"","cfgFoxDevId":"","cfgPvActive":0,"cfgPvCycleTime":30,"cfgPvLimStart":61,"cfgPvLimStop":50,"cfgPvPhFactor":69,"cfgPvOffset":1,"cfgPvCalcMode":0,"cfgPvInvert":0,"cfgPvInvertBatt":0,"cfgPvMinTime":0,"cfgPvHttpIp":"","cfgPvHttpPath":"/","cfgPvHttpJson":"","cfgPvHttpPort":80,"cfgTotalCurrMax":0,"cfgHwVersion":15,"cfgWifiSleepMode":0,"cfgLoopDelay":255,"cfgKnockOutTimer":0,"cfgShellyIp":"","cfgMeterIp":"","cfgMeterType":0,"cfgInverterIp":"","cfgInverterType":0,"cfgInverterPort":0,"cfgInverterAddr":0,"cfgInvSmartAddr":0,"cfgInvRegToGrid":0,"cfgInvRegFromGrid":0,"cfgInvRegBattery":0,"cfgBootlogSize":2000,"cfgBtnDebounce":0,"cfgWifiConnectTimeout":10,"cfgEnergyOffset":0,"cfgDisplayAutoOff":2,"cfgWifiAutoReconnect":1,"cfgLedIp":1,"cfgWifiOff":0,"cfgChargeLog":0,"cfgWbecMac":237,"cfgWbecIp":""}'
 );
 
 const descObj = {
@@ -53,6 +53,8 @@ const descObj = {
 	cfgLoopDelay           :"(!) intern",
 	cfgKnockOutTimer       :"(!) [min] Zyklischer Reset von wbec alle xx Minuten",
 	cfgShellyIp            :"Shelly: IP-Adresse, um den Wert Bezug/Einspeisung abzufragen",
+	cfgMeterIp             :"Meter: IP-Adresse, um den Wert Bezug/Einspeisung abzufragen",
+	cfgMeterType           :"Meter: Typ, s. Wiki",
 	cfgInverterIp          :"Modbus-TCP: IP-Adresse, um den Wert Bezug/Einspeisung abzufragen",
 	cfgInverterType        :"Modbus-TCP: Typ, s. Wiki",
 	cfgInverterPort        :"Modbus-TCP: Port, s. Wiki",
