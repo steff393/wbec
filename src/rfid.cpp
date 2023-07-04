@@ -87,14 +87,14 @@ void rfid_loop() {
 	}
   rfid_lastCall = millis();
 
-  if ((rfid_plugged(rfid_chgStat_old) && !rfid_plugged(content[id][1])) || 
-    (!rfid_plugged(content[id][1]) && (rfid_lastReleased != 0) && (millis() - rfid_lastReleased > RELEASE_TIME))) {
+  if ((rfid_plugged(rfid_chgStat_old) && !rfid_plugged(mb_status(id))) || 
+    (!rfid_plugged(mb_status(id)) && (rfid_lastReleased != 0) && (millis() - rfid_lastReleased > RELEASE_TIME))) {
     // vehicle unplugged or not plugged within RELEASE_TIME --> RFID chip no longer allowed
     rfid_released = false;
     rfid_lastReleased = 0;
     lm_storeRequest(id, 0);
   }
-  rfid_chgStat_old = content[id][1];
+  rfid_chgStat_old = mb_status(id);
 
 
 	// Check for new card
@@ -118,7 +118,7 @@ void rfid_loop() {
       rfid_released = true;
       rfid_lastReleased = millis();
       // set current to max value
-      lm_storeRequest(id, content[id][15]);
+      lm_storeRequest(id, mb_amperageMaximum(id));
     } else {
       log(0, F("unknown"));
     }

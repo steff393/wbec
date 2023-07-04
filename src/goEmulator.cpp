@@ -41,23 +41,23 @@ void goE_handle() {
 	goE_lastCall = millis();
 
 	for (uint8_t id = 0; id < cfgCntWb; id++) {
-		if ((!goE_plugged(box[id].chgStat_old) && goE_plugged(content[id][1]))  || (box[id].energyI == 0)) {
+		if ((!goE_plugged(box[id].chgStat_old) && goE_plugged(mb_status(id)))  || (box[id].energyI == 0)) {
 			// vehicle plugged --> store energy count  (and also, when energyI == 0 because this indicates that there was no update after init)
-			box[id].energyI = (uint32_t) content[id][13] << 16 | (uint32_t)content[id][14];
+			box[id].energyI = mb_energyTotal(id);
 		}
-		box[id].chgStat_old = content[id][1];
+		box[id].chgStat_old = mb_status(id);
 
 		// update alw & amp based on value from wallbox
-		if (content[id][53] == 0) {
+		if (mb_amperageLimit(id) == 0) {
 			box[id].alw = 0;
 		} else {
 			box[id].alw = 1;
-			box[id].amp = content[id][53];
+			box[id].amp = mb_amperageLimit(id);
 		}
 		
 		// implement the auto-switch-off function
 		if (box[id].dwo != 0) {
-			if (box[id].dwo * 100 < (((uint32_t) content[id][13] << 16 | (uint32_t)content[id][14]) - box[id].energyI)) {
+			if (box[id].dwo * 100 < (mb_energyTotal(id) - box[id].energyI)) {
 				// Defined energy for this load cycle was reached => stop loading
 				box[id].alw = 0;
 				box[id].dwo = 0;
@@ -110,7 +110,7 @@ String goE_getStatus(uint8_t id, boolean fromApp) {
 		data[F("box")]=String(id);
 	}
 	data["version"] = F("B");
-	switch(content[id][1]) {
+	switch(mb_status(id)) {
 		case  2:  data[F("car")] = F("1"); data[F("err")] = F( "0"); break;
 		case  3:  data[F("car")] = F("1"); data[F("err")] = F( "0"); break;
 		case  4:  data[F("car")] = F("4"); data[F("err")] = F( "0"); break;
@@ -127,27 +127,27 @@ String goE_getStatus(uint8_t id, boolean fromApp) {
 	data[F("amx")] = String(box[id].amp / 10);
 	data[F("stp")] = F("0");
 	uint8_t pha = 0;
-	if (content[id][6] > 200) { pha+=9; } 	// 0000 1001
-	if (content[id][7] > 200) { pha+=18; } // 0001 0010
-	if (content[id][8] > 200) { pha+=36; } // 0010 0100
+	if (mb_voltages(id)[0] > 200) { pha+=9; } 	// 0000 1001
+	if (mb_voltages(id)[1] > 200) { pha+=18; } // 0001 0010
+	if (mb_voltages(id)[2] > 200) { pha+=36; } // 0010 0100
 	data[F("pha")] = String(pha);
-	data[F("tmp")] = String(content[id][5] / 10);
-	data[F("dws")] = String((((uint32_t) content[id][13] << 16 | (uint32_t)content[id][14]) - box[id].energyI) * 360);
+	data[F("tmp")] = String(mb_temperature(id) / 10);
+	data[F("dws")] = String((mb_energyTotal(id) - box[id].energyI) * 360);
 	data[F("dwo")] = String(box[id].dwo);
 	data[F("uby")] = F("0");
-	data[F("eto")] = String(((uint32_t) content[id][13] << 16 | (uint32_t)content[id][14]) / 100);
-	data[F("nrg")][0] = content[id][6]; // L1
-	data[F("nrg")][1] = content[id][7]; // L2
-	data[F("nrg")][2] = content[id][8]; // L3
+	data[F("eto")] = String(mb_energyTotal(id) / 100);
+	data[F("nrg")][0] = mb_voltages(id)[0]; // L1
+	data[F("nrg")][1] = mb_voltages(id)[1]; // L2
+	data[F("nrg")][2] = mb_voltages(id)[2]; // L3
 	data[F("nrg")][3] = 0;
-	data[F("nrg")][4] = content[id][2]; // L1
-	data[F("nrg")][5] = content[id][3]; // L2
-	data[F("nrg")][6] = content[id][4]; // L3
+	data[F("nrg")][4] = mb_amperages(id)[0]; // L1
+	data[F("nrg")][5] = mb_amperages(id)[1]; // L2
+	data[F("nrg")][6] = mb_amperages(id)[2]; // L3
 	data[F("nrg")][7] = 0;
 	data[F("nrg")][8] = 0;
 	data[F("nrg")][9] = 0;
 	data[F("nrg")][10] = 0;
-	data[F("nrg")][11] = content[id][10] / 10;
+	data[F("nrg")][11] = mb_power(id) / 10;
 	data[F("nrg")][12] = 0;
 	data[F("nrg")][13] = 0;
 	data[F("nrg")][14] = 0;
@@ -155,7 +155,7 @@ String goE_getStatus(uint8_t id, boolean fromApp) {
 	data[F("fwv")] = F("040");
 	char txt[7]; mb_getAscii(id, 27, 3, txt);
 	data[F("sse")] = txt;
-	data[F("ama")] = String(content[id][15]);
+	data[F("ama")] = String(mb_amperageMaximum(id));
 	data[F("ust")] = F("2");
 	data[F("ast")] = F("0");
 
@@ -168,5 +168,5 @@ String goE_getStatus(uint8_t id, boolean fromApp) {
 
 uint32_t goE_getEnergySincePlugged(uint8_t id) {
 	// substract the stored energy counter at plugging from the current energy counter
-	return(((uint32_t) content[id][13] << 16 | (uint32_t)content[id][14]) - box[id].energyI);
+	return(mb_energyTotal(id) - box[id].energyI);
 }

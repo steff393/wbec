@@ -33,18 +33,18 @@ uint32_t timerWait0Amp_Entry  = 0;
 
 uint8_t pc_checkVoltages() {
 	uint32_t now = millis();
-	if (content[id][6] > LIMIT_230V && 
-			content[id][7] > LIMIT_230V &&
-			content[id][8] > LIMIT_230V &&
+	if (mb_voltages(id)[0] > LIMIT_230V && 
+			mb_voltages(id)[1] > LIMIT_230V &&
+			mb_voltages(id)[2] > LIMIT_230V &&
 			modbusResultCode[id] == 0) {
 		if (now - timerCheck3p > VOLT_DEB_TIME) {
 			return(3);
 		}
 	} else { timerCheck3p = now; }
 
-	if (content[id][6] > LIMIT_230V &&
-			content[id][7] < LIMIT_0V   &&
-			content[id][8] < LIMIT_0V   &&
+	if (mb_voltages(id)[0] > LIMIT_230V &&
+			mb_voltages(id)[1] < LIMIT_0V   &&
+			mb_voltages(id)[2] < LIMIT_0V   &&
 			modbusResultCode[id] == 0) {
 		if (now - timerCheck1p > VOLT_DEB_TIME) {
 			return(1);
@@ -56,9 +56,9 @@ uint8_t pc_checkVoltages() {
 
 bool pc_check0Amp() {
 	uint32_t now = millis();
-	if (content[id][2] <= LIMIT_0A && 
-			content[id][3] <= LIMIT_0A &&
-			content[id][4] <= LIMIT_0A &&
+	if (mb_amperages(id)[0] <= LIMIT_0A && 
+			mb_amperages(id)[1] <= LIMIT_0A &&
+			mb_amperages(id)[2] <= LIMIT_0A &&
 			modbusResultCode[id] == 0) {
 		if (now - timerWait0Amp > AMPS_DEB_TIME) {
 			return(true);
