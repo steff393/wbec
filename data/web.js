@@ -43,7 +43,7 @@ window.addEventListener('DOMContentLoaded', () => {
 		}
 
 		assignValuesToHtml({
-			currLim: `${val / 10}`,
+			currLim: val / 10,
 		})
 	}
 
@@ -61,7 +61,7 @@ window.addEventListener('DOMContentLoaded', () => {
 		for (const element of valueContainerElements) {
 			const key = element.getAttribute('data-value');
 			if (values[key] !== undefined) {
-				element.innerHTML = values[key];
+				element.innerHTML = values[key].toLocaleString('de-DE');
 			}
 		}
 	}
@@ -90,10 +90,10 @@ window.addEventListener('DOMContentLoaded', () => {
 		assignValuesToHtml({
 			carStat: carStat,
 			wbStat:  wbStat,
-			power:   message.power,
+			power:   message.power / 1000,
 			energyI: message.energyI,
 			energyC: message.energyC,
-			watt:    message.watt,
+			watt:    message.watt / 1000,
 			timeNow: message.timeNow,
 		})
 
