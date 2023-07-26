@@ -47,6 +47,8 @@ uint8_t  cfgWifiSleepMode;            // Set sleep type for power saving, recome
 uint8_t  cfgLoopDelay;                // Delay [ms] at end of main loop, might have an impact on web server reactivitiy, default: 255 = inactive
 uint16_t cfgKnockOutTimer;            // Interval[min] after which wbec knocks itself out, i.e. triggers a reset, default: 0 = inactive; values < 20min not allowed
 char     cfgShellyIp[16];             // IP address of Shelly 3em, "" to disable 
+char     cfgMeterIp[16];              // IP address of Smart Meter, "" to disable 
+MeterType cfgMeterType;               // Type of Smart Meter
 char     cfgInverterIp[16];           // IP address of Inverter, "" to disable 
 uint8_t  cfgInverterType;             // 0=off, 1=SolarEdge, 2=Fronius, 3=Kostal
 uint16_t cfgInverterPort;             // Overwrite default inverter port setting
@@ -155,6 +157,8 @@ void loadConfig() {
 	cfgLoopDelay              = doc["cfgLoopDelay"]          | 255;
 	cfgKnockOutTimer          = doc["cfgKnockOutTimer"]      | 0UL;
 	strncpy(cfgShellyIp,        doc["cfgShellyIp"]           | "",                 sizeof(cfgShellyIp));
+	strncpy(cfgMeterIp,         doc["cfgMeterIp"]            | "",                 sizeof(cfgMeterIp));
+	cfgMeterType              = static_cast<MeterType>(doc["cfgMeterType"].as<uint8_t>());
 	strncpy(cfgInverterIp,      doc["cfgInverterIp"]         | "",                 sizeof(cfgInverterIp));
 	cfgInverterType           = doc["cfgInverterType"]       | 0;
 	cfgInverterPort           = doc["cfgInverterPort"]       | 0UL;
