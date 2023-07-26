@@ -1,5 +1,6 @@
 // Copyright (c) 2021 steff393, MIT license
 
+#include <algorithm>
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <globalConfig.h>
@@ -30,13 +31,13 @@ void pvAlgo() {
 	int32_t availPower = 0;
 
 	uint16_t targetCurr = 0;
-	uint8_t actualCurr = content[BOXID][53];
+	uint8_t actualCurr = mb_amperageLimit(BOXID);
 
-	if (content[BOXID][1] >= 4 && content[BOXID][1] <= 7) {   // Car is connected
+	if (mb_isCarConnected(BOXID)) {
 
-		// available power for charging is 'Einspeisung + akt. Ladeleistung' = -watt + content[0][10]
+		// available power for charging is 'Einspeisung + akt. Ladeleistung' = -watt + mb_power(BOXID)
 		// negative 'watt' means 'Einspeisung'
-		availPower = (int16_t)(content[BOXID][10] - watt - cfgPvOffset);
+		availPower = (int16_t)(mb_power(BOXID) - watt - cfgPvOffset);
 		
 		// Simple filter (average of this and previous value)
 		availPower = (availPowerPrev + availPower) / 2;
@@ -55,18 +56,12 @@ void pvAlgo() {
 			// MIN+PV, don't switch off, but ...
 			if ((pvMode == PV_MIN_PV) ||
 			    (cfgPvMinTime != 0 && lastActivation != 0 && (millis() - lastActivation < ((uint32_t)cfgPvMinTime) * 60 * 1000))) {   // also if MinTime not elapsed (#71)
-				targetCurr = content[BOXID][16]; // ... set minimal current configured in box
+				targetCurr = mb_amperageMinimum(BOXID); // ... set minimal current configured in box
 			}
 		}
 
 		// Saturation to 0 or 6..16A
-		if (targetCurr != 0) {
-			if (targetCurr < CURR_ABS_MIN) {
-				targetCurr = CURR_ABS_MIN;
-			} else if (targetCurr > CURR_ABS_MAX) {
-				targetCurr = CURR_ABS_MAX;
-			} 
-		}
+		targetCurr = std::clamp(targetCurr, (uint16_t)CURR_ABS_MIN, (uint16_t)CURR_ABS_MAX);
 
 		if (actualCurr == 0 && targetCurr >= CURR_ABS_MIN) {
 			// switch on => remember timestamp for cfgPvMinTime (#71)
@@ -90,7 +85,7 @@ void pvAlgo() {
 		logFile.print(";");
 		logFile.print(watt);
 		logFile.print(";");
-		logFile.print(content[BOXID][10]);
+		logFile.print(mb_power(BOXID));
 		logFile.print(";");
 		logFile.print(actualCurr);
 		logFile.print(";");

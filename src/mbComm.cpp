@@ -23,7 +23,7 @@ typedef struct rb_struct {
 } rb_t;
 
 
-uint16_t         content[WB_CNT][55];
+static uint16_t  content[WB_CNT][55];
 uint32_t         modbusLastTime = 0;
 uint8_t          modbusResultCode[WB_CNT];
 
@@ -195,4 +195,99 @@ void mb_writeReg(uint8_t id, uint16_t reg, uint16_t val) {
 		rb[rbIn].val = 0;
 		rb[rbIn].buf = &content[id][53];
 	}
+}
+
+
+bool mb_isCarConnected(uint8_t id) {
+	return content[id][1] >= 4 && content[id][1] <= 7;
+}
+
+
+uint16_t mb_version(uint8_t id) {
+	return content[id][0];
+}
+
+
+uint16_t mb_status(uint8_t id) {
+	return content[id][1];
+}
+
+
+uint16_t mb_temperature(uint8_t id) {
+	return content[id][5];
+}
+
+
+uint16_t mb_extLock(uint8_t id) {
+	return content[id][9];
+}
+
+
+uint16_t mb_power(uint8_t id) {
+	return content[id][10];
+}
+
+
+uint16_t mb_amperageLimit(uint8_t id) {
+	return content[id][53];
+}
+
+
+uint16_t mb_amperageMaximum(uint8_t id) {
+	return content[id][15];
+}
+
+
+uint16_t mb_amperageMinimum(uint8_t id) {
+	return content[id][16];
+}
+
+
+uint16_t mb_chargingRequested(uint8_t id) {
+	// check charging state, as a binary number
+	if (content[id][1] == 6 || content[id][1] == 7) {       // C1 or C2
+		return(1 << id);
+	} else {
+		return(0);
+	}
+}
+
+
+uint32_t mb_energyTotal(uint8_t id) {
+	return ((uint32_t)content[id][13] << 16 | (uint32_t)content[id][14]);
+}
+
+
+uint32_t mb_energyPowerOn(uint8_t id) {
+	return ((uint32_t)content[id][11] << 16 | (uint32_t)content[id][12]);
+}
+
+
+const std::array<uint16_t,3>& mb_voltages(uint8_t id) {
+	return reinterpret_cast<const std::array<uint16_t,3>&>(content[id][6]);
+}
+
+
+const std::array<uint16_t,3>& mb_amperages(uint8_t id) {
+	return reinterpret_cast<const std::array<uint16_t,3>&>(content[id][2]);
+}
+
+
+uint16_t mb_watchdogTimeout(uint8_t id) {
+	return content[id][49];
+}
+
+
+uint16_t mb_standby(uint8_t id) {
+	return content[id][50];
+}
+
+
+uint16_t mb_remLock(uint8_t id) {
+	return content[id][51];
+}
+
+
+uint16_t mb_amperageFailsafe(uint8_t id) {
+	return content[id][54];
 }

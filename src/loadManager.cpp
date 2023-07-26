@@ -19,15 +19,6 @@ static uint16_t sumReq             = 0;
 static boolean  allBoxesReceived   = false;
 */
 
-static uint16_t chargingRequested(uint8_t id) {
-	// check charging state, as a binary number
-	if (content[id][1] == 6 || content[id][1] == 7) {       // C1 or C2
-		return(1 << id);
-	} else {
-		return(0);
-	}
-}
-
 
 static uint8_t saturate1(uint8_t val, uint16_t limit) {
 	if (val > limit) {
@@ -55,16 +46,16 @@ static void lm_updateWbLimits() {
 	// It shall calculate the currLim[] value for every wallbox
 	//
 	// Input:
-	// - chargingRequested(id)    Car connected with charging request
-	// - lastReq[id]              Last requested current limit from any of the 'applications' on higher level
-	// - content[id][15]          Maximum current configured in box (switch S1)
-	// - content[id][53]          Current limit which is wallbox
+	// - mb_chargingRequested(id)      Car connected with charging request
+	// - lastReq[id]                   Last requested current limit from any of the 'applications' on higher level
+	// - mb_amperageMaximum(id) Maximum current configured in box (switch S1)
+	// - mb_amperageLimit(id) Current limit which is wallbox
 	// Output:
 	// - currLim[id]              Current limit which shall be in the wallbox
 
 
 	// Simple stupid method, only for 2 wallboxes with 50%/50%
-	uint16_t requestMap = chargingRequested(0) + chargingRequested(1);
+	uint16_t requestMap = mb_chargingRequested(0) + mb_chargingRequested(1);
 
 	switch(requestMap) {
 		case 0: {   // no charging request
@@ -73,18 +64,18 @@ static void lm_updateWbLimits() {
 			break;
 		}
 		case 1: {   // charging request only on box 0
-			currLim[0] = saturate2(lastReq[0], content[0][15], cfgTotalCurrMax);
+			currLim[0] = saturate2(lastReq[0], mb_amperageMaximum(0), cfgTotalCurrMax);
 			currLim[1] = 0;
 			break;
 		}
 		case 2: {   // charging request only on box 1
 			currLim[0] = 0;
-			currLim[1] = saturate2(lastReq[1], content[1][15], cfgTotalCurrMax);
+			currLim[1] = saturate2(lastReq[1], mb_amperageMaximum(1), cfgTotalCurrMax);
 			break;
 		}
 		case 3: {   // charging request on both boxes 
-			currLim[0] = saturate2(lastReq[0], content[0][15], cfgTotalCurrMax / 2);
-			currLim[1] = saturate2(lastReq[1], content[1][15], cfgTotalCurrMax / 2);
+			currLim[0] = saturate2(lastReq[0], mb_amperageMaximum(0), cfgTotalCurrMax / 2);
+			currLim[1] = saturate2(lastReq[1], mb_amperageMaximum(1), cfgTotalCurrMax / 2);
 			break;
 		}
 		default: { ; }  // shouldn't happen
@@ -105,7 +96,7 @@ static void lm_updateWbLimits() {
 
 	// count boxes with charge request
 	for (uint8_t id = 0; id < cfgCntWb ; id++) {
-		if (chargingRequested(id)) {
+		if (mb_chargingRequested(id)) {
 			cnt++;
 		}
 	}
@@ -117,8 +108,8 @@ static void lm_updateWbLimits() {
 
 	// every box with charge request and request < 'fair' limit gets its request
 	for (uint8_t id = 0; id < cfgCntWb ; id++) {
-		if (chargingRequested(id) && lastReq[id] <= limit) {
-			currLim[id] = saturate2(lastReq[id], remaining, content[id][15]);
+		if (mb_chargingRequested(id) && lastReq[id] <= limit) {
+			currLim[id] = saturate2(lastReq[id], remaining, mb_amperageMaximum(id));
 			remaining -= currLim[id]; // can't become negative, as currLim is always <= remaining
 			cnt--;
 		}
@@ -131,8 +122,8 @@ static void lm_updateWbLimits() {
 
 	// every box with charge request and request > 'fair' limit gets its request
 	for (uint8_t id = 0; id < cfgCntWb ; id++) {
-		if (chargingRequested(id)) {
-			currLim[id] = saturate2(lastReq[id], limit, content[id][15]);
+		if (mb_chargingRequested(id)) {
+			currLim[id] = saturate2(lastReq[id], limit, mb_amperageMaximum(id));
 			remaining -= currLim[id]; // can't become negative, as currLim is always <= remaining
 		}
 	}
@@ -146,7 +137,7 @@ static void lm_updateWbLimits() {
 
 	// count boxes with load request
 	for (uint8_t id = 0; id < cfgCntWb ; id++) {
-		if (chargingRequested(id)) {
+		if (mb_chargingRequested(id)) {
 			cnt++;
 		}
 		// avoid limits < 6A
@@ -154,7 +145,7 @@ static void lm_updateWbLimits() {
 			cnt--;
 			break;
 		}
-		sumRead += content[id][53];
+		sumRead += mb_amperageLimit(id);
 		sumReq  += lastReq[id];
 	}
 
@@ -209,7 +200,7 @@ void lm_loop() {
 	lm_updateWbLimits();
 	
 	for (uint8_t id = 0; id < cfgCntWb ; id++) {
-		if (content[id][53] != currLim[id]) {
+		if (mb_amperageLimit(id) != currLim[id]) {
 			// when the value from box differs to wanted value then write current via modbus
 			mb_writeReg(id, REG_CURR_LIMIT, currLim[id]);
 		}
@@ -230,7 +221,7 @@ uint8_t lm_getLastRequest(uint8_t id) {
 void lm_storeRequest(uint8_t id, uint8_t val) {
 	lastReq[id] = val;
 	// when there is still buffer OR request is lowered OR load management inactive
-	if (/*(sumRead + val < cfgTotalCurrMax) ||*/ (val < content[id][53]) || (cfgTotalCurrMax == 0)) {
+	if (/*(sumRead + val < cfgTotalCurrMax) ||*/ (val < mb_amperageLimit(id)) || (cfgTotalCurrMax == 0)) {
 		// direct write is possible
 		mb_writeReg(id, REG_CURR_LIMIT, val);
 	}
@@ -240,6 +231,6 @@ void lm_storeRequest(uint8_t id, uint8_t val) {
 void lm_currentReadSuccess(uint8_t id) {
 	// takeover the value from wallbox as long as not all boxes are received
 	//if (allBoxesReceived == false) {
-	//	currLim[id] = content[id][53];
+	//	currLim[id] = mb_amperageLimit(id);
 	//} // else do nothing
 }

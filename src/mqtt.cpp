@@ -213,7 +213,7 @@ void mqtt_publish(uint8_t i) {
 	uint8_t cs = 0;
 	char status;
 
-	switch(content[i][1]) {
+	switch(mb_status(i)) {
 		case 2:  ps = 0; cs = 0; status = 'A'; break;
 		case 3:  ps = 0; cs = 0; status = 'A'; break;
 		case 4:  ps = 1; cs = 0; status = 'B'; break;
@@ -241,22 +241,22 @@ void mqtt_publish(uint8_t i) {
 	client.publish(topic, value, retain);
 
 	snprintf_P(topic, sizeof(topic), PSTR("%s/W"), header);
-	snprintf_P(value, sizeof(value), PSTR("%d"), content[i][10]);
+	snprintf_P(value, sizeof(value), PSTR("%d"), mb_power(i));
 	client.publish(topic, value, retain);
 
 	snprintf_P(topic, sizeof(topic), PSTR("%s/kWhCounter"), header);
-	snprintf_P(value, sizeof(value), PSTR("%.3f"), (float)((uint32_t) content[i][13] << 16 | (uint32_t)content[i][14]) / 1000.0);
+	snprintf_P(value, sizeof(value), PSTR("%.3f"), mb_energyTotal(i)/1000.0f);
 	client.publish(topic, value, retain);
 
-	for (uint8_t ph = 1; ph <= 3; ph++) {
-		snprintf_P(topic, sizeof(topic), PSTR("%s/VPhase%d"), header, ph);
-		snprintf_P(value, sizeof(value), PSTR("%d"), content[i][ph+5]);	// L1 = 6, L2 = 7, L3 = 8
+	for (uint8_t ph = 0; ph < 3; ++ph) {
+		snprintf_P(topic, sizeof(topic), PSTR("%s/VPhase%d"), header, ph+1);
+		snprintf_P(value, sizeof(value), PSTR("%d"), mb_voltages(i)[ph]);	// L1 = 6, L2 = 7, L3 = 8
 		client.publish(topic, value, retain);
 	}
 
-	for (uint8_t ph = 1; ph <= 3; ph++) {
-		snprintf_P(topic, sizeof(topic), PSTR("%s/APhase%d"), header, ph);
-		snprintf_P(value, sizeof(value), PSTR("%.1f"), (float)content[i][ph+1]/10.0);	// L1 = 2, L2 = 3, L3 = 4
+	for (uint8_t ph = 0; ph < 3; ++ph) {
+		snprintf_P(topic, sizeof(topic), PSTR("%s/APhase%d"), header, ph+1);
+		snprintf_P(value, sizeof(value), PSTR("%.1f"), mb_amperages(i)[ph]/10.0f);	// L1 = 2, L2 = 3, L3 = 4
 		client.publish(topic, value, retain);
 	}
 
@@ -274,19 +274,19 @@ void mqtt_publish(uint8_t i) {
 	client.publish(topic, value, retain);
 
 	snprintf_P(topic, sizeof(topic), PSTR("%s/get/power"), header);
-	snprintf_P(value, sizeof(value), PSTR("%d"), content[i][10]);
+	snprintf_P(value, sizeof(value), PSTR("%d"), mb_power(i));
 	client.publish(topic, value, retain);
 
 	snprintf_P(topic, sizeof(topic), PSTR("%s/get/imported"), header);
-	snprintf_P(value, sizeof(value), PSTR("%ld"), ((uint32_t) content[i][13] << 16 | (uint32_t)content[i][14]) );
+	snprintf_P(value, sizeof(value), PSTR("%ld"), mb_energyTotal(i)/1000.0f);
 	client.publish(topic, value, retain);
 
 	snprintf_P(topic, sizeof(topic), PSTR("%s/get/voltages"), header);
-	snprintf_P(value, sizeof(value), PSTR("[%d,%d,%d]"), content[i][6], content[i][7], content[i][8]);	// L1 = 6, L2 = 7, L3 = 8
+	snprintf_P(value, sizeof(value), PSTR("[%d,%d,%d]"), mb_voltages(i)[0], mb_voltages(i)[1], mb_voltages(i)[2]);	// L1 = 6, L2 = 7, L3 = 8
 	client.publish(topic, value, retain);
 
 	snprintf_P(topic, sizeof(topic), PSTR("%s/get/currents"), header);
-	snprintf_P(value, sizeof(value), PSTR("[%.1f,%.1f,%.1f]"), (float)content[i][2]/10.0, (float)content[i][3]/10.0, (float)content[i][4]/10.0);	// L1 = 2, L2 = 3, L3 = 4
+	snprintf_P(value, sizeof(value), PSTR("[%.1f,%.1f,%.1f]"), mb_amperages(i)[0]/10.0f, mb_amperages(i)[1]/10.0f, mb_amperages(i)[2]/10.0f);	// L1 = 2, L2 = 3, L3 = 4
 	client.publish(topic, value, retain);
 
 	snprintf_P(topic, sizeof(topic), PSTR("%s/get/phases_in_use"), header);
@@ -305,38 +305,38 @@ void mqtt_publish(uint8_t i) {
 	client.publish(topic, value, retain);
 
 	snprintf_P(topic, sizeof(topic), PSTR("%s/enabled"), header);
-	if (content[i][53] > 0) {
+	if (mb_amperageLimit(i) > 0) {
 		client.publish(topic, "true", retain);
-		maxcurrent[i] = content[i][53];       // memorize the current limit if not 0
+		maxcurrent[i] = mb_amperageLimit(i);       // memorize the current limit if not 0
 	} else {
 		client.publish(topic, "false", retain);
 	}
 
 	snprintf_P(topic, sizeof(topic), PSTR("%s/power"), header);
-	snprintf_P(value, sizeof(value), PSTR("%d"), content[i][10]);
+	snprintf_P(value, sizeof(value), PSTR("%d"), mb_power(i));
 	client.publish(topic, value, retain);
 
 	snprintf_P(topic, sizeof(topic), PSTR("%s/energy"), header);
-	snprintf_P(value, sizeof(value), PSTR("%.3f"), (float)((uint32_t) content[i][13] << 16 | (uint32_t)content[i][14]) / 1000.0);
+	snprintf_P(value, sizeof(value), PSTR("%.3f"), mb_energyTotal(i)/1000.0f);
 	client.publish(topic, value, retain);
 	
-	for (uint8_t ph = 1; ph <= 3; ph++) {
-		snprintf_P(topic, sizeof(topic), PSTR("%s/currL%d"), header, ph);
-		snprintf_P(value, sizeof(value), PSTR("%.1f"), (float)content[i][ph+1]/10.0);	// L1 = 2, L2 = 3, L3 = 4
+	for (uint8_t ph = 0; ph < 3; ++ph) {
+		snprintf_P(topic, sizeof(topic), PSTR("%s/currL%d"), header, ph+1);
+		snprintf_P(value, sizeof(value), PSTR("%.1f"), mb_amperages(i)[ph]/10.0f);	// L1 = 2, L2 = 3, L3 = 4
 		client.publish(topic, value, retain);
 	}
 	
-	for (uint8_t ph = 1; ph <= 3; ph++) {
-		snprintf_P(topic, sizeof(topic), PSTR("%s/voltL%d"), header, ph);
-		snprintf_P(value, sizeof(value), PSTR("%d"), content[i][ph+5]);	// L1 = 2, L2 = 3, L3 = 4
+	for (uint8_t ph = 0; ph < 3; ++ph) {
+		snprintf_P(topic, sizeof(topic), PSTR("%s/voltL%d"), header, ph+1);
+		snprintf_P(value, sizeof(value), PSTR("%d"), mb_voltages(i)[ph]);	// L1 = 2, L2 = 3, L3 = 4
 		client.publish(topic, value, retain);
 	}
 	snprintf_P(topic, sizeof(topic), PSTR("%s/currLimit"), header);
-	snprintf_P(value, sizeof(value), PSTR("%.1f"), (float)content[i][53]/10.0);
+	snprintf_P(value, sizeof(value), PSTR("%.1f"), mb_amperageLimit(i)/10.0f);
 	client.publish(topic, value, retain);
 
 	snprintf_P(topic, sizeof(topic), PSTR("%s/pcbTemp"), header);
-	snprintf_P(value, sizeof(value), PSTR("%.1f"), (float)content[i][5]/10.0);
+	snprintf_P(value, sizeof(value), PSTR("%.1f"), mb_temperature(i)/10.0f);
 	client.publish(topic, value, retain);
 
 	snprintf_P(topic, sizeof(topic), PSTR("%s/resCode"), header);

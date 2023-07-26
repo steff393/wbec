@@ -64,11 +64,11 @@ void webSocket_loop() {
 
 	StaticJsonDocument<JSON_LEN> data;
 	data[F("id")]       = id;
-	data[F("chgStat")]  = content[id][1];
-	data[F("power")]    = content[id][10];
-	data[F("energyI")]  = (float)((uint32_t) content[id][13] << 16 | (uint32_t)content[id][14]) / 1000.0;
-	data[F("energyC")]  = (float)goE_getEnergySincePlugged(id) / 1000.0;
-	data[F("currLim")]  = (float)content[id][53]/10.0;
+	data[F("chgStat")]  = mb_status(id);
+	data[F("power")]    = mb_power(id);
+	data[F("energyI")]  = mb_energyTotal(id) / 1000.0f;
+	data[F("energyC")]  = goE_getEnergySincePlugged(id) / 1000.0f;
+	data[F("currLim")]  = mb_amperageLimit(id) / 10.0f;
 	data[F("watt")]     = pv_getWatt();
 	data[F("pvMode")]   = pv_getMode();
 	data[F("timeNow")]  = log_time();
