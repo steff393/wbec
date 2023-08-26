@@ -140,6 +140,18 @@ void webServer_setup() {
 		if (request->hasParam(F("wdTmOut"))) {
 			mb_writeReg(id, REG_WD_TIME_OUT, request->getParam(F("wdTmOut"))->value().toInt());
 		}
+		if (request->hasParam(F("standby"))) {
+			uint16_t val = request->getParam(F("standby"))->value().toInt();
+			if (val == 0 || val == 4) {   // Heidelberg allows only 0 and 4, others are reserved by manufacturer
+				if (request->hasParam(F("id"))) {
+					mb_writeReg(id, REG_STANDBY_CTRL, val);    // if id is provided, then use it
+				} else {
+					for (uint8_t i = 0; i < WB_CNT; i++) {     // ... else write it for all boxes
+						mb_writeReg(id, REG_STANDBY_CTRL, val);
+					}
+				}
+			}
+		}
 		if (request->hasParam(F("remLock"))) {
 			uint16_t val = request->getParam(F("remLock"))->value().toInt();
 			if (val <= 1) {
@@ -201,6 +213,7 @@ void webServer_setup() {
 			data[F("box")][i][F("lmReq")]    = lm_getLastRequest(i);
 			data[F("box")][i][F("lmLim")]    = lm_getWbLimit(i);
 			data[F("box")][i][F("resCode")]  = String(modbusResultCode[i], HEX);
+			data[F("box")][i][F("FailCnt")]  = mb_getFailureCnt(i);
 		}
 		data[F("modbus")][F("state")][F("lastTm")]  = modbusLastTime;
 		data[F("modbus")][F("state")][F("millis")]  = millis();

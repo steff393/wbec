@@ -5,10 +5,11 @@
 #ifndef MBCOMM_H
 #define MBCOMM_H
 
-extern void mb_getAscii(uint8_t id, uint8_t from, uint8_t len, char *result);
-extern void mb_setup();
-extern void mb_loop();
-extern void mb_writeReg(uint8_t id, uint16_t reg, uint16_t val);
+extern void      mb_setup();
+extern void      mb_loop();
+extern void      mb_writeReg(uint8_t id, uint16_t reg, uint16_t val);
+extern void      mb_getAscii(uint8_t id, uint8_t from, uint8_t len, char *result);
+extern uint8_t   mb_getFailureCnt(uint8_t id);
 
 extern uint16_t  content[WB_CNT][55];
 extern uint32_t  modbusLastTime;

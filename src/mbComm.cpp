@@ -59,16 +59,17 @@ void mb_getAscii(uint8_t id, uint8_t from, uint8_t len, char *result) {
 
 
 static void timeout(uint8_t id) {
-	if (cfgStandby == 4) {
-		// standby disabled => timeout indicates a failure => reset all
-		for (int i =  1; i <= 16; i++) { content[id][i] = 0;	}
-		for (int i = 49; i <= 54; i++) { content[id][i] = 0;	}
-	} else {
-		// standby enabled => timeout is normal, but the following should avoid to consider 'old' values as valid
-		for (int i =  2; i <= 12; i++) { content[id][i] = 0;	}
-		content[id][53] = 0;
+	if (cfgResetOnTimeout) {
+		if (cfgStandby == 4) {
+			// standby disabled => timeout indicates a failure => reset all
+			for (int i =  1; i <= 16; i++) { content[id][i] = 0;	}
+			for (int i = 49; i <= 54; i++) { content[id][i] = 0;	}
+		} else {
+			// standby enabled => timeout is normal, but the following should avoid to consider 'old' values as valid
+			for (int i =  2; i <= 12; i++) { content[id][i] = 0;	}
+			content[id][53] = 0;
+		}
 	}
-	
 }
 
 
@@ -85,8 +86,7 @@ static bool cbWrite(Modbus::ResultCode event, uint16_t transactionId, void* data
 			LOG(m, "Timeout BusID %d", mb.slave());
 			timeout(id);
 		}
-	} else
-	{
+	} else {
 		// no failure
 		modbusFailureCnt[id] = 0;
 		// tell load manager that the current register was successfully read
@@ -110,6 +110,10 @@ void mb_setup() {
 	}
 	mb.begin(&S, PIN_DE_RE);
 	mb.master();
+	for (uint8_t i = 0; i < WB_CNT; i++) {
+		modbusFailureCnt[i] = 0;
+		modbusResultCode[i] = 0;
+	}
 }
 
 
@@ -147,8 +151,8 @@ void mb_loop() {
 					case 5: if (!modbusResultCode[id] && content[id][0] > 263)  { mb.readHreg (id+1, REG_REMOTE_LOCK,  &content[id][51],   1, cbWrite); } break;	// Can't be read in FW 0x0107 = 263dec
 					case 6: if (!modbusResultCode[id])                          { mb.readHreg (id+1, REG_CURR_LIMIT,   &content[id][53],   2, cbWrite); } break;
 					case 7: if (!modbusResultCode[id])                          { mb.writeHreg(id+1, REG_WD_TIME_OUT,  &cfgMbTimeout,      1, cbWrite); } break;
-					case 8: if (!modbusResultCode[id])                          { mb.writeHreg(id+1, REG_STANDBY_CTRL, &cfgStandby,        1, cbWrite); } break;
-					case 9: if (!modbusResultCode[id])                          { mb.writeHreg(id+1, REG_CURR_LIMIT_FS,&cfgFailsafeCurrent,1, cbWrite); } break;
+					//case 8: if (!modbusResultCode[id])                          { mb.writeHreg(id+1, REG_STANDBY_CTRL, &cfgStandby,        1, cbWrite); } break; // wbecPro Issue #11
+					case 8: if (!modbusResultCode[id])                          { mb.writeHreg(id+1, REG_CURR_LIMIT_FS,&cfgFailsafeCurrent,1, cbWrite); } break;
 					default: ; // do nothing, should not happen
 				}
 				modbusLastMsgSentTime = millis();
@@ -157,7 +161,7 @@ void mb_loop() {
 					id = 0;
 					msgCnt++;
 				}
-				if (msgCnt > 9 || 
+				if (msgCnt > 8 || 
 					 (msgCnt > 6 && modbusLastTime != 0)) {						// write the REG_WD_TIME_OUT and REG_STANDBY_CTRL and REG_CURR_LIMIT_FS only on the very first loop
 					msgCnt = 0;
 					//Serial.print("Time:");Serial.println(millis()-modbusLastTime);
@@ -177,7 +181,7 @@ void mb_writeReg(uint8_t id, uint16_t reg, uint16_t val) {
 		return;
 	}
 	rbIn = (rbIn+1) % RINGBUF_SIZE; 		// increment pointer, but take care of overflow
-	rb[rbIn].id  =  id;
+	rb[rbIn].id  = id;
 	rb[rbIn].reg = reg;
 	rb[rbIn].val = val;
 	rb[rbIn].buf = 0;
@@ -190,9 +194,14 @@ void mb_writeReg(uint8_t id, uint16_t reg, uint16_t val) {
 	// direct read back, when current register was modified
 	if (reg == REG_CURR_LIMIT && ((rbIn+1) % RINGBUF_SIZE != rbOut)) {	// ... but reading is not worth an overflow (with loosing data)
 		rbIn = (rbIn+1) % RINGBUF_SIZE; 		// increment pointer, but take care of overflow
-		rb[rbIn].id  =  id;
+		rb[rbIn].id  = id;
 		rb[rbIn].reg = reg;
 		rb[rbIn].val = 0;
 		rb[rbIn].buf = &content[id][53];
 	}
+}
+
+
+uint8_t mb_getFailureCnt(uint8_t id) {
+	return(modbusFailureCnt[id]);
 }
