@@ -213,7 +213,7 @@ void webServer_setup() {
 			data[F("box")][i][F("lmReq")]    = lm_getLastRequest(i);
 			data[F("box")][i][F("lmLim")]    = lm_getWbLimit(i);
 			data[F("box")][i][F("resCode")]  = String(modbusResultCode[i], HEX);
-			data[F("box")][i][F("FailCnt")]  = mb_getFailureCnt(i);
+			data[F("box")][i][F("failCnt")]  = mb_getFailureCnt(i);
 		}
 		data[F("modbus")][F("state")][F("lastTm")]  = modbusLastTime;
 		data[F("modbus")][F("state")][F("millis")]  = millis();
