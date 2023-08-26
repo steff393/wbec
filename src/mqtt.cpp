@@ -36,7 +36,7 @@ void callback(char* topic, byte* payload, uint8_t length)
 		buffer[i] = (char)payload[i];		
 	}
 	buffer[length] = '\0';			// add string termination
-	LOGN(m, "Received: %s, Payload: %s", topic, buffer)
+	LOGEXT(m, "Received: %s, Payload: %s", topic, buffer)
 
 	// topics for openWB
 	if (strstr_P(topic, PSTR("openWB/lp/")) && strstr_P(topic, PSTR("/AConfigured"))) {
