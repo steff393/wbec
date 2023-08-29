@@ -69,6 +69,7 @@ void webSocket_loop() {
 	data[F("energyI")]  = (float)((uint32_t) content[id][13] << 16 | (uint32_t)content[id][14]) / 1000.0;
 	data[F("energyC")]  = (float)goE_getEnergySincePlugged(id) / 1000.0;
 	data[F("currLim")]  = (float)content[id][53]/10.0;
+	data[F("failCnt")]  = mb_getFailureCnt(id);
 	data[F("watt")]     = pv_getWatt();
 	data[F("pvMode")]   = pv_getMode();
 	data[F("timeNow")]  = log_time();

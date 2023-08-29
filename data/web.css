@@ -4,6 +4,7 @@
 	--theme-color-3: rgb(239, 239, 243);
 	--theme-color-4: rgb(0, 0, 0);
 	--theme-color-5: rgb(169, 169, 169);
+	--theme-color-6: rgb(255, 165, 0);
 }
 
 :root {
@@ -14,6 +15,7 @@
 
 	--headline-1-color: var(--theme-color-2);
 	--headline-2-color: var(--theme-color-3);
+	--connection-color: var(--theme-color-6);
 
 	--box-background-color: var(--theme-color-3);
 	--box-text-color: var(--theme-color-4);
@@ -45,6 +47,29 @@ h2 {
 	text-align: center;
 	font-size: 1.25em;
 	font-weight: normal;
+}
+
+.containerHeader {
+	display: flex;
+  justify-content: center;
+  align-items: center;
+	position: relative;
+	padding-top: var(--grid-size);
+	padding-bottom: calc(3*var(--grid-size));
+}
+
+.title {
+	text-align: center;
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+.connectionOff {
+	position: absolute;
+	right: 0; 
+	color: var(--connection-color);
+	font-size: 0.75em;
 }
 
 footer {

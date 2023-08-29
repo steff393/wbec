@@ -10,6 +10,7 @@ window.addEventListener('DOMContentLoaded', () => {
 	let sliderSliding = false;
 
 	function init() {
+		setSectionVisibility('connection', false);
 		setSectionVisibility('boxSelection', wallboxButtons.length > 1);
 		setSectionVisibility('pvLaden', false);
 
@@ -107,6 +108,7 @@ window.addEventListener('DOMContentLoaded', () => {
 		for (const element of pvModeButtons) {
 			setClass(element, 'active', message.pvMode === parseInt(element.getAttribute('data-pv-mode')));
 		}
+		setSectionVisibility('connection', message.failCnt >= 10);
 		setSectionVisibility('pvLaden', message.pvMode >= 1 && message.pvMode <= 3);
 
 		for (const element of wallboxButtons) {

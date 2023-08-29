@@ -164,7 +164,7 @@ void loadConfig() {
 	cfgBootlogSize            = doc["cfgBootlogSize"]        | 2000;
 	cfgBtnDebounce            = doc["cfgBtnDebounce"]        | 0;
 	cfgWifiConnectTimeout     = doc["cfgWifiConnectTimeout"] | 10;
-	cfgResetOnTimeout         = doc["cfgResetOnTimeout"]     | 1;
+	cfgResetOnTimeout         = doc["cfgResetOnTimeout"]     | 0;
 	
 	LOG(m, "cfgWbecVersion: %s", cfgWbecVersion);
 	LOG(m, "cfgBuildDate: %s"  , cfgBuildDate);
