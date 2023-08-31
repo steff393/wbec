@@ -1,4 +1,6 @@
-// Copyright (c) 2021 steff393, MIT license
+// Copyright (c) 2023 steff393, MIT license
+
+import {initNavBar, assignValuesToHtml, setSectionVisibility} from './common.js';
 
 window.addEventListener('DOMContentLoaded', () => {
 	let Socket;
@@ -13,16 +15,11 @@ window.addEventListener('DOMContentLoaded', () => {
 		setSectionVisibility('connection', false);
 		setSectionVisibility('boxSelection', wallboxButtons.length > 1);
 		setSectionVisibility('pvLaden', false);
+		initNavBar();
+		document.getElementById('btnExit').addEventListener('click', exit);
 
 		Socket = new WebSocket(`ws://${window.location.hostname}:81/`);
 		Socket.onmessage = processReceivedCommand;
-
-		document.getElementById('btnLog'). addEventListener('click', function() {window.location.href = "/log.html"});
-		document.getElementById('btnCfg'). addEventListener('click', function() {window.location.href = "/cfg.html"});
-		document.getElementById('btnJson').addEventListener('click', function() {window.location.href = "/json"});
-		document.getElementById('btnEdit').addEventListener('click', function() {window.location.href = "/edit"});
-		document.getElementById('btnUpd'). addEventListener('click', function() {window.location.href = "/update"});
-		document.getElementById('btnExit').addEventListener('click', exit);
 
 		// Update the current slider value (each time you drag the slider handle)
 		elementCurrentSlider.addEventListener('input', onStartSliderSliding);
@@ -56,15 +53,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
 		sendText(`currLim=${val}`);
 		sliderSliding = false;
-	}
-
-	function assignValuesToHtml(values) {
-		for (const element of valueContainerElements) {
-			const key = element.getAttribute('data-value');
-			if (values[key] !== undefined) {
-				element.innerHTML = values[key].toLocaleString('de-DE');
-			}
-		}
 	}
 
 	function setClass(element, className, state) {
@@ -114,10 +102,6 @@ window.addEventListener('DOMContentLoaded', () => {
 		for (const element of wallboxButtons) {
 			setClass(element, 'active', message.id === parseInt(element.getAttribute('data-wallbox-id')));
 		}
-	}
-
-	function setSectionVisibility(sectionId, isVisible) {
-		setClass(document.getElementById(sectionId), 'not-available', !isVisible);
 	}
 
 	function exit() {

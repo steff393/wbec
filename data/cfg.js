@@ -7,6 +7,7 @@
 // Parameter werden nicht hier geändert.
 // ----------------------------------------------------------------------------------
 
+import {initNavBar} from './common.js';
 
 // Default settings 22.05.2023
 const defaultObj = JSON.parse(
@@ -64,7 +65,7 @@ const descObj = {
 	cfgBootlogSize         :"(!) intern",
 	cfgBtnDebounce         :"[ms] Entprellzeit für Taster, z.B. 300",
 	cfgWifiConnectTimeout  :"(!) (s) Wartezeit bis wbec bei fehlendem WLAN einen eigenen Access Point öffnet",
-	cfgResetOnTimeout      :"(!) Nullen aller Werte bei Modbus-Timeout"
+	cfgResetOnTimeout      :"(!) Nullen aller Werte bei Modbus-Timeout",
 	cfgEnergyOffset        :"[Wh] Offset, der vom Energiezähler abgezogen werden kann",
 	cfgDisplayAutoOff      :"[min] Wartezeit für Displayabschaltung",
 	cfgWifiAutoReconnect   :"(!) intern",
@@ -80,13 +81,10 @@ window.addEventListener('DOMContentLoaded', () => {
 	var rootElement = document.documentElement;
 	rootElement.style.setProperty('--container-width-max', '1000px');
 
-	document.getElementById('btnLog'). addEventListener('click', function() {window.location.href = "/log.html"});
-	document.getElementById('btnCfg'). addEventListener('click', function() {window.location.href = "/cfg.html"});
-	document.getElementById('btnJson').addEventListener('click', function() {window.location.href = "/json"});
-	document.getElementById('btnEdit').addEventListener('click', function() {window.location.href = "/edit"});
-	document.getElementById('btnUpd'). addEventListener('click', function() {window.location.href = "/update"});
-	document.getElementById('btnExit').addEventListener('click', function() {window.location.href = "/"});
-
+	initNavBar();
+	document.getElementById('btnStore').addEventListener('click', storeCfg);
+	document.getElementById('btnReset').addEventListener('click', resetWbec);
+	document.getElementById('btnRefresh').addEventListener('click', refresh);
 	const settings = {};
 
 	createHtmlTable();

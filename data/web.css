@@ -85,6 +85,7 @@ footer {
 }
 
 .top-nav {
+	max-width: 820px;
 	text-align: right;
 }
 .top-nav-item {
@@ -124,6 +125,14 @@ footer {
 .box-content {
 	font-weight: bold;
 	text-align: center;
+}
+
+.time-end {
+	color: var(--body-background-color);
+}
+
+.divDisabled {
+	color: var(--main-disabled);
 }
 
 .value {
@@ -256,4 +265,53 @@ svg {
 	border-radius: 50%;
 	background: var(--theme-color-2);
 	cursor: pointer; /* Cursor on hover */
+}
+
+/* ---------- Slider for time based charging ---------- */
+
+#sliderContainer {
+	width: 100%;
+	margin-bottom: 20px;
+}
+#sliderTrack {
+	--slider-height: 0.8rem;
+	-webkit-appearance: none; /* Override default CSS styles */
+	appearance: none;
+	width: 95%; 
+	margin: auto var(--grid-size);
+	height: var(--slider-height);
+	border-radius: calc(var(--slider-height) / 2);
+	background: var(--theme-color-5); /* Grey background */
+	outline: none; /* Remove outline */
+	opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+	-webkit-transition: .2s; /* 0.2 seconds transition on hover */
+	transition: opacity .2s;
+
+	position: relative;
+}
+#sliderTrack:hover {
+	opacity: 1; /* Fully shown on mouse-over */
+}
+#sliderRange {
+	height: 100%;
+	background: var(--theme-color-2);
+	position: absolute;
+	cursor: move;
+}
+#sliderKnobStart,
+#sliderKnobEnd {
+	-webkit-appearance: none; /* Override default look */
+	appearance: none;
+	width: 1.5rem; /* Set a specific slider handle width */
+	height: 1.5rem;
+	border-radius: 50%;
+	border: 1px solid var(--theme-color-5);
+	background: var(--theme-color-2); 
+	cursor: pointer;
+
+	position: absolute;
+	top: -0.375rem;
+}
+#sliderKnobEnd {
+  background: var(--body-background-color);
 }
