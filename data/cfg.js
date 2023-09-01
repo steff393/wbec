@@ -11,7 +11,7 @@ import {initNavBar} from './common.js';
 
 // Default settings 22.05.2023
 const defaultObj = JSON.parse(
-	'{"cfgApSsid":"wbec","cfgApPass":"wbec1234","cfgCntWb":1,"cfgMbCycleTime":10,"cfgMbDelay":100,"cfgMbTimeout":60000,"cfgStandby":4,"cfgFailsafeCurrent":0,"cfgMqttIp":"","cfgMqttLp":[],"cfgMqttPort":1883,"cfgMqttUser":"","cfgMqttPass":"","cfgMqttWattTopic":"wbec/pv/setWatt","cfgMqttWattJson":"","cfgNtpServer":"europe.pool.ntp.org","cfgFoxUser":"","cfgFoxPass":"","cfgFoxDevId":"","cfgPvActive":0,"cfgPvCycleTime":30,"cfgPvLimStart":61,"cfgPvLimStop":50,"cfgPvPhFactor":69,"cfgPvOffset":1,"cfgPvCalcMode":0,"cfgPvInvert":0,"cfgPvInvertBatt":0,"cfgPvMinTime":0,"cfgPvHttpIp":"","cfgPvHttpPath":"/","cfgPvHttpJson":"","cfgPvHttpPort":80,"cfgTotalCurrMax":0,"cfgHwVersion":15,"cfgWifiSleepMode":0,"cfgLoopDelay":255,"cfgKnockOutTimer":0,"cfgShellyIp":"","cfgInverterIp":"","cfgInverterType":0,"cfgInverterPort":0,"cfgInverterAddr":0,"cfgInvSmartAddr":0,"cfgInvRegToGrid":0,"cfgInvRegFromGrid":0,"cfgInvRegBattery":0,"cfgBootlogSize":2000,"cfgBtnDebounce":0,"cfgWifiConnectTimeout":10,"cfgResetOnTimeout":0,"cfgEnergyOffset":0,"cfgDisplayAutoOff":2,"cfgWifiAutoReconnect":1,"cfgLedIp":1,"cfgWifiOff":0,"cfgChargeLog":0,"cfgWbecMac":237,"cfgWbecIp":""}'
+	'{"cfgApSsid":"wbec","cfgApPass":"wbec1234","cfgCntWb":1,"cfgMbCycleTime":10,"cfgMbDelay":100,"cfgMbTimeout":60000,"cfgStandby":4,"cfgFailsafeCurrent":0,"cfgMqttIp":"","cfgMqttLp":[],"cfgMqttPort":1883,"cfgMqttUser":"","cfgMqttPass":"","cfgMqttWattTopic":"wbec/pv/setWatt","cfgMqttWattJson":"","cfgNtpServer":"europe.pool.ntp.org","cfgFoxUser":"","cfgFoxPass":"","cfgFoxDevId":"","cfgPvActive":0,"cfgPvCycleTime":30,"cfgPvLimStart":61,"cfgPvLimStop":50,"cfgPvPhFactor":69,"cfgPvOffset":1,"cfgPvCalcMode":0,"cfgPvInvert":0,"cfgPvInvertBatt":0,"cfgPvMinTime":0,"cfgPvHttpIp":"","cfgPvHttpPath":"/","cfgPvHttpJson":"","cfgPvHttpPort":80,"cfgTotalCurrMax":0,"cfgHwVersion":15,"cfgWifiSleepMode":0,"cfgLoopDelay":255,"cfgKnockOutTimer":0,"cfgShellyIp":"","cfgInverterIp":"","cfgInverterType":0,"cfgInverterPort":0,"cfgInverterAddr":0,"cfgInvSmartAddr":0,"cfgInvRegPowerInv":0,"cfgInvRegPowerInvS":0,"cfgInvRegPowerMet":0,"cfgInvRegPowerMetS":0,"cfgInvRegToGrid":0,"cfgInvRegFromGrid":0,"cfgInvRegBattery":0,"cfgBootlogSize":2000,"cfgBtnDebounce":0,"cfgWifiConnectTimeout":10,"cfgResetOnTimeout":0,"cfgEnergyOffset":0,"cfgDisplayAutoOff":2,"cfgWifiAutoReconnect":1,"cfgLedIp":1,"cfgWifiOff":0,"cfgChargeLog":0,"cfgWbecMac":237,"cfgWbecIp":""}'
 );
 
 const descObj = {
@@ -59,6 +59,10 @@ const descObj = {
 	cfgInverterPort        :"Modbus-TCP: Port, s. Wiki",
 	cfgInverterAddr        :"(!) Modbus-TCP: Modbus-Adresse, s. Wiki",
 	cfgInvSmartAddr        :"(!) Modbus-TCP: Modbus-Adresse, s. Wiki",
+	cfgInvRegPowerInv      :"(!) Modbus-TCP: Register",
+	cfgInvRegPowerInvS     :"(!) Modbus-TCP: Register",
+	cfgInvRegPowerMet      :"(!) Modbus-TCP: Register",
+	cfgInvRegPowerMetS     :"(!) Modbus-TCP: Register",
 	cfgInvRegToGrid        :"(!) Modbus-TCP: Register",
 	cfgInvRegFromGrid      :"(!) Modbus-TCP: Register",
 	cfgInvRegBattery       :"(!) Modbus-TCP: Register",
