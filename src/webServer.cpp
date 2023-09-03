@@ -147,7 +147,7 @@ void webServer_setup() {
 					mb_writeReg(id, REG_STANDBY_CTRL, val);    // if id is provided, then use it
 				} else {
 					for (uint8_t i = 0; i < WB_CNT; i++) {     // ... else write it for all boxes
-						mb_writeReg(id, REG_STANDBY_CTRL, val);
+						mb_writeReg(i, REG_STANDBY_CTRL, val);
 					}
 				}
 			}
