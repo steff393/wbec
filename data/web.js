@@ -3,6 +3,9 @@
 import {initNavBar, assignValuesToHtml, setSectionVisibility} from './common.js';
 
 window.addEventListener('DOMContentLoaded', () => {
+	// Adjustable values -----
+	let phases         = 3;   // number of phases
+	// -----------------------
 	let Socket;
 	let elementCurrentSlider   = document.getElementById('slideCurr');
 	let pvModeButtons          = document.querySelectorAll('[data-pv-mode]');
@@ -41,7 +44,8 @@ window.addEventListener('DOMContentLoaded', () => {
 		}
 
 		assignValuesToHtml({
-			currLim: val / 10,
+			currLim:  val / 10,
+			powerLim: val * 23 * phases / 1000,
 		})
 	}
 
@@ -88,7 +92,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
 		if (!sliderSliding) {
 			assignValuesToHtml({
-				currLim: message.currLim
+				currLim:  message.currLim,
+				powerLim: message.currLim * 230 * phases / 1000,
 			});
 			elementCurrentSlider.value = message.currLim * 10;
 		}
@@ -112,6 +117,7 @@ window.addEventListener('DOMContentLoaded', () => {
 			energyI: '-',
 			energyC: '-',
 			currLim: '-',
+			powerLim:'-',
 			watt:    '-',
 			timeNow: '-',
 		})
