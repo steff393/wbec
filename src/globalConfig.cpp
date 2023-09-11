@@ -8,7 +8,7 @@
 
 const uint8_t m = 5;
 
-#define WBEC_VER(s) "v" MAJOR_VER_STRING(s) ".4.9"     // token stringification
+#define WBEC_VER(s) "v" MAJOR_VER_STRING(s) ".5.0"     // token stringification
 #define MAJOR_VER_STRING(s) #s                         // .. with two levels of macros
 
 char     cfgWbecVersion[]             = WBEC_VER(WBEC_VERSION_MAJOR); // wbec version
@@ -54,7 +54,8 @@ uint16_t cfgInverterAddr;             // Overwrite default inverter address sett
 uint16_t cfgInvSmartAddr;             // Overwrite default smart meter address setting
 uint16_t cfgBootlogSize;              // Size of the bootlog buffer for debugging, max. 5000 [bytes]
 uint16_t cfgBtnDebounce;              // Debounce time for button [ms]
-uint16_t cfgWifiConnectTimeout;       // Timeout in seconds to connect to Wifi before change to AP-Mode.
+uint16_t cfgWifiConnectTimeout;       // Timeout in seconds to connect to Wifi before change to AP-Mode
+uint8_t  cfgResetOnTimeout;           // Set (some) Modbus values to 0 after 10x message timeout
 
 
 static bool createConfig() {
@@ -163,6 +164,7 @@ void loadConfig() {
 	cfgBootlogSize            = doc["cfgBootlogSize"]        | 2000;
 	cfgBtnDebounce            = doc["cfgBtnDebounce"]        | 0;
 	cfgWifiConnectTimeout     = doc["cfgWifiConnectTimeout"] | 10;
+	cfgResetOnTimeout         = doc["cfgResetOnTimeout"]     | 0;
 	
 	LOG(m, "cfgWbecVersion: %s", cfgWbecVersion);
 	LOG(m, "cfgBuildDate: %s"  , cfgBuildDate);

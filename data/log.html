@@ -8,7 +8,8 @@
 
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="web.css">
-	<script src="log.js" defer></script>
+	<script src="common.js" type="module" defer></script>
+	<script src="log.js"    type="module" defer></script>
 
 	<meta name="theme-color" content="#6a6a6a">
 </head>
@@ -21,12 +22,13 @@
 <div class="container">
 	<header>
 		<nav class="top-nav">
-			<button id="btnLog"  class="top-nav-text">Ladelog</button>
-			<button id="btnCfg"  class="top-nav-text">Config</button>
-			<button id="btnJson" class="top-nav-text">Json</button>
-			<button id="btnEdit" class="top-nav-text">Edit</button>
-			<button id="btnUpd"  class="top-nav-text">Update</button>
-			<button id="btnExit" class="top-nav-item">&times;</button>
+			<button class="top-nav-text" top-nav-link="/log.html" >Log</button>
+			<button class="top-nav-text" top-nav-link="/time.html">Zeit</button>
+			<button class="top-nav-text" top-nav-link="/cfg.html" >Config</button>
+			<button class="top-nav-text" top-nav-link="/json"     >Json</button>
+			<button class="top-nav-text" top-nav-link="/edit"     >Edit</button>
+			<button class="top-nav-text" top-nav-link="/update"   >Update</button>
+			<button class="top-nav-item" top-nav-link="/"         >&times;</button>
 		</nav>
 		<h1>wbec</h1>
 		<h2>Heidelberg Wallbox Energy Control</h2>
@@ -47,7 +49,7 @@
 						<div class="table-head">Wallbox</div>
 					</div>
 				</div>
-				<button onclick="exportToExcel()">Export CSV</button>
+				<button id="btnExport">Export CSV</button>
 			</div>
 		</div>
 	</section>

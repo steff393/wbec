@@ -9,7 +9,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<link rel="stylesheet" href="web.css">
-	<script src="web.js" defer></script>
+	<script src="common.js" type="module" defer></script>
+	<script src="web.js"    type="module" defer></script>
 
 	<meta name="theme-color" content="#6a6a6a">
 </head>
@@ -27,15 +28,19 @@
 <div class="container">
 	<header>
 		<nav class="top-nav">
-			<button id="btnLog"  class="top-nav-text">Ladelog</button>
-			<button id="btnCfg"  class="top-nav-text">Config</button>
-			<button id="btnJson" class="top-nav-text">Json</button>
-			<button id="btnEdit" class="top-nav-text">Edit</button>
-			<button id="btnUpd"  class="top-nav-text">Update</button>
-			<button id="btnExit" class="top-nav-item">&times;</button>
+			<button class="top-nav-text" top-nav-link="/log.html" >Log</button>
+			<button class="top-nav-text" top-nav-link="/time.html">Zeit</button>
+			<button class="top-nav-text" top-nav-link="/cfg.html" >Config</button>
+			<button class="top-nav-text" top-nav-link="/json"     >Json</button>
+			<button class="top-nav-text" top-nav-link="/edit"     >Edit</button>
+			<button class="top-nav-text" top-nav-link="/update"   >Update</button>
+			<button class="top-nav-item" id="btnExit">&times;</button>
 		</nav>
 		<h1>wbec</h1>
-		<h2>Heidelberg Wallbox Energy Control</h2>
+		<div class="containerHeader">
+			<h2 class="title">Heidelberg Wallbox Energy Control</h2>
+			<span class="connectionOff" id="connection">Offline /<br>Standby</span>
+		</div>
 	</header>
 
 	<section class="box-group" id="boxSelection">
@@ -54,7 +59,7 @@
 				<svg class="flash"><use xlink:href="#flash"></use></svg>&nbsp;<span>Ladestrom</span>
 			</h3>
 			<div class="box-content">
-				<label for="slideCurr" class="value">max <span data-value="currLim">-</span>A</label>
+				<label for="slideCurr" class="value">max <span data-value="currLim">-</span> A (<span data-value="powerLim"></span> kW)</label>
 				<div class="slider-wrapper">
 					<span class="slider-min">0A</span>
 					<input type="range" min="0" max="160" value="60" class="slider" id="slideCurr">
@@ -126,7 +131,7 @@
 				<svg class="ecar"><use xlink:href="#ecar"></use></svg>&nbsp;<span>Ladeleistung</span>
 			</h3>
 			<div class="box-content">
-				<span class="value"><span data-value="power">-</span> W</span>
+				<span class="value"><span data-value="power">-</span> kW</span>
 			</div>
 		</div>
 
@@ -135,7 +140,7 @@
 				<svg class="arrows"><use xlink:href="#arrows"></use></svg>&nbsp;<span>Bezug(+) / Einsp.(-)</span>
 			</h3>
 			<div class="box-content">
-				<span class="value"><span data-value="watt">-</span> W</span>
+				<span class="value"><span data-value="watt">-</span> kW</span>
 			</div>
 		</div>
 

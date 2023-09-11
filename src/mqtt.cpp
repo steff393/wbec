@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <globalConfig.h>
+#include <goEmulator.h>
 #include <inverter.h>
 #include <logger.h>
 #include <loadManager.h>
@@ -27,8 +28,7 @@ uint8_t   maxcurrent[WB_CNT];
 boolean   callbackActive = false;
 
 
-void callback(char* topic, byte* payload, uint8_t length)
-{
+void callback(char* topic, byte* payload, uint8_t length) {
 	callbackActive = true;
 	// handle received message
 	char buffer[length+1];	// +1 for string termination
@@ -36,7 +36,7 @@ void callback(char* topic, byte* payload, uint8_t length)
 		buffer[i] = (char)payload[i];		
 	}
 	buffer[length] = '\0';			// add string termination
-	LOGN(m, "Received: %s, Payload: %s", topic, buffer)
+	LOGEXT(m, "Received: %s, Payload: %s", topic, buffer)
 
 	// topics for openWB
 	if (strstr_P(topic, PSTR("openWB/lp/")) && strstr_P(topic, PSTR("/AConfigured"))) {
@@ -318,6 +318,10 @@ void mqtt_publish(uint8_t i) {
 
 	snprintf_P(topic, sizeof(topic), PSTR("%s/energy"), header);
 	snprintf_P(value, sizeof(value), PSTR("%.3f"), (float)((uint32_t) content[i][13] << 16 | (uint32_t)content[i][14]) / 1000.0);
+	client.publish(topic, value, retain);
+
+	snprintf_P(topic, sizeof(topic), PSTR("%s/energyC"), header);
+	snprintf_P(value, sizeof(value), PSTR("%.3f"), (float)goE_getEnergySincePlugged(i) / 1000.0);
 	client.publish(topic, value, retain);
 	
 	for (uint8_t ph = 1; ph <= 3; ph++) {

@@ -1,17 +1,15 @@
 // Copyright (c) 2023 steff393, MIT license
 
+import {initNavBar} from './common.js';
+
 window.addEventListener('DOMContentLoaded', () => {
 	let tableHeaders = document.querySelectorAll('.table-head');
 	var sortOrder = 1;
 
-	document.getElementById('btnLog'). addEventListener('click', function() {window.location.href = "/log.html"});
-	document.getElementById('btnCfg'). addEventListener('click', function() {window.location.href = "/cfg.html"});
-	document.getElementById('btnJson').addEventListener('click', function() {window.location.href = "/json"});
-	document.getElementById('btnEdit').addEventListener('click', function() {window.location.href = "/edit"});
-	document.getElementById('btnUpd'). addEventListener('click', function() {window.location.href = "/update"});
-	document.getElementById('btnExit').addEventListener('click', function() {window.location.href = "/"});
-
 	function init() {
+		initNavBar();
+		document.getElementById('btnExport').addEventListener('click', exportToExcel);
+
 		for (const element of tableHeaders) {
 			element.addEventListener('click', sortTable);
 		}
@@ -101,7 +99,6 @@ window.addEventListener('DOMContentLoaded', () => {
 	
 	
 	init();
-
 });
 
 

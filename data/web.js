@@ -1,6 +1,11 @@
-// Copyright (c) 2021 steff393, MIT license
+// Copyright (c) 2023 steff393, MIT license
+
+import {initNavBar, assignValuesToHtml, setSectionVisibility} from './common.js';
 
 window.addEventListener('DOMContentLoaded', () => {
+	// Adjustable values -----
+	let phases         = 3;   // number of phases
+	// -----------------------
 	let Socket;
 	let elementCurrentSlider   = document.getElementById('slideCurr');
 	let pvModeButtons          = document.querySelectorAll('[data-pv-mode]');
@@ -10,18 +15,14 @@ window.addEventListener('DOMContentLoaded', () => {
 	let sliderSliding = false;
 
 	function init() {
+		setSectionVisibility('connection', false);
 		setSectionVisibility('boxSelection', wallboxButtons.length > 1);
 		setSectionVisibility('pvLaden', false);
+		initNavBar();
+		document.getElementById('btnExit').addEventListener('click', exit);
 
 		Socket = new WebSocket(`ws://${window.location.hostname}:81/`);
 		Socket.onmessage = processReceivedCommand;
-
-		document.getElementById('btnLog'). addEventListener('click', function() {window.location.href = "/log.html"});
-		document.getElementById('btnCfg'). addEventListener('click', function() {window.location.href = "/cfg.html"});
-		document.getElementById('btnJson').addEventListener('click', function() {window.location.href = "/json"});
-		document.getElementById('btnEdit').addEventListener('click', function() {window.location.href = "/edit"});
-		document.getElementById('btnUpd'). addEventListener('click', function() {window.location.href = "/update"});
-		document.getElementById('btnExit').addEventListener('click', exit);
 
 		// Update the current slider value (each time you drag the slider handle)
 		elementCurrentSlider.addEventListener('input', onStartSliderSliding);
@@ -43,7 +44,8 @@ window.addEventListener('DOMContentLoaded', () => {
 		}
 
 		assignValuesToHtml({
-			currLim: `${val / 10}`,
+			currLim:  val / 10,
+			powerLim: val * 23 * phases / 1000,
 		})
 	}
 
@@ -55,15 +57,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
 		sendText(`currLim=${val}`);
 		sliderSliding = false;
-	}
-
-	function assignValuesToHtml(values) {
-		for (const element of valueContainerElements) {
-			const key = element.getAttribute('data-value');
-			if (values[key] !== undefined) {
-				element.innerHTML = values[key];
-			}
-		}
 	}
 
 	function setClass(element, className, state) {
@@ -90,16 +83,17 @@ window.addEventListener('DOMContentLoaded', () => {
 		assignValuesToHtml({
 			carStat: carStat,
 			wbStat:  wbStat,
-			power:   message.power,
+			power:   message.power / 1000,
 			energyI: message.energyI,
 			energyC: message.energyC,
-			watt:    message.watt,
+			watt:    message.watt / 1000,
 			timeNow: message.timeNow,
 		})
 
 		if (!sliderSliding) {
 			assignValuesToHtml({
-				currLim: message.currLim
+				currLim:  message.currLim,
+				powerLim: message.currLim * 230 * phases / 1000,
 			});
 			elementCurrentSlider.value = message.currLim * 10;
 		}
@@ -107,15 +101,12 @@ window.addEventListener('DOMContentLoaded', () => {
 		for (const element of pvModeButtons) {
 			setClass(element, 'active', message.pvMode === parseInt(element.getAttribute('data-pv-mode')));
 		}
+		setSectionVisibility('connection', message.failCnt >= 10);
 		setSectionVisibility('pvLaden', message.pvMode >= 1 && message.pvMode <= 3);
 
 		for (const element of wallboxButtons) {
 			setClass(element, 'active', message.id === parseInt(element.getAttribute('data-wallbox-id')));
 		}
-	}
-
-	function setSectionVisibility(sectionId, isVisible) {
-		setClass(document.getElementById(sectionId), 'not-available', !isVisible);
 	}
 
 	function exit() {
@@ -126,6 +117,7 @@ window.addEventListener('DOMContentLoaded', () => {
 			energyI: '-',
 			energyC: '-',
 			currLim: '-',
+			powerLim:'-',
 			watt:    '-',
 			timeNow: '-',
 		})

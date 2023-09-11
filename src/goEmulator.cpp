@@ -7,7 +7,8 @@
 #include <loadManager.h>
 #include <mbComm.h>
 
-#define CYCLE_TIME		   1000		// 1s
+#define CYCLE_TIME		                1000    // 1s
+#define MAX_PLAUSIBLE_ENERGY       1000000ULL // no car should be able to load more than 1000kWh in one cycle
 
 const uint8_t m = 4;
 
@@ -168,5 +169,10 @@ String goE_getStatus(uint8_t id, boolean fromApp) {
 
 uint32_t goE_getEnergySincePlugged(uint8_t id) {
 	// substract the stored energy counter at plugging from the current energy counter
-	return(((uint32_t) content[id][13] << 16 | (uint32_t)content[id][14]) - box[id].energyI);
+	uint32_t delta = ((uint32_t) content[id][13] << 16 | (uint32_t)content[id][14]) - box[id].energyI;
+	if (delta > MAX_PLAUSIBLE_ENERGY) {
+		return(0); // prevent underflow
+	} else {
+		return(delta);
+	}
 }

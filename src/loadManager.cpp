@@ -183,9 +183,17 @@ void lm_setup() {
 		currLim[id] = 255;     // 255 is the marker, that no valid value received yet
 		lastReq[id] = 0;
 	}
-	if (cfgTotalCurrMax != 0) {
-		cfgStandby = 4;        // disable standby when using load management
-	}
+	//if (cfgTotalCurrMax != 0) {
+	//	cfgStandby = 4;        // disable standby when using load management
+	//}  Reasons to remove:
+	//    - if standby is disabled
+	//        --> then this code doesn't matter
+	//    - if standby is enabled
+	//        - as long as communication is up and running --> all fine, all values up to date
+	//        - if communication stops:
+	//            - normally car was disconnected before (because this is the reason to enter standby mode) --> chgStat = unplugged, no charge request
+	//        - if communication stops due to an error:
+	//            - the old values remain --> chgStat = plugged, charge request --> safe state
 }
 
 
