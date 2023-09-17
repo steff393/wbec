@@ -1,12 +1,12 @@
 // Copyright (c) 2023 steff393, MIT license
 
-export function initNavBar() {
+function initNavBar() {
 	for (const element of document.querySelectorAll('[top-nav-link]')) {
 		element.addEventListener('click', function() {window.location.href = element.getAttribute('top-nav-link')});
 	}
 }
 
-export function assignValuesToHtml(values) {
+function assignValuesToHtml(values) {
 	let valueContainerElements = document.querySelectorAll('[data-value]');
 	for (const element of valueContainerElements) {
 		const key = element.getAttribute('data-value');
@@ -16,7 +16,7 @@ export function assignValuesToHtml(values) {
 	}
 }
 
-export function setClass(element, className, state) {
+function setClass(element, className, state) {
 	if (state) {
 		element.classList.add(className)
 	} else {
@@ -24,6 +24,8 @@ export function setClass(element, className, state) {
 	}
 }
 
-export function setSectionVisibility(sectionId, isVisible) {
+function setSectionVisibility(sectionId, isVisible) {
 	setClass(document.getElementById(sectionId), 'not-available', !isVisible);
 }
+
+export { initNavBar, assignValuesToHtml, setClass, setSectionVisibility };
