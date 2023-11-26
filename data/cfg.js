@@ -7,7 +7,35 @@
 // Parameter werden nicht hier geändert.
 // ----------------------------------------------------------------------------------
 
-import {initNavBar} from './common.js';
+// ----------------------------- COMMON SECTION: START ------------------------------
+function initNavBar() {
+	for (const element of document.querySelectorAll('[top-nav-link]')) {
+		element.addEventListener('click', function() {window.location.href = element.getAttribute('top-nav-link')});
+	}
+}
+
+function assignValuesToHtml(values) {
+	let valueContainerElements = document.querySelectorAll('[data-value]');
+	for (const element of valueContainerElements) {
+		const key = element.getAttribute('data-value');
+		if (values[key] !== undefined) {
+			element.innerHTML = values[key].toLocaleString('de-DE');
+		}
+	}
+}
+
+function setClass(element, className, state) {
+	if (state) {
+		element.classList.add(className)
+	} else {
+		element.classList.remove(className)
+	}
+}
+
+function setSectionVisibility(sectionId, isVisible) {
+	setClass(document.getElementById(sectionId), 'not-available', !isVisible);
+}
+// ----------------------------- COMMON SECTION:  END  ------------------------------
 
 // Default settings 22.05.2023
 const defaultObj = JSON.parse(
