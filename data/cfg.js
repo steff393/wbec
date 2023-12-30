@@ -1,4 +1,4 @@
-// Copyright (c) 2023 steff393, MIT license
+// Copyright (c) 2024 steff393, MIT license
 
 
 // Achtung
@@ -37,7 +37,7 @@ function setSectionVisibility(sectionId, isVisible) {
 }
 // ----------------------------- COMMON SECTION:  END  ------------------------------
 
-// Default settings 22.05.2023
+// Default settings 30.12.2023
 const defaultObj = JSON.parse(
 	'{"cfgApSsid":"wbec","cfgApPass":"wbec1234","cfgCntWb":1,"cfgMbCycleTime":10,"cfgMbDelay":100,"cfgMbTimeout":60000,"cfgStandby":4,"cfgFailsafeCurrent":0,"cfgMqttIp":"","cfgMqttLp":[],"cfgMqttPort":1883,"cfgMqttUser":"","cfgMqttPass":"","cfgMqttWattTopic":"wbec/pv/setWatt","cfgMqttWattJson":"","cfgNtpServer":"europe.pool.ntp.org","cfgFoxUser":"","cfgFoxPass":"","cfgFoxDevId":"","cfgPvActive":0,"cfgPvCycleTime":30,"cfgPvLimStart":61,"cfgPvLimStop":50,"cfgPvPhFactor":69,"cfgPvOffset":1,"cfgPvCalcMode":0,"cfgPvInvert":0,"cfgPvInvertBatt":0,"cfgPvMinTime":0,"cfgPvHttpIp":"","cfgPvHttpPath":"/","cfgPvHttpJson":"","cfgPvHttpPort":80,"cfgTotalCurrMax":0,"cfgHwVersion":15,"cfgWifiSleepMode":0,"cfgLoopDelay":255,"cfgKnockOutTimer":0,"cfgShellyIp":"","cfgInverterIp":"","cfgInverterType":0,"cfgInverterPort":0,"cfgInverterAddr":0,"cfgInvSmartAddr":0,"cfgInvRegPowerInv":0,"cfgInvRegPowerInvS":0,"cfgInvRegPowerMet":0,"cfgInvRegPowerMetS":0,"cfgInvRegToGrid":0,"cfgInvRegFromGrid":0,"cfgInvRegBattery":0,"cfgBootlogSize":2000,"cfgBtnDebounce":0,"cfgWifiConnectTimeout":10,"cfgResetOnTimeout":0,"cfgEnergyOffset":0,"cfgDisplayAutoOff":2,"cfgWifiAutoReconnect":1,"cfgWifiScanMethod":0,"cfgLedIp":1,"cfgWifiOff":0,"cfgChargeLog":0,"cfgWallboxIp":"","cfgWallboxPort":502,"cfgWallboxAddr":1,"cfgRfidCurr":160,"cfgAutoEnable":1,"cfgWbecMac":237,"cfgWbecIp":""}'
 );

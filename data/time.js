@@ -1,4 +1,4 @@
-// Copyright (c) 2023 steff393
+// Copyright (c) 2024 steff393
 
 // ----------------------------- COMMON SECTION: START ------------------------------
 function initNavBar() {
