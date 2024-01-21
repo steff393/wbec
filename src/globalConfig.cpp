@@ -25,7 +25,7 @@ uint16_t cfgFailsafeCurrent;          // <don't use - still beta> Reg. 262: Fail
 char     cfgMqttIp[16];               // IP address of MQTT broker, "" to disable MQTT
 uint16_t cfgMqttPort;                 // Port of MQTT broker (optional)
 char     cfgMqttUser[32];             // MQTT: Username
-char     cfgMqttPass[32];             // MQTT: Password
+char     cfgMqttPass[128];            // MQTT: Password
 uint8_t  cfgMqttLp[WB_CNT];           // Array with assignments to openWB loadpoints, e.g. [4,2,0,1]: Box0 = LP4, Box1 = LP2, Box2 = no MQTT, Box3 = LP1
 char     cfgMqttWattTopic[60];        // MQTT: Topic for setting the watt value for PV charging, default: "wbec/pv/setWatt"
 char     cfgMqttWattJson[30];         // MQTT: Optional: Element in a JSON string, which contains the power in watt, default: ""
