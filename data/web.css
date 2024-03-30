@@ -5,6 +5,7 @@
 	--theme-color-4: rgb(0, 0, 0);
 	--theme-color-5: rgb(169, 169, 169);
 	--theme-color-6: rgb(255, 165, 0);
+	--theme-color-7: rgb(255, 0, 0);
 }
 
 :root {
@@ -16,6 +17,7 @@
 	--headline-1-color: var(--theme-color-2);
 	--headline-2-color: var(--theme-color-3);
 	--connection-color: var(--theme-color-6);
+	--enwgError-color:  var(--theme-color-7);
 
 	--box-background-color: var(--theme-color-3);
 	--box-text-color: var(--theme-color-4);
@@ -63,6 +65,21 @@ h2 {
 	position: absolute;
 	left: 50%;
 	transform: translateX(-50%);
+}
+
+.enwgWarning {
+	color: var(--enwgError-color);
+	text-align: center;
+	font-size: 1em;
+	font-weight: bold;
+	padding-top: var(--grid-size);
+}
+
+.enwg14aClass {
+	position: absolute;
+	left: 0; 
+	color: var(--connection-color);
+	font-size: 0.75em;
 }
 
 .connectionOff {

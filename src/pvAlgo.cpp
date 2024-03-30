@@ -24,6 +24,7 @@ static uint32_t  lastActivation       = 0;  // timestamp of the recent switch-on
 static int32_t   watt                 = 0;  // power from powerfox API (neg. = 'Einspeisung', pos. = 'Bezug')
 static int32_t   availPowerPrev       = 0;  // availPower from previous cycle
 static pvMode_t  pvMode               = PV_OFF;
+static pvMode_t  pvModePrev           = PV_OFF;
 
 
 void pvAlgo() {
@@ -129,6 +130,13 @@ void pv_loop() {
 	} else {
 		availPowerPrev = 0;
 	}
+	if (pvModePrev > PV_OFF && pvMode == PV_OFF) { // Feature from #119
+		if (cfgPvOffCurrent == 0 || (cfgPvOffCurrent >= CURR_ABS_MIN && cfgPvOffCurrent <= CURR_ABS_MAX)) {
+			lm_storeRequest(BOXID, cfgPvOffCurrent);
+		}
+	}
+	pvModePrev = pvMode;
+	
 	rtc.saveToRTC();   // memorize over reset
 }
 

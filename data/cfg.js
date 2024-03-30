@@ -37,9 +37,9 @@ function setSectionVisibility(sectionId, isVisible) {
 }
 // ----------------------------- COMMON SECTION:  END  ------------------------------
 
-// Default settings 30.12.2023
+// Default settings 24.03.2024
 const defaultObj = JSON.parse(
-	'{"cfgApSsid":"wbec","cfgApPass":"wbec1234","cfgCntWb":1,"cfgMbCycleTime":10,"cfgMbDelay":100,"cfgMbTimeout":60000,"cfgStandby":4,"cfgFailsafeCurrent":0,"cfgMqttIp":"","cfgMqttLp":[],"cfgMqttPort":1883,"cfgMqttUser":"","cfgMqttPass":"","cfgMqttWattTopic":"wbec/pv/setWatt","cfgMqttWattJson":"","cfgNtpServer":"europe.pool.ntp.org","cfgFoxUser":"","cfgFoxPass":"","cfgFoxDevId":"","cfgPvActive":0,"cfgPvCycleTime":30,"cfgPvLimStart":61,"cfgPvLimStop":50,"cfgPvPhFactor":69,"cfgPvOffset":1,"cfgPvCalcMode":0,"cfgPvInvert":0,"cfgPvInvertBatt":0,"cfgPvMinTime":0,"cfgPvHttpIp":"","cfgPvHttpPath":"/","cfgPvHttpJson":"","cfgPvHttpPort":80,"cfgTotalCurrMax":0,"cfgHwVersion":15,"cfgWifiSleepMode":0,"cfgLoopDelay":255,"cfgKnockOutTimer":0,"cfgShellyIp":"","cfgInverterIp":"","cfgInverterType":0,"cfgInverterPort":0,"cfgInverterAddr":0,"cfgInvSmartAddr":0,"cfgInvRegPowerInv":0,"cfgInvRegPowerInvS":0,"cfgInvRegPowerMet":0,"cfgInvRegPowerMetS":0,"cfgInvRegToGrid":0,"cfgInvRegFromGrid":0,"cfgInvRegBattery":0,"cfgBootlogSize":2000,"cfgBtnDebounce":0,"cfgWifiConnectTimeout":10,"cfgResetOnTimeout":0,"cfgEnergyOffset":0,"cfgDisplayAutoOff":2,"cfgWifiAutoReconnect":1,"cfgWifiScanMethod":0,"cfgLedIp":1,"cfgWifiOff":0,"cfgChargeLog":0,"cfgWallboxIp":"","cfgWallboxPort":502,"cfgWallboxAddr":1,"cfgRfidCurr":160,"cfgAutoEnable":1,"cfgWbecMac":237,"cfgWbecIp":""}'
+	'{"cfgApSsid":"wbec","cfgApPass":"wbec1234","cfgCntWb":1,"cfgMbCycleTime":10,"cfgMbDelay":100,"cfgMbTimeout":60000,"cfgStandby":4,"cfgFailsafeCurrent":0,"cfgMqttIp":"","cfgMqttLp":[],"cfgMqttPort":1883,"cfgMqttUser":"","cfgMqttPass":"","cfgMqttWattTopic":"wbec/pv/setWatt","cfgMqttWattJson":"","cfgNtpServer":"europe.pool.ntp.org","cfgFoxUser":"","cfgFoxPass":"","cfgFoxDevId":"","cfgPvActive":0,"cfgPvCycleTime":30,"cfgPvLimStart":61,"cfgPvLimStop":50,"cfgPvPhFactor":69,"cfgPvOffset":0,"cfgPvCalcMode":0,"cfgPvInvert":0,"cfgPvInvertBatt":0,"cfgPvMinTime":0,"cfgPvOffCurrent":255,"cfgPvHttpIp":"","cfgPvHttpPath":"/","cfgPvHttpJson":"","cfgPvHttpPort":80,"cfgTotalCurrMax":0,"cfgLmChargeState":6,"cfgHwVersion":15,"cfgWifiSleepMode":0,"cfgLoopDelay":255,"cfgKnockOutTimer":0,"cfgShellyIp":"","cfgInverterIp":"","cfgInverterType":0,"cfgInverterPort":0,"cfgInverterAddr":0,"cfgInvSmartAddr":0,"cfgInvRegPowerInv":0,"cfgInvRegPowerInvS":0,"cfgInvRegPowerMet":0,"cfgInvRegPowerMetS":0,"cfgInvRegToGrid":0,"cfgInvRegFromGrid":0,"cfgInvRegBattery":0,"cfgBootlogSize":2000,"cfgBtnDebounce":0,"cfgWifiConnectTimeout":10,"cfgResetOnTimeout":0,"cfgEnergyOffset":0,"cfgDisplayAutoOff":2,"cfgWifiAutoReconnect":1,"cfgWifiScanMethod":0,"cfgLedIp":1,"cfgWifiOff":0,"cfgChargeLog":0,"cfgWallboxIp":"","cfgWallboxPort":502,"cfgWallboxAddr":1,"cfgRfidCurr":160,"cfgAutoEnable":1,"cfgEnwgSource":0,"cfgEnwgBox":0,"cfgWbecMac":237,"cfgWbecIp":""}'
 );
 
 const descObj = {
@@ -72,11 +72,13 @@ const descObj = {
 	cfgPvInvert            :"PV-Überschussregelung: Vorzeichen von Bezug/Einspeisung invertieren (1)",
 	cfgPvInvertBatt        :"PV-Überschussregelung: Vorzeichen von Batterieleistung invertieren (1)",
 	cfgPvMinTime           :"[min] PV-Überschussregelung: Minimale Aktivierungszeit",
+	cfgPvOffCurrent        :"[100mA] PV-Überschussregelung: Strom, welcher bei Wechsel auf Modus Aus eingestellt wird",
 	cfgPvHttpIp            :"PV-Überschussregelung HTTP: IP-Adresse, um den Wert Bezug/Einspeisung abzufragen",
 	cfgPvHttpPath          :"PV-Überschussregelung HTTP: URL, um den Wert Bezug/Einspeisung abzufragen",
 	cfgPvHttpJson          :"PV-Überschussregelung HTTP: Suchstring, um den Wert Bezug/Einspeisung zu finden",
 	cfgPvHttpPort          :"PV-Überschussregelung HTTP: Port, um den Wert Bezug/Einspeisung abzufragen",
 	cfgTotalCurrMax        :"[100mA] Maximaler Systemstrom bei mehreren Wallbox, ACHTUNG: SICHERUNG NÖTIG!",
+	cfgLmChargeState       :"(!) Ladezustand, ab dem Lastmanagement eine Ladeanforderung erkennt",
 	cfgHwVersion           :"(!) intern",
 	cfgWifiSleepMode       :"(!) intern",
 	cfgLoopDelay           :"(!) intern",
@@ -110,6 +112,8 @@ const descObj = {
 	cfgWallboxAddr         :"(!) connect.home Wallbox",
 	cfgRfidCurr            :"[100mA] Strom bei Freischaltung per RFID",
 	cfgAutoEnable          :"1: nach Wakeup von Standby den letzten Stromwert wiederherstellen",
+	cfgEnwgSource          :"§14a EnWG: Quelle: 0:inaktiv, 1:Schließer, 2:Öffner, 3:HTTP, Achtung: permanent!",
+	cfgEnwgBox             :"§14a EnWG: Auswahl der Box für die Leistungsreduzierung",
 	cfgWbecMac             :"(!) wbecLan: Letztes Byte der wbec-MAC-Adresse ändern (dez.)",
 	cfgWbecIp              :"(!) wbecLan: stat. IP-Adresse für wbec, z.B. 192.168.178.123",
 }

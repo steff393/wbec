@@ -14,7 +14,7 @@
 static WiFiUDP ntpUDP;
 static NTPClient timeClient(ntpUDP, cfgNtpServer, 3600, 60000); // GMT+1 and update every minute
 
-static const char *mod[13] = {"", "MB  ", "MQTT", "WEBS", "GO-E", "CFG ", "1P3P", "LLOG", "RFID", "PFOX", "SOCK", "PV  ", "SHLY"};
+static const char *mod[15] = {"", "MB  ", "MQTT", "WEBS", "GO-E", "CFG ", "1P3P", "LLOG", "RFID", "PFOX", "SOCK", "PV  ", "SHLY", "PVHT", "MAIN"};
 static char *   bootLog;
 static uint16_t bootLogSize;
 

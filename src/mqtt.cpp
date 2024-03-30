@@ -215,6 +215,7 @@ void mqtt_publish(uint8_t i) {
 	char status;
 
 	switch(content[i][1]) {
+		case 0:  ps = 0; cs = 0; status = 'A'; break; // e.g. wallbox offline (#120)
 		case 2:  ps = 0; cs = 0; status = 'A'; break;
 		case 3:  ps = 0; cs = 0; status = 'A'; break;
 		case 4:  ps = 1; cs = 0; status = 'B'; break;

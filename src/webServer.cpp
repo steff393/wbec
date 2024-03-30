@@ -26,7 +26,7 @@
 #include <WiFiManager.h>
 
 #define PFOX_JSON_LEN 256
-#define GPIO_JSON_LEN  32
+#define GPIO_JSON_LEN  64
 
 static const uint8_t m = 3;
 

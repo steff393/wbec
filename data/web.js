@@ -43,6 +43,7 @@ window.addEventListener('DOMContentLoaded', () => {
 	let sliderSliding = false;
 
 	function init() {
+		setSectionVisibility('enwg14a',    false);
 		setSectionVisibility('connection', false);
 		setSectionVisibility('boxSelection', wallboxButtons.length > 1);
 		setSectionVisibility('pvLaden', false);
@@ -67,8 +68,11 @@ window.addEventListener('DOMContentLoaded', () => {
 		sliderSliding = true;
 
 		let val = parseInt(elementCurrentSlider.value);
-		if (val !== 0 && !(val >= 60 && val <= 160)) {
+		if ((val >= 0) && (val <= 30)) {
 			elementCurrentSlider.value = val = 0;
+		}
+		if ((val > 30) && (val <= 60)) {
+			elementCurrentSlider.value = val = 60;
 		}
 
 		assignValuesToHtml({
@@ -78,9 +82,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
 	function onSliderReleased() {
 		let val = parseInt(elementCurrentSlider.value);
-		if (val !== 0 && !(val >= 60 && val <= 160)) {
+		if ((val >= 0) && (val <= 30)) {
 			elementCurrentSlider.value = val = 0;
 		}
+		if ((val > 30) && (val <= 60)) {
+			elementCurrentSlider.value = val = 60;
+		}
+			
 
 		sendText(`currLim=${val}`);
 		sliderSliding = false;
@@ -114,6 +122,7 @@ window.addEventListener('DOMContentLoaded', () => {
 			energyI: message.energyI,
 			energyC: message.energyC,
 			watt:    message.watt / 1000,
+			enwgErr: message.enwgErr ? "Fehler in der Funktion §14a EnWG. <br>Die Anlage ist nicht mehr EnWG-konform (" + message.enwgErr + "). " : "",
 			timeNow: message.timeNow,
 		})
 
@@ -127,6 +136,7 @@ window.addEventListener('DOMContentLoaded', () => {
 		for (const element of pvModeButtons) {
 			setClass(element, 'active', message.pvMode === parseInt(element.getAttribute('data-pv-mode')));
 		}
+		setSectionVisibility('enwg14a',    message.enwg14a ==  1);
 		setSectionVisibility('connection', message.failCnt >= 10);
 		setSectionVisibility('pvLaden', message.pvMode >= 1 && message.pvMode <= 3);
 

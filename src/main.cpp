@@ -21,13 +21,17 @@
 #include <webServer.h>
 #include <webSocket.h>
 
+const uint8_t m = 14;
+
 
 static bool _handlingOTA = false;
 
 
 void setup() {
   Serial.begin(115200);
-  Serial.println(F("\n\nStarting wbec ;-)"));
+  Serial.println(F(" ")); Serial.println(F("-----------------"));
+  Serial.println(F("Starting wbec ;-)"));
+  Serial.println(F("-----------------")); Serial.println(F(" "));
   logger_allocate();
   
   if(!LittleFS.begin()){ 
@@ -72,8 +76,8 @@ void setup() {
   btn_setup();
   pv_setup();
   lm_setup();
-  Serial.print(F("Boot time: ")); Serial.println(millis());
-  Serial.print(F("Free heap: ")); Serial.println(ESP.getFreeHeap());
+  LOG(m, "Boot time: %ld ms", millis());
+  LOG(m, "Free heap: %ld Byte",ESP.getFreeHeap());
 }
 
 

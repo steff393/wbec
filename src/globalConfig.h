@@ -52,6 +52,7 @@ extern uint8_t  cfgPvPhFactor;               // PV charging: Power/Current facto
 extern uint16_t cfgPvOffset;                 // PV charging: Offset for the available power calculation (in W); can be used to assure that no/less current is consumed from net
 extern uint8_t  cfgPvInvert;                 // PV charging: Invert the watt value (pos./neg.)
 extern uint8_t  cfgPvMinTime;                // PV charging: Minimum activation time (in minutes), 0 to disable
+extern uint8_t  cfgPvOffCurrent;             // PV charging: Current value which will be set, when mode changes to OFF (255 to disable)
 extern uint16_t cfgTotalCurrMax;             // Total current limit for load management (in 0.1A) - !! Additional fuse mandatory !!
 extern uint8_t  cfgHwVersion;                // Selection of the used HW
 extern uint8_t  cfgWifiSleepMode;            // Set sleep type for power saving, recomendation is 255 (=no influence) or 0 (=WIFI_NONE_SLEEP)
