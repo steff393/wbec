@@ -127,6 +127,7 @@ window.addEventListener('DOMContentLoaded', () => {
 	document.getElementById('btnStore').addEventListener('click', storeCfg);
 	document.getElementById('btnReset').addEventListener('click', resetWbec);
 	document.getElementById('btnRefresh').addEventListener('click', refresh);
+	document.getElementById('btnResWifi').addEventListener('click', resetWifi);
 	const settings = {};
 
 	createHtmlTable();
@@ -256,6 +257,13 @@ function createHtmlTable() {
 
 function resetWbec() {
 	fetch('/reset');
+}
+
+
+function resetWifi() {
+	if (confirm('Möchtest du wirklich die WLAN-Zugangsdaten löschen? Hast du dir den Parameter cfgApPass notiert?')) {
+		window.open('/resetwifi', '_self');
+	}
 }
 
 
