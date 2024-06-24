@@ -15,7 +15,6 @@ const uint8_t m = 11;
 
 #define WATT_MIN        -100000		// 100kW Feed-in
 #define WATT_MAX         100000		// 100kW Consumption
-#define BOXID                 0		// only 1 box supported
 
 RTCVars rtc;                               // used to memorize a few global variables over reset (not for cold boot / power on reset)
 
@@ -23,6 +22,7 @@ static uint32_t  lastCall             = 0;
 static uint32_t  lastActivation       = 0;  // timestamp of the recent switch-on (#71), to avoid to frequent on/off
 static int32_t   watt                 = 0;  // power from powerfox API (neg. = 'Einspeisung', pos. = 'Bezug')
 static int32_t   availPowerPrev       = 0;  // availPower from previous cycle
+static uint8_t   pvWbId               = 0;  // id to be controlled by pv algo
 static pvMode_t  pvMode               = PV_OFF;
 static pvMode_t  pvModePrev           = PV_OFF;
 
@@ -31,13 +31,13 @@ void pvAlgo() {
 	int32_t availPower = 0;
 
 	uint16_t targetCurr = 0;
-	uint8_t actualCurr = content[BOXID][53];
+	uint8_t actualCurr = content[pvWbId][53];
 
-	if (content[BOXID][1] >= 4 && content[BOXID][1] <= 7) {   // Car is connected
+	if (content[pvWbId][1] >= 4 && content[pvWbId][1] <= 7) {   // Car is connected
 
 		// available power for charging is 'Einspeisung + akt. Ladeleistung' = -watt + content[0][10]
 		// negative 'watt' means 'Einspeisung'
-		availPower = (int16_t)(content[BOXID][10] - watt - cfgPvOffset);
+		availPower = (int16_t)(content[pvWbId][10] - watt - cfgPvOffset);
 		
 		// Simple filter (average of this and previous value)
 		availPower = (availPowerPrev + availPower) / 2;
@@ -56,7 +56,7 @@ void pvAlgo() {
 			// MIN+PV, don't switch off, but ...
 			if ((pvMode == PV_MIN_PV) ||
 			    (cfgPvMinTime != 0 && lastActivation != 0 && (millis() - lastActivation < ((uint32_t)cfgPvMinTime) * 60 * 1000))) {   // also if MinTime not elapsed (#71)
-				targetCurr = content[BOXID][16]; // ... set minimal current configured in box
+				targetCurr = content[pvWbId][16]; // ... set minimal current configured in box
 			}
 		}
 
@@ -91,7 +91,7 @@ void pvAlgo() {
 		logFile.print(";");
 		logFile.print(watt);
 		logFile.print(";");
-		logFile.print(content[BOXID][10]);
+		logFile.print(content[pvWbId][10]);
 		logFile.print(";");
 		logFile.print(actualCurr);
 		logFile.print(";");
@@ -100,7 +100,7 @@ void pvAlgo() {
 	}
 
 	if ((targetCurr != actualCurr)) {														// update the value not too often 
-		lm_storeRequest(BOXID, targetCurr);
+		lm_storeRequest(pvWbId, targetCurr);
 	}
 }
 
@@ -132,7 +132,7 @@ void pv_loop() {
 	}
 	if (pvModePrev > PV_OFF && pvMode == PV_OFF) { // Feature from #119
 		if (cfgPvOffCurrent == 0 || (cfgPvOffCurrent >= CURR_ABS_MIN && cfgPvOffCurrent <= CURR_ABS_MAX)) {
-			lm_storeRequest(BOXID, cfgPvOffCurrent);
+			lm_storeRequest(pvWbId, cfgPvOffCurrent);
 		}
 	}
 	pvModePrev = pvMode;
@@ -167,3 +167,17 @@ void pv_setMode(pvMode_t val) {
 	rtc.saveToRTC();     // memorize over reset
 	lastCall = 0;  // make sure to call pv_Algo() in the next pv_loop() call
 }
+
+
+uint8_t pv_getWbId() {
+	return(pvWbId);
+}
+
+
+void pv_setWbId(uint8_t val) {
+	pv_getWbId = val;
+	rtc.saveToRTC();     // memorize over reset
+	lastCall = 0;  // make sure to call pv_Algo() in the next pv_loop() call
+}
+
+
