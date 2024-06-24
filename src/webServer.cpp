@@ -176,6 +176,12 @@ void webServer_setup() {
 				pv_setMode(val);
 			}
 		}
+		if (request->hasParam(F("pvWbId"))) {
+			uint8_t val = (uint8_t) request->getParam(F("pvWbId"))->value().toInt();
+			if (val < cfgCntWb) {
+				pv_setWbId(val);
+			}
+		}
 		if (request->hasParam(F("pvWatt"))) {
 			pv_setWatt(request->getParam(F("pvWatt"))->value().toInt());
 		}
@@ -222,6 +228,7 @@ void webServer_setup() {
 		data[F("rfid")][F("lastId")]       = rfid_getLastID();
 		data[F("pv")][F("mode")]           = pv_getMode();
 		data[F("pv")][F("watt")]           = pv_getWatt();
+		data[F("pv")][F("wbId")]           = pv_getWbId();
 		data[F("wifi")][F("mac")]          = WiFi.macAddress();
 		int qrssi = WiFi.RSSI();     
 		data[F("wifi")][F("rssi")]         = qrssi;
@@ -282,6 +289,12 @@ void webServer_setup() {
 				pv_setMode(val);
 			}
 		}
+		if (request->hasParam(F("pvWbId"))) {
+			uint8_t val = (uint8_t) request->getParam(F("pvWbId"))->value().toInt();
+			if (val < cfgCntWb) {
+				pv_setWbId(val);
+			}
+		}
 		if (request->hasParam(F("pvWatt"))) {
 			pv_setWatt(request->getParam(F("pvWatt"))->value().toInt());
 		}
@@ -293,6 +306,7 @@ void webServer_setup() {
 		data[F("modbus")][F("millis")]  = millis();
 		data[F("pv")][F("mode")]    = pv_getMode();
 		data[F("pv")][F("watt")]    = pv_getWatt();
+		data[F("pv")][F("wbId")]    = pv_getWbId();
 		char response[PFOX_JSON_LEN];
 		serializeJson(data, response, PFOX_JSON_LEN);
 		request->send(200, F("application/json"), response);
