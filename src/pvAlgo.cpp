@@ -175,7 +175,7 @@ uint8_t pv_getWbId() {
 
 
 void pv_setWbId(uint8_t val) {
-	pv_getWbId = val;
+	pvWbId = val;
 	rtc.saveToRTC();     // memorize over reset
 	lastCall = 0;  // make sure to call pv_Algo() in the next pv_loop() call
 }
