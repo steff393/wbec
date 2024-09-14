@@ -73,18 +73,18 @@ static void lm_updateWbLimits() {
 			break;
 		}
 		case 1: {   // charging request only on box 0
-			currLim[0] = saturate2(lastReq[0], content[0][15], cfgTotalCurrMax);
+			currLim[0] = saturate2(lastReq[0], content[0][15] * 10, cfgTotalCurrMax);
 			currLim[1] = 0;
 			break;
 		}
 		case 2: {   // charging request only on box 1
 			currLim[0] = 0;
-			currLim[1] = saturate2(lastReq[1], content[1][15], cfgTotalCurrMax);
+			currLim[1] = saturate2(lastReq[1], content[1][15] * 10, cfgTotalCurrMax);
 			break;
 		}
 		case 3: {   // charging request on both boxes 
-			currLim[0] = saturate2(lastReq[0], content[0][15], cfgTotalCurrMax / 2);
-			currLim[1] = saturate2(lastReq[1], content[1][15], cfgTotalCurrMax / 2);
+			currLim[0] = saturate2(lastReq[0], content[0][15] * 10, cfgTotalCurrMax / 2);
+			currLim[1] = saturate2(lastReq[1], content[1][15] * 10, cfgTotalCurrMax / 2);
 			break;
 		}
 		default: { ; }  // shouldn't happen
