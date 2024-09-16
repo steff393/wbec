@@ -6,18 +6,17 @@ info:
   contact:
     name: steff393
     url: https://github.com/steff393/wbec
-
 servers:
   - url: http://{ip}
     variables:
       ip:
         default: wbec.local
         description: Customer ID assigned by the service provider
-  
-
 paths:
   /:
     get:
+      tags:
+        - HTML
       summary: Simple web interface
       description: Provides a simple web interface to read values and set the load current.
       responses:
@@ -27,11 +26,14 @@ paths:
             text/html:
               schema:
                 type: string
-
   /json:
     get:
+      tags:
+        - API
       summary: Get all internal values
-      description: Retrieves all internal system values in JSON format. Supports query parameters to filter the data.
+      description: >-
+        Retrieves all internal system values in JSON format. Supports query
+        parameters to filter the data.
       parameters:
         - name: id
           in: query
@@ -96,9 +98,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JsonResponse'
-
   /edit:
     get:
+      tags:
+        - HTML
       summary: List files in LittleFS
       description: Displays the list of files stored in the LittleFS.
       responses:
@@ -110,9 +113,10 @@ paths:
                 type: array
                 items:
                   type: string
-
   /cfg:
     get:
+      tags:
+        - API
       summary: Get cfg.json content
       description: Returns the content of the `cfg.json` file for testing purposes.
       responses:
@@ -123,27 +127,32 @@ paths:
               schema:
                 type: object
                 additionalProperties: true
-
   /reset:
     get:
+      tags:
+        - API
       summary: Trigger system reset
       description: Triggers a system reset.
       responses:
         '200':
           description: System resetting, no response content.
-
   /resetwifi:
     get:
+      tags:
+        - API
       summary: Reset WiFi credentials
       description: Resets all WiFi credentials (used mainly for testing).
       responses:
         '200':
           description: WiFi credentials reset, no response content.
-
   /status:
     get:
+      tags:
+        - API
       summary: Get system status
-      description: Provides a subset of values needed for openWB/EVCC integration. Supports query parameter to access a specific box.
+      description: >-
+        Provides a subset of values needed for openWB/EVCC integration. Supports
+        query parameter to access a specific box.
       parameters:
         - name: box
           in: query
@@ -159,9 +168,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StatusResponse'
-
   /mqtt:
     get:
+      tags:
+        - API
       summary: Send MQTT command
       description: Sends a command via MQTT to control the system or wallbox.
       parameters:
@@ -182,17 +192,21 @@ paths:
       responses:
         '200':
           description: MQTT command executed successfully.
-
   /update:
     get:
+      tags:
+        - API
       summary: Trigger firmware update
-      description: Starts the firmware update process. In some test versions, available as `/ota`.
+      description: >-
+        Starts the firmware update process. In some test versions, available as
+        `/ota`.
       responses:
         '200':
           description: Firmware update started.
-
   /bootlog:
     get:
+      tags:
+        - API
       summary: Get debug log
       description: Returns the current debug buffer.
       responses:
@@ -202,27 +216,29 @@ paths:
             text/plain:
               schema:
                 type: string
-
   /bootlog_reset:
     get:
+      tags:
+        - API
       summary: Clear debug log
       description: Clears the current debug buffer.
       responses:
         '200':
           description: Debug buffer cleared.
-
   /gpio:
     get:
+      tags:
+        - API
       summary: Get or set GPIO pin D3
       description: Retrieves the status of GPIO pin D3 or allows changing its state.
       parameters:
-        - name: on
+        - name: 'on'
           in: query
           description: Turns on GPIO pin D3.
           required: false
           schema:
             type: boolean
-        - name: off
+        - name: 'off'
           in: query
           description: Turns off GPIO pin D3.
           required: false
@@ -231,11 +247,14 @@ paths:
       responses:
         '200':
           description: Status or confirmation of GPIO pin state.
-
   /pv:
     get:
+      tags:
+        - API
       summary: Get or set PV system data
-      description: Retrieves or sets current data from the PV system. Supports query parameters to filter the data.
+      description: >-
+        Retrieves or sets current data from the PV system. Supports query
+        parameters to filter the data.
       parameters:
         - name: pvMode
           in: query
@@ -265,11 +284,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PvResponse'
-
   /phaseCtrl:
     get:
+      tags:
+        - API
       summary: Control phases
-      description: Allows controlling the phases of the system based on the provided parameter.
+      description: >-
+        Allows controlling the phases of the system based on the provided
+        parameter.
       parameters:
         - name: ph
           in: query
@@ -285,9 +307,10 @@ paths:
             text/plain:
               schema:
                 type: string
-
   /inverter:
     get:
+      tags:
+        - API
       summary: Get inverter status
       description: Retrieves the status of the inverter.
       responses:
@@ -298,9 +321,10 @@ paths:
               schema:
                 type: object
                 additionalProperties: true
-
   /log.html:
     get:
+      tags:
+        - HTML
       summary: Get logs in HTML
       description: Retrieves the load logs in HTML format.
       responses:
@@ -310,11 +334,40 @@ paths:
             text/html:
               schema:
                 type: string
-
+  /time.html:
+    get:
+      tags:
+        - HTML
+      summary: xxx
+      description: xxx.
+      responses:
+        '200':
+          description: HTML page displaying the time control options logs.
+          content:
+            text/html:
+              schema:
+                type: string
+  /cfg.html:
+    get:
+      tags:
+        - HTML
+      summary: xxx
+      description: xxx.
+      responses:
+        '200':
+          description: HTML page displaying the configuration options.
+          content:
+            text/html:
+              schema:
+                type: string
   /chargelog:
     get:
+      tags:
+        - API
       summary: Get load logs
-      description: Retrieves load logs in JSON format. Supports query parameters to filter the logs.
+      description: >-
+        Retrieves load logs in JSON format. Supports query parameters to filter
+        the logs.
       parameters:
         - name: id
           in: query
@@ -337,7 +390,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChargeLogResponse'
-
 components:
   schemas:
     StatusResponse:
@@ -346,53 +398,67 @@ components:
         car:
           type: string
           description: >
-            Charging state of the vehicle.
-            - "0" means no car is connected.
-            - "1" means car is connected.
-          example: "0"
+            Charging state of the vehicle. - "0" means no car is connected. -
+            "1" means car is connected.
+          example: '0'
         err:
           type: string
           description: Error code indicating the current error state.
-          example: "0"
+          example: '0'
         alw:
           type: string
           description: Allow charging status.
-          example: "0"
+          example: '0'
         amp:
           type: string
           description: Current amperage.
-          example: "0"
+          example: '0'
         stp:
           type: string
           description: Stop status.
-          example: "0"
+          example: '0'
         tmp:
           type: string
           description: Temperature reading.
-          example: "0"
+          example: '0'
         dws:
           type: string
           description: Day/night switch status.
-          example: "0"
+          example: '0'
         ubi:
           type: string
           description: Ubiquity status.
-          example: "0"
+          example: '0'
         eto:
           type: string
           description: Estimated time remaining.
-          example: "0"
+          example: '0'
         nrg:
           type: array
           items:
             type: integer
           description: Array of energy readings.
-          example: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+          example:
+            - 0
+            - 0
+            - 0
+            - 0
+            - 0
+            - 0
+            - 0
+            - 0
+            - 0
+            - 0
+            - 0
+            - 0
+            - 0
+            - 0
+            - 0
+            - 0
         fwv:
           type: string
           description: Firmware version.
-          example: "40"
-
+          example: '40'
     JsonResponse:
       type: object
       properties:
@@ -410,7 +476,6 @@ components:
           $ref: '#/components/schemas/PvDetails'
         wifi:
           $ref: '#/components/schemas/WifiDetails'
-
     PvResponse:
       type: object
       properties:
@@ -420,22 +485,21 @@ components:
           $ref: '#/components/schemas/ModbusDetails'
         pv:
           $ref: '#/components/schemas/PvDetails'
-
     WbecDetails:
       type: object
       properties:
         version:
           type: string
           description: Version of the system software.
-          example: "v2.5.2-smabatt"
+          example: v2.5.2-smabatt
         bldDate:
           type: string
           description: Build date of the system software.
-          example: "Jul 13 2024 17:45:00"
+          example: Jul 13 2024 17:45:00
         timeNow:
           type: string
           description: Current time in the system.
-          example: "20:03:19"
+          example: '20:03:19'
         enwg14a:
           type: integer
           description: Enable/disable flag for a certain feature.
@@ -444,7 +508,6 @@ components:
           type: integer
           description: Error flag for a certain feature.
           example: 0
-
     BoxDetails:
       type: object
       properties:
@@ -455,7 +518,7 @@ components:
         version:
           type: string
           description: Software version of the box.
-          example: "108"
+          example: '108'
         chgStat:
           type: integer
           description: Charging status.
@@ -519,7 +582,7 @@ components:
         logStr:
           type: string
           description: Log string.
-          example: "00.000.0000/00 0000 000000"
+          example: 00.000.0000/00 0000 000000
         wdTmOut:
           type: integer
           description: Watchdog timer timeout.
@@ -551,12 +614,11 @@ components:
         resCode:
           type: string
           description: Result code.
-          example: "0"
+          example: '0'
         failCnt:
           type: integer
           description: Failure count.
           example: 0
-
     ModbusDetails:
       type: object
       properties:
@@ -571,7 +633,6 @@ components:
               type: integer
               description: Current time in milliseconds.
               example: 787703271
-
     RfidDetails:
       type: object
       properties:
@@ -586,8 +647,7 @@ components:
         lastId:
           type: string
           description: Last RFID ID.
-          example: ""
-
+          example: ''
     PvDetails:
       type: object
       properties:
@@ -603,14 +663,13 @@ components:
           type: number
           description: Battery status or charge level.
           example: 0
-
     WifiDetails:
       type: object
       properties:
         mac:
           type: string
           description: MAC address of the WiFi module.
-          example: "00:00:00:00:00:00"
+          example: '00:00:00:00:00:00'
         rssi:
           type: integer
           description: RSSI signal strength.
@@ -623,7 +682,6 @@ components:
           type: integer
           description: WiFi channel.
           example: 0
-
     ChargeLogResponse:
       type: object
       properties:
