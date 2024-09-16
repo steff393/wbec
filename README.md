@@ -8,6 +8,10 @@ Ziel des Projekts ist es, eine WLAN-Schnittstelle zu entwickeln um zusätzliche 
   
 ![GitHub all releases](https://img.shields.io/github/downloads/steff393/wbec/total?color=blue&style=flat-square)  
 
+## API
+
+[Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/jb-io/wbec/add-swagger-documentation/api.swagger.yaml)
+
 ## Funktionen
 - Anbindung an openWB, EVCC, Solaranzeige
 - MQTT-Kommunikation mit openWB und EVCC (ideal für mehrere Ladestationen)
