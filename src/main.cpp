@@ -95,7 +95,7 @@ void loop() {
     rfid_loop();
     powerfox_loop(); 
     shelly_loop();
-    pvHttp_loop();
+    //pvHttp_loop();
     inverter_loop();
     btn_loop();
     pv_loop();

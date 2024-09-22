@@ -56,6 +56,7 @@ extern uint8_t  cfgPvOffCurrent;             // PV charging: Current value which
 extern char     cfgPvHttpIp[16];             // IP   for generic HTTP call, "" to disable 
 extern char     cfgPvHttpPath[64];           // Path for generic http call, default: "/", example: /cm?cmd=status%2010
 extern char     cfgPvHttpJson[30];           // Element in a JSON string, which contains the power in watt, default: "", example: ",\"power_curr\":"
+extern char     cfgPvHttpJsonBatt[30];       // Element in a JSON string, which contains the power in watt, default: "", example: ",\"power_curr\":"
 extern uint16_t cfgPvHttpPort;               // Port for generic http call, default: 80
 extern uint16_t cfgTotalCurrMax;             // Total current limit for load management (in 0.1A) - !! Additional fuse mandatory !!
 extern uint8_t  cfgHwVersion;                // Selection of the used HW

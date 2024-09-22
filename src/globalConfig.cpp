@@ -45,6 +45,7 @@ uint8_t  cfgPvOffCurrent;             // PV charging: Current value which will b
 char     cfgPvHttpIp[16];             // IP   for generic HTTP call, "" to disable 
 char     cfgPvHttpPath[64];           // Path for generic http call, default: "/", example: /cm?cmd=status%2010
 char     cfgPvHttpJson[30];           // Element in a JSON string, which contains the power in watt, default: "", example: ",\"power_curr\":"
+char     cfgPvHttpJsonBatt[30];       // Element in a JSON string, which contains the power in watt, default: "", example: ",\"power_curr\":"
 uint16_t cfgPvHttpPort;               // Port for generic http call, default: 80
 uint16_t cfgTotalCurrMax;             // Total current limit for load management (in 0.1A) - !! Additional fuse mandatory !!
 uint8_t  cfgHwVersion;                // Selection of the used HW
@@ -159,6 +160,7 @@ void loadConfig() {
 	strncpy(cfgPvHttpIp,        doc["cfgPvHttpIp"]           | "",                 sizeof(cfgPvHttpIp));
 	strncpy(cfgPvHttpPath,      doc["cfgPvHttpPath"]         | "/",                sizeof(cfgPvHttpPath));
 	strncpy(cfgPvHttpJson,      doc["cfgPvHttpJson"]         | "",                 sizeof(cfgPvHttpJson));
+	strncpy(cfgPvHttpJsonBatt,  doc["cfgPvHttpJsonBatt"]     | "",                 sizeof(cfgPvHttpJsonBatt));
 	cfgPvHttpPort             = doc["cfgPvHttpPort"]         | 80;
 	cfgTotalCurrMax           = doc["cfgTotalCurrMax"]       | 0UL;
 	cfgHwVersion              = doc["cfgHwVersion"]          | 15;

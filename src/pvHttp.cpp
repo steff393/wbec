@@ -63,6 +63,17 @@ void pvHttp_loop() {
 			watt = atol(pch);
 		}
 	}
+
+	int32_t batt = 0;
+
+	if (strcmp(cfgPvHttpJsonBatt, "") == 0) {
+		char *pch = strstr(response.c_str(), cfgPvHttpJsonBatt); // search the index of cfgPvHttpJsonBatt, then add it's length
+		if (pch != NULL) {
+			pch += strlen(cfgPvHttpJsonBatt); 
+			batt = atol(pch);  // battery power (pos. = discharging battery, neg. = charging battery)
+			watt += batt;      // adding means, that watt will become smaller (=> availPower will become higher), when battery is charging 
+		}
+	}
 	LOG(m, "Watt=%d", watt)
 	pv_setWatt(watt);
 }
