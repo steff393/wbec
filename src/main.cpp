@@ -14,6 +14,7 @@
 #include <phaseCtrl.h>
 #include <powerfox.h>
 #include <pvAlgo.h>
+#include <pvHttp.h>
 #include <rfid.h>
 #include <shelly.h>
 #define WIFI_MANAGER_USE_ASYNC_WEB_SERVER
@@ -72,6 +73,7 @@ void setup() {
   rfid_setup();
   powerfox_setup();
   shelly_setup();
+  pvHttp_setup();
   inverter_setup();
   btn_setup();
   pv_setup();
@@ -93,6 +95,7 @@ void loop() {
     rfid_loop();
     powerfox_loop(); 
     shelly_loop();
+    pvHttp_loop();
     inverter_loop();
     btn_loop();
     pv_loop();

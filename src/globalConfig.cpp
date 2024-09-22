@@ -42,6 +42,10 @@ uint16_t cfgPvOffset;                 // PV charging: Offset for the available p
 uint8_t  cfgPvInvert;                 // PV charging: Invert the watt value (pos./neg.)
 uint8_t  cfgPvMinTime;                // PV charging: Minimum activation time (in minutes), 0 to disable
 uint8_t  cfgPvOffCurrent;             // PV charging: Current value which will be set, when mode changes to OFF (255 to disable)
+char     cfgPvHttpIp[16];             // IP   for generic HTTP call, "" to disable 
+char     cfgPvHttpPath[64];           // Path for generic http call, default: "/", example: /cm?cmd=status%2010
+char     cfgPvHttpJson[30];           // Element in a JSON string, which contains the power in watt, default: "", example: ",\"power_curr\":"
+uint16_t cfgPvHttpPort;               // Port for generic http call, default: 80
 uint16_t cfgTotalCurrMax;             // Total current limit for load management (in 0.1A) - !! Additional fuse mandatory !!
 uint8_t  cfgHwVersion;                // Selection of the used HW
 uint8_t  cfgWifiSleepMode;            // Set sleep type for power saving, recomendation is 255 (=no influence) or 0 (=WIFI_NONE_SLEEP)
@@ -152,6 +156,10 @@ void loadConfig() {
 	cfgPvInvert               = doc["cfgPvInvert"]           | 0L;
 	cfgPvMinTime              = doc["cfgPvMinTime"]          | 0L;
 	cfgPvOffCurrent           = doc["cfgPvOffCurrent"]       | 255;
+	strncpy(cfgPvHttpIp,        doc["cfgPvHttpIp"]           | "",                 sizeof(cfgPvHttpIp));
+	strncpy(cfgPvHttpPath,      doc["cfgPvHttpPath"]         | "/",                sizeof(cfgPvHttpPath));
+	strncpy(cfgPvHttpJson,      doc["cfgPvHttpJson"]         | "",                 sizeof(cfgPvHttpJson));
+	cfgPvHttpPort             = doc["cfgPvHttpPort"]         | 80;
 	cfgTotalCurrMax           = doc["cfgTotalCurrMax"]       | 0UL;
 	cfgHwVersion              = doc["cfgHwVersion"]          | 15;
 	cfgWifiSleepMode          = doc["cfgWifiSleepMode"]      | 0;
