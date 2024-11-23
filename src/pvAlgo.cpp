@@ -56,7 +56,7 @@ void pvAlgo() {
 			// MIN+PV, don't switch off, but ...
 			if ((pvMode == PV_MIN_PV) ||
 			    (cfgPvMinTime != 0 && lastActivation != 0 && (millis() - lastActivation < ((uint32_t)cfgPvMinTime) * 60 * 1000))) {   // also if MinTime not elapsed (#71)
-				targetCurr = content[pvWbId][16]; // ... set minimal current configured in box
+				targetCurr = content[pvWbId][16] * 10; // ... set minimal current configured in box
 			}
 		}
 
