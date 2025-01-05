@@ -40,6 +40,7 @@ extern char     cfgMqttPass[128];            // MQTT: Password
 extern uint8_t  cfgMqttLp[WB_CNT];           // Array with assignments to openWB loadpoints, e.g. [4,2,0,1]: Box0 = LP4, Box1 = LP2, Box2 = no MQTT, Box3 = LP1
 extern char     cfgMqttWattTopic[60];        // MQTT: Topic for setting the watt value for PV charging, default: "wbec/pv/setWatt"
 extern char     cfgMqttWattJson[30];         // MQTT: Optional: Element in a JSON string, which contains the power in watt, default: ""
+extern uint8_t  cfgMqttClientId;             // MQTT: Client-ID, default: 0 = random
 extern char     cfgNtpServer[30];            // NTP server
 extern char     cfgFoxUser[32];              // powerfox: Username
 extern char     cfgFoxPass[16];              // powerfox: Password

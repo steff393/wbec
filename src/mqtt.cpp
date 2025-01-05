@@ -159,7 +159,12 @@ void reconnect() {
 	LOGN(m, "Attempting MQTT connection...", "");
 	// Create a random client ID
 	char clientId[10];
-	snprintf_P(clientId, sizeof(clientId), PSTR("wbec-%d"), (uint8_t)random(255));
+	if (cfgMqttClientId) {
+		snprintf_P(clientId, sizeof(clientId), PSTR("wbec-%d"), cfgMqttClientId);
+	} else {
+		snprintf_P(clientId, sizeof(clientId), PSTR("wbec-%d"), (uint8_t)random(255));
+	}
+	
 
 	// Attempt to connect
 	boolean con = false;
