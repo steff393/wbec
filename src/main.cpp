@@ -29,6 +29,8 @@ static bool _handlingOTA = false;
 
 
 void setup() {
+  rst_info* rinfo = ESP.getResetInfoPtr(); // get reset cause
+
   Serial.begin(115200);
   Serial.println(F(" ")); Serial.println(F("-----------------"));
   Serial.println(F("Starting wbec ;-)"));
@@ -80,6 +82,36 @@ void setup() {
   lm_setup();
   LOG(m, "Boot time: %ld ms", millis());
   LOG(m, "Free heap: %ld Byte",ESP.getFreeHeap());
+
+  // For Debugging:
+  //
+  // https://www.espressif.com/sites/default/files/documentation/esp8266_reset_causes_and_common_fatal_exception_causes_en.pdf
+  // Identifying and logging the Reset Cause:
+  // rinfo->reason:
+  // 0 = Power reboot
+  // 1 = Hardware WDT reset
+  // 2 = Fatal exception
+  // 3 = Software watchdog reset
+  // 4 = Software reset
+  // 5 = Deep-sleep
+  // 6 = Hardware reset
+  //
+  // Fatal Exception causes
+  // 0 = Invalidcommand
+  // 6 = Division by zero
+  // 9 = Unaligned read/write operation address
+  // 28= Access to invalid address
+  // 29= Access to invalid address
+
+  LOG(m, "Reset reason: %x", rinfo->reason);
+  if (rinfo->reason == REASON_EXCEPTION_RST) 
+  {
+    LOG(m, "Fatal excception: %d", rinfo->exccause);
+  }
+  LOG(m, "  epc1=0x%08X", rinfo->epc1);
+  LOG(m, "  epc2=0x%08X", rinfo->epc2);
+  LOG(m, "  epc3=0x%08X", rinfo->epc3);
+  LOG(m, "  excvaddr=%0x%08X", rinfo->excvaddr);
 }
 
 
