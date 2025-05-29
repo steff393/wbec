@@ -338,8 +338,8 @@ paths:
     get:
       tags:
         - HTML
-      summary: xxx
-      description: xxx.
+      summary: Time control options
+      description: Displays the time control options for the wallbox.
       responses:
         '200':
           description: HTML page displaying the time control options logs.
@@ -351,8 +351,8 @@ paths:
     get:
       tags:
         - HTML
-      summary: xxx
-      description: xxx.
+      summary: Configuration options
+      description: Displays the configuration options for the wallbox.
       responses:
         '200':
           description: HTML page displaying the configuration options.
@@ -490,118 +490,138 @@ components:
       properties:
         version:
           type: string
-          description: Version of the system software.
-          example: v2.5.2-smabatt
+          description: wbec version.
+          example: v0.3.0
         bldDate:
           type: string
-          description: Build date of the system software.
-          example: Jul 13 2024 17:45:00
+          description: wbec build date.
+          example: 2021-06-10
         timeNow:
           type: string
           description: Current time in the system.
           example: '20:03:19'
         enwg14a:
           type: integer
-          description: Enable/disable flag for a certain feature.
+          description: Status of §14a EnWG throttling.
           example: 0
         enwgErr:
           type: integer
-          description: Error flag for a certain feature.
+          description: Error with §14a EnWG functionality.
           example: 0
     BoxDetails:
       type: object
       properties:
         busId:
           type: integer
-          description: Identifier for the box.
+          description: Modbus bus id (as configured by DIP switches).
           example: 1
         version:
           type: string
-          description: Software version of the box.
+          description: |
+            Modbus Register-Layouts Version, e.g. 1.0.8.
+            https://www.amperfied.de/wp-content/uploads/2022/06/ModBus-Register-Tabelle.pdf
+            https://www.amperfied.de/wp-content/uploads/2023/03/20220809_AMP-Erweiterte-ModBus-Registerbeschreibung.pdf
           example: '108'
         chgStat:
           type: integer
-          description: Charging status.
+          description: |
+            Charging State.
+            - 2: State A1, No Vehicle plugged, Wallbox doesn't allow charging
+            - 3: State A2, No Vehicle plugged, Wallbox allows charging
+            - 4: State B1, Vehicle plugged without charging request, Wallbox doesn't allow charging
+            - 5: State B2, Vehicle plugged without charging request, Wallbox allows charging
+            - 6: State C1, Vehicle plugged with charging request, Wallbox doesn't allow charging
+            - 7: State C2, Vehicle plugged with charging request, Wallbox allows charging
+            - 8 --- Derating
+            - 9: State E, Error
+            - 10: State F, Wallbox locked or not ready
+            - 11 --- Error
           example: 2
         currL1:
           type: number
-          description: Current on phase L1.
+          description: L1 - Current RMS (in 0.1A).
           example: 0
         currL2:
           type: number
-          description: Current on phase L2.
+          description: L2 - Current RMS (in 0.1A).
           example: 0
         currL3:
           type: number
-          description: Current on phase L3.
+          description: L3 - Current RMS (in 0.1A).
           example: 0
         pcbTemp:
           type: integer
-          description: PCB temperature. in 1/10 °C
-          example: 236
+          description: PCB temperature (in 0.1°C).
+          example: 333
         voltL1:
           type: integer
-          description: Voltage on phase L1.
-          example: 234
+          description: Voltage L1 - N rms in Volt.
+          example: 232
         voltL2:
           type: integer
-          description: Voltage on phase L2.
-          example: 233
+          description: Voltage L2 - N rms in Volt.
+          example: 9
         voltL3:
           type: integer
-          description: Voltage on phase L3.
-          example: 233
+          description: Voltage L3 - N rms in Volt.
+          example: 9
         extLock:
           type: integer
-          description: External lock status.
+          description: |
+            Extern lock state.
+            - 0: System locked
+            - 1: System unlocked
           example: 1
         power:
           type: number
-          description: Power consumption.
+          description: Power (L1+L2+L3) in VA.
           example: 0
         energyP:
           type: number
-          description: Energy produced.
-          example: 0.044
+          description: Energy since PowerOn (in kWh).
+          example: 0
         energyI:
           type: number
-          description: Energy imported.
-          example: 1.365
+          description: Energy since Installation (in kWh).
+          example: 0.003
         energyC:
           type: number
-          description: Energy consumed.
+          description: Energy since Car is plugged (in kWh).
           example: 0
         currMax:
           type: number
-          description: Maximum current setting.
+          description: Hardware configuration maximal current (in 0.1A).
           example: 16
         currMin:
           type: number
-          description: Minimum current setting.
+          description: Hardware configuration minimal current (in 0.1A).
           example: 6
         logStr:
           type: string
-          description: Log string.
-          example: 00.000.0000/00 0000 000000
+          description: Log string in format "<item no> <mfgDate> <serial>".
+          example: "00.000.0000/00 0000 000000"
         wdTmOut:
           type: integer
-          description: Watchdog timer timeout.
-          example: 60000
+          description: ModBus-Master WatchDog Timeout (in ms).
+          example: 15000
         standby:
           type: integer
-          description: Standby status.
+          description: | 
+            Standby Function Control.
+            - 0: active
+            - 4: inactive (recommended)
           example: 4
         remLock:
           type: integer
-          description: Remote lock status.
+          description: Remote lock (only if extern lock unlocked).
           example: 1
         currLim:
           type: number
-          description: Current limit.
-          example: 0
+          description: Maximal current command.
+          example: 130
         currFs:
           type: number
-          description: Current frequency setting.
+          description: FailSafe Current configuration.
           example: 0
         lmReq:
           type: number
@@ -611,9 +631,13 @@ components:
           type: number
           description: Load management limit.
           example: 0
+        load:
+          type: number
+          description: wbec load management.
+          example: 0
         resCode:
           type: string
-          description: Result code.
+          description: Result code of last Modbus message (0 = ok).
           example: '0'
         failCnt:
           type: integer
@@ -627,12 +651,12 @@ components:
           properties:
             lastTm:
               type: integer
-              description: Last timestamp of Modbus state.
-              example: 787694951
+              description: Timestamp of last Modbus message (in ms).
+              example: 2852819
             millis:
               type: integer
-              description: Current time in milliseconds.
-              example: 787703271
+              description: Time since start of wbec (in ms).
+              example: 2855489
     RfidDetails:
       type: object
       properties:
@@ -659,6 +683,10 @@ components:
           type: integer
           description: Power generated by the PV system in watts.
           example: 4386
+        wbId:
+          type: integer
+          description: Id of wallbox that is controlled by pv.
+          example: 1
         batt:
           type: number
           description: Battery status or charge level.
@@ -669,19 +697,19 @@ components:
         mac:
           type: string
           description: MAC address of the WiFi module.
-          example: '00:00:00:00:00:00'
+          example: '00:1F:3F:15:29:7E'
         rssi:
           type: integer
-          description: RSSI signal strength.
-          example: 0
+          description: WLAN signal strength (in dBm).
+          example: -76
         signal:
           type: integer
-          description: WiFi signal strength in percentage.
-          example: 100
+          description: WiFi signal quality (in %).
+          example: 48
         channel:
           type: integer
           description: WiFi channel.
-          example: 0
+          example: 11
     ChargeLogResponse:
       type: object
       properties:
