@@ -7,9 +7,9 @@ info:
     name: steff393
     url: https://github.com/steff393/wbec
 servers:
-  - url: http://{ip}
+  - url: http://{hostname}
     variables:
-      ip:
+      hostname:
         default: wbec.local
         description: IP address or hostname of the WBEC device
 paths:
@@ -577,8 +577,8 @@ components:
           type: string
           description: |
             Modbus Register-Layouts Version, e.g. 1.0.8.
-            https://www.amperfied.de/wp-content/uploads/2022/06/ModBus-Register-Tabelle.pdf
-            https://www.amperfied.de/wp-content/uploads/2023/03/20220809_AMP-Erweiterte-ModBus-Registerbeschreibung.pdf
+            - https://www.amperfied.de/wp-content/uploads/2022/06/ModBus-Register-Tabelle.pdf
+            - https://www.amperfied.de/wp-content/uploads/2023/03/20220809_AMP-Erweiterte-ModBus-Registerbeschreibung.pdf
           example: '108'
         chgStat:
           type: integer
@@ -791,7 +791,7 @@ components:
           type: integer
           description: Box identifier.
           example: 0
-          
+
     ChargeLogResponse:
       type: object
       properties:
