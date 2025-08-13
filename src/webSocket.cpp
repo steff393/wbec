@@ -13,7 +13,7 @@
 #include <WebSocketsServer.h>
 
 #define CYCLE_TIME	 1000	
-#define JSON_LEN      256
+#define JSON_LEN      512 // see #99 
 
 static const uint8_t m = 10;
 
