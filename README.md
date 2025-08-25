@@ -8,6 +8,10 @@ Ziel des Projekts ist es, eine WLAN-Schnittstelle zu entwickeln um zusätzliche 
   
 ![GitHub all releases](https://img.shields.io/github/downloads/steff393/wbec/total?color=blue&style=flat-square)  
 
+## API
+Die Vollständige API Dokumentation befindet sich in der Datei [api.swagger.yaml](./api.swagger.yaml). 
+Eine Formatierte Version ist unter [petstore.swagger.io](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/steff393/wbec/master/api.swagger.yaml) verfügbar.
+
 ## Funktionen
 - Anbindung an openWB, EVCC, Solaranzeige
 - MQTT-Kommunikation mit openWB und EVCC (ideal für mehrere Ladestationen)
