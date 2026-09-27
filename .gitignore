@@ -7,3 +7,5 @@
 include/wlan_key.h
 output
 releases
+data_min
+tools

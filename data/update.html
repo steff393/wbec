@@ -155,7 +155,7 @@
 		fd.append("update", file, file.name);
 
 		const xhr = new XMLHttpRequest();
-		xhr.open("POST", "/update?type=" + type);
+		xhr.open("POST", "/update?type=" + type + "&size=" + file.size);   // size: wbecLan reads the file in blocks then
 		xhr.setRequestHeader("x-MD5", md5Hex);
 
 		xhr.upload.onprogress = e => {
