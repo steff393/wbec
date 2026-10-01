@@ -13,21 +13,21 @@ Die Heidelberg Energy Control ist eine hochwertige Ladestation „made in German
 > **Vom Hersteller empfohlen:** wbec wird im offiziellen [Amperfied-Blog von Heidelberg](https://web.archive.org/web/20260116192803if_/https://www.amperfied.de/2022/11/21/wbec-fuer-heidelberg-wallbox-energy-control-blog/) vorgestellt.
 > Im Einsatz und bewährt seit 2021 · entwickelt und gefertigt in Deutschland.
 
-🔗 **[Homepage & Anleitung](https://steff393.github.io/wbec-site/)** · **[Preise & Bestellung](https://steff393.github.io/wbec-site/docs/bestellung.html)** · **[Wiki](https://github.com/steff393/wbec/wiki)**
+🔗 **[Homepage](https://wbec.ibferstl.de/)** · **[Modelle & Bestellung](https://wbec.ibferstl.de/modelle/)** · **[Anleitungen](https://wbec.ibferstl.de/anleitungen/)** · **[Wiki](https://github.com/steff393/wbec/wiki)**
 
 ---
 
 ## Was wbec kann
 
-- **PV-Überschussladen.** Statt teuren Netzstroms lädt dein Auto den Strom, den deine PV-Anlage gerade übrig hat. Der Ladestrom wird dynamisch an den Überschuss angepasst – [so rechnet sich das](https://steff393.github.io/wbec-site/docs/pvCalc.html).
+- **PV-Überschussladen.** Statt teuren Netzstroms lädt dein Auto den Strom, den deine PV-Anlage gerade übrig hat. Der Ladestrom wird dynamisch an den Überschuss angepasst – [so rechnet sich das](https://wbec.ibferstl.de/pv-laden/#rechner).
 - **Dein Smart Home, deine Regeln.** Anbindung an Home Assistant, ioBroker, openWB, EVCC, Solaranzeige, Loxone, openHAB, IP-Symcon, Node-RED – per **MQTT, HTTP oder offener JSON-API**. Für Fremdsteuerungen zusätzlich go-eCharger-Emulation.
-- **Viele Wechselrichter & Smartmeter.** u.a. SolarEdge, Fronius, Kostal, SMA, Huawei, Victron, GoodWe, Shelly 3EM, powerfox – die vollständige getestete Liste steht auf der [Homepage](https://steff393.github.io/wbec-site/docs/pvLaden.html). Vorab prüfen kannst du die Erreichbarkeit mit dem kostenlosen Tool [wbecModbus](https://github.com/steff393/wbecModbus).
+- **Viele Wechselrichter & Smartmeter.** u.a. SolarEdge, Fronius, Kostal, SMA, Huawei, Victron, GoodWe, Shelly 3EM, powerfox – die vollständige getestete Liste steht auf der [Homepage](https://wbec.ibferstl.de/pv-laden/#kompatibel). Vorab prüfen kannst du die Erreichbarkeit mit dem kostenlosen Tool [wbecModbus](https://github.com/steff393/wbecModbus).
 - **Lokal & offen.** Läuft ausschließlich in deinem Netz – erreichbar unter `http://wbec.local/`. Kein Cloud-Dienst, der abgeschaltet werden kann, keine Registrierung. Volle Datenhoheit.
 - **Mehrere Ladepunkte.** Steuert bis zu 16 Wallboxen am Modbus-Bus (bis zu 8 openWB-Ladepunkte), inkl. lokalem Lastmanagement für bis zu 2 Wallboxen.
 - **RFID-Freischaltung** der Wallbox per Karte/Chip (optionale Zusatz-Hardware, s. Wiki).
 - **Sparsam & wartungsarm.** Unter 1 W Verbrauch. Software-Updates bequem über den Browser (Over-the-Air).
 
-Die aktuellen und neuesten Funktionen findest du unter [→ Funktionen](https://steff393.github.io/wbec-site/docs/features.html).
+Die aktuellen und neuesten Funktionen findest du unter [→ Funktionen](https://wbec.ibferstl.de/funktionen/).
 
 ---
 
@@ -39,16 +39,16 @@ Der komplette Quellcode für den ESP8266 liegt hier offen. Freuen würde ich mic
 **2. Fertig kaufen – geprüft, sofort einsatzbereit, mit Support.**
 Nicht jeder will basteln. Die fertigen Module kommen **einzeln an der Heidelberg Energy Control getestet**, fertig programmiert, mit 12-seitiger Anleitung und persönlichem Support per E-Mail. Die aktuellen ESP32-Modelle bieten zudem Funktionen, die die freie Version nicht hat (z.B. Touch-Display, Ladelog, Zeitladen, §14a EnWG). Mit dem Kauf unterstützt du direkt die Weiterentwicklung.
 
-➡️ **[Modelle & Preise ansehen](https://steff393.github.io/wbec-site/docs/bestellung.html)** – Einstieg ab 25 € (Demo), Standardmodul ab 120 €.
+➡️ **[Modelle & Preise ansehen](https://wbec.ibferstl.de/modelle/)**
 
 ---
 
 ## Beispiele
 
-Einfaches Web-Interface (für jeden Browser, Smartphone wie PC) unter `http://wbec.local/`:
+Einfaches Web-Interface (für jeden Browser, Smartphone wie PC) unter `http://wbec.local/` – hier die neue Oberfläche der ESP32-Modelle (die freie ESP8266-Version nutzt die klassische Oberfläche):
 
 <p align="center">
-  <img src="https://i.ibb.co/3sg0YdL/wbec-web3.png">
+  <img src="https://wbec.ibferstl.de/assets/img/ui/uebersicht.webp" width="800" alt="Übersicht der wbec-Oberfläche mit Wallbox-Status, Verlauf, Ladestrom, Lademodus und Zeitsteuerung">
 </p>
 
 Offene JSON-API unter `http://wbec.local/json` – ein Auszug:
@@ -109,4 +109,4 @@ Besonderer Dank an die frühen Tester und Unterstützer: mli987, profex1337, Cla
 
 ## Projekt unterstützen
 
-wbec gefällt dir? Dann gib dem Projekt einen [⭐ auf GitHub](https://github.com/steff393/wbec/stargazers) – oder mach es wie über 1000 begeisterte Kunden und [hol dir ein fertiges Modul](https://steff393.github.io/wbec-site/docs/bestellung.html).  
+wbec gefällt dir? Dann gib dem Projekt einen [⭐ auf GitHub](https://github.com/steff393/wbec/stargazers) – oder mach es wie über 1000 begeisterte Kunden und [hol dir ein fertiges Modul](https://wbec.ibferstl.de/modelle/).  
