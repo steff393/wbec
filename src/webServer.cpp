@@ -52,6 +52,14 @@ static void onUpload(AsyncWebServerRequest *request, String filename, size_t ind
 }
 
 
+static void sendJson(AsyncWebServerRequest *request, const JsonDocument &data) {
+	// serialize directly into a buffer of exact size, avoids the String copies of request->send() (saves heap)
+	AsyncResponseStream *response = request->beginResponseStream(F("application/json"), measureJson(data) + 1);	// +1: cbuf keeps one byte free
+	serializeJson(data, *response);
+	request->send(response);
+}
+
+
 static uint8_t getSignalQuality(int rssi)
 {
 		int quality = 0;
@@ -234,10 +242,7 @@ void webServer_setup() {
 		data[F("wifi")][F("rssi")]         = qrssi;
 		data[F("wifi")][F("signal")]       = getSignalQuality(qrssi);
 		data[F("wifi")][F("channel")]      = WiFi.channel();
-		String response;
-		serializeJson(data, response);
-		log(m, response);
-		request->send(200, F("application/json"), response);
+		sendJson(request, data);
 	});
 
 	server.on("/status", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -250,7 +255,9 @@ void webServer_setup() {
 				id = 0;
 			}
 		}
-		request->send(200, F("application/json"), goE_getStatus(id, fromApp));
+		DynamicJsonDocument data(1024);
+		goE_getStatus(id, fromApp, data);
+		sendJson(request, data);
 	});
 
 	server.on("/mqtt", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -269,7 +276,9 @@ void webServer_setup() {
 			goE_setPayload(request->getParam(F("payload"))->value(), id);
 		}
 		// response
-		request->send(200, F("application/json"), goE_getStatus(id, fromApp));
+		DynamicJsonDocument data(1024);
+		goE_getStatus(id, fromApp, data);
+		sendJson(request, data);
 	});
 
 	server.on("/phaseCtrl", HTTP_GET, [](AsyncWebServerRequest *request){

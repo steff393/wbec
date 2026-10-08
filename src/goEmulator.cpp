@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <AsyncJson.h>
 #include <ArduinoJson.h>
+#include <goEmulator.h>
 #include <logger.h>
 #include <loadManager.h>
 #include <mbComm.h>
@@ -34,6 +35,12 @@ boolean goE_plugged(uint16_t chgStat) {
 }
 
 
+boolean goE_unplugged(uint16_t chgStat) {
+	// only A1/A2 mean 'no vehicle', other states (e.g. 0, 8, 9, 10) are no reason to start a new load cycle
+	return(chgStat == 2 || chgStat == 3);
+}
+
+
 void goE_handle() {
 	if (millis() - goE_lastCall < CYCLE_TIME) {
 		// avoid unnecessary frequent calls
@@ -42,11 +49,18 @@ void goE_handle() {
 	goE_lastCall = millis();
 
 	for (uint8_t id = 0; id < cfgCntWb; id++) {
-		if ((!goE_plugged(box[id].chgStat_old) && goE_plugged(content[id][1]))  || (box[id].energyI == 0)) {
-			// vehicle plugged --> store energy count  (and also, when energyI == 0 because this indicates that there was no update after init)
-			box[id].energyI = (uint32_t) content[id][13] << 16 | (uint32_t)content[id][14];
+		uint32_t energy = (uint32_t) content[id][13] << 16 | (uint32_t)content[id][14];
+		// only take over a valid counter (0 = not read yet after boot or reset by timeout)
+		if (energy != 0) {
+			if ((goE_unplugged(box[id].chgStat_old) && goE_plugged(content[id][1])) || (box[id].energyI == 0)) {
+				// vehicle plugged --> store energy count  (and also, when energyI == 0 because this indicates that there was no update after init)
+				box[id].energyI = energy;
+			}
 		}
-		box[id].chgStat_old = content[id][1];
+		// ignore 0 (not read yet or reset by timeout), so that e.g. 3 -> 0 -> 4 is still detected as plugging
+		if (content[id][1] != 0) {
+			box[id].chgStat_old = content[id][1];
+		}
 
 		// update alw & amp based on value from wallbox
 		if (content[id][53] == 0) {
@@ -58,7 +72,7 @@ void goE_handle() {
 		
 		// implement the auto-switch-off function
 		if (box[id].dwo != 0) {
-			if (box[id].dwo * 100 < (((uint32_t) content[id][13] << 16 | (uint32_t)content[id][14]) - box[id].energyI)) {
+			if (box[id].dwo * 100 < goE_getEnergySincePlugged(id)) {
 				// Defined energy for this load cycle was reached => stop loading
 				box[id].alw = 0;
 				box[id].dwo = 0;
@@ -102,9 +116,7 @@ void goE_setPayload(String payload, uint8_t id) {
 	}
 }
 
-String goE_getStatus(uint8_t id, boolean fromApp) {
-	DynamicJsonDocument data(1024); 
-
+void goE_getStatus(uint8_t id, boolean fromApp, JsonDocument &data) {
 	if (fromApp) {
 		data[F("oem")]=F("wbec");
 		data[F("typ")]=F("Heidelberg Energy Control");
@@ -133,7 +145,7 @@ String goE_getStatus(uint8_t id, boolean fromApp) {
 	if (content[id][8] > 200) { pha+=36; } // 0010 0100
 	data[F("pha")] = String(pha);
 	data[F("tmp")] = String(content[id][5] / 10);
-	data[F("dws")] = String((((uint32_t) content[id][13] << 16 | (uint32_t)content[id][14]) - box[id].energyI) * 360);
+	data[F("dws")] = String(goE_getEnergySincePlugged(id) * 360);
 	data[F("dwo")] = String(box[id].dwo);
 	data[F("uby")] = F("0");
 	data[F("eto")] = String(((uint32_t) content[id][13] << 16 | (uint32_t)content[id][14]) / 100);
@@ -159,15 +171,13 @@ String goE_getStatus(uint8_t id, boolean fromApp) {
 	data[F("ama")] = String(content[id][15]);
 	data[F("ust")] = F("2");
 	data[F("ast")] = F("0");
-
-	String response;
-	serializeJson(data, response);
-	log(m, response);
-	return(response);
 }
 
 
 uint32_t goE_getEnergySincePlugged(uint8_t id) {
+	if (box[id].energyI == 0) {
+		return(0); // no valid counter stored yet (e.g. directly after boot)
+	}
 	// substract the stored energy counter at plugging from the current energy counter
 	uint32_t delta = ((uint32_t) content[id][13] << 16 | (uint32_t)content[id][14]) - box[id].energyI;
 	if (delta > MAX_PLAUSIBLE_ENERGY) {
