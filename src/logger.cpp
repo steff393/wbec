@@ -179,6 +179,21 @@ void logger_setup() {
 
 
 void logger_loop() {
-	timeClient.update();
+  // Backoff for timeClient.update():
+  // NTPClient blocks up to 1s while waiting for a reply, and due to a bug in the library
+  // (_lastUpdate is never set on a timeout, see NTPClient::forceUpdate()), it retries on
+  // every single call once the first sync attempt fails - regardless of its own configured
+  // _updateInterval. Without this backoff, every subsequent loop() iteration would retry
+  // immediately and stall the main loop for ~1s each time, starving mb_loop() (Modbus
+  // polling to the wallbox), mqtt_handle(), webServer_loop() and webSocket_loop() for as
+  // long as the configured NTP server stays unreachable.
+  static uint32_t nextNtpTry = 0;
+  if ((int32_t)(millis() - nextNtpTry) >= 0) {
+    if (timeClient.update()) {
+      nextNtpTry = millis() + 12UL * 3600UL * 1000UL; // success: 12h
+    } else {
+      nextNtpTry = millis() + 10UL * 60UL * 1000UL;   // failure: 10min
+    }
+  }
 	if (getDstGermany(timeClient.getEpochTime())) timeClient.setTimeOffset(7200);
 }
